@@ -8,6 +8,13 @@
       "when": 1740998261504,
       "tag": "0000_salty_namorita",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1741017044636,
+      "tag": "0001_vengeful_korg",
+      "breakpoints": true
     }
   ]
 }
