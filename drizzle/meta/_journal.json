@@ -15,6 +15,13 @@
       "when": 1741017044636,
       "tag": "0001_vengeful_korg",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1741189681355,
+      "tag": "0002_mature_namor",
+      "breakpoints": true
     }
   ]
 }
