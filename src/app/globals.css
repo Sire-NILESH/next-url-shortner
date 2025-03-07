@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@config "../../tailwind.config.js";
+
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
@@ -126,4 +128,12 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.brandText {
+  @apply font-bold bg-gradient-to-r from-amber-500 to-fuchsia-500 bg-clip-text text-transparent;
+}
+
+.boldText {
+  @apply font-bold bg-clip-text text-transparent bg-gradient-to-t from-neutral-700 to-neutral-700 dark:from-neutral-500 dark:to-white;
 }
