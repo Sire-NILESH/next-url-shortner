@@ -13,9 +13,7 @@ export default function LoginPage() {
     <div className="flex flex-col items-center justify-center">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 max-w-lg">
         <div className="flex flex-col space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Welcome back!
-          </h1>
+          <h1 className="text-3xl boldText">Welcome back!</h1>
           <p className="text-sm text-muted-foreground">
             Enter your credentials below to log in to your account.
           </p>

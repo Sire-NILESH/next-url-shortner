@@ -42,10 +42,10 @@ const ShortenedURLResultCard = ({
   };
 
   return (
-    <Card className={cn("", className)} {...props}>
+    <Card className={cn("rounded-3xl", className)} {...props}>
       <CardContent className="space-y-6">
-        <p className="uppercase tracking-wider text-sm font-medium text-muted-foreground">
-          Your shortened URL
+        <p className="tracking-wide text-sm font-semibold text-muted-foreground">
+          {"✨ We Shrinkified your URL ✨"}
         </p>
 
         <div className="flex items-center gap-2">

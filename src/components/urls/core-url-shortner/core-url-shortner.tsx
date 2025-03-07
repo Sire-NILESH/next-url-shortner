@@ -107,8 +107,11 @@ export function CoreUrlShortner() {
     <>
       <div className="w-full max-w-2xl mx-auto">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-2">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 sm:space-y-8"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <FormField
                 control={form.control}
                 name="url"
@@ -116,6 +119,7 @@ export function CoreUrlShortner() {
                   <FormItem className="flex-1">
                     <FormControl>
                       <Input
+                        className="h-12 bg-secondary  rounded-full"
                         placeholder="Paste your long URL here"
                         {...field}
                         disabled={false}
@@ -125,7 +129,12 @@ export function CoreUrlShortner() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading}>
+
+              <Button
+                type="submit"
+                className="h-12 rounded-full"
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <>
                     <span className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -190,3 +199,24 @@ export function CoreUrlShortner() {
     </>
   );
 }
+
+// function MagicButton({
+//   className,
+//   children,
+//   ...props
+// }: ComponentProps<"button">) {
+//   return (
+//     <button
+//       className={cn(
+//         "relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50",
+//         className
+//       )}
+//       {...props}
+//     >
+//       <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
+//       <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
+//         {children}
+//       </span>
+//     </button>
+//   );
+// }
