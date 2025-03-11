@@ -5,7 +5,17 @@ const config = {
   content: ["./src/**/*.{ts,tsx}"],
   darkMode: "class",
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        marquee: "marquee var(--duration) linear infinite",
+      },
+      keyframes: {
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" }, // Move exactly half to loop seamlessly
+        },
+      },
+    },
   },
   plugins: [
     function ({ matchUtilities, theme }) {

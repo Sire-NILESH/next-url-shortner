@@ -10,16 +10,16 @@ import Link from "next/link";
 
 export default function LoginPage() {
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="mx-auto flex w-full flex-col justify-center space-y-6 max-w-lg">
+    <div className="my-6 md:my-20 flex flex-1 flex-col">
+      <div className="my-32 mx-auto flex w-full flex-col justify-center space-y-6 max-w-lg">
         <div className="flex flex-col space-y-2 text-center">
           <h1 className="text-3xl boldText">Welcome back!</h1>
           <p className="text-sm text-muted-foreground">
-            Enter your credentials below to log in to your account.
+            Login to your account to unlock full potential.
           </p>
         </div>
 
-        <Card>
+        <Card className="py-10">
           <CardHeader className="space-y-1">
             <CardTitle>Log in</CardTitle>
             <CardDescription>

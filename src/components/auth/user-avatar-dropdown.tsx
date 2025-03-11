@@ -10,10 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AvatarFallback } from "@radix-ui/react-avatar";
 import { signOut, useSession } from "next-auth/react";
 import { toast } from "sonner";
-import { Avatar, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export function UserAvatarDropdown() {
   const session = useSession();
@@ -35,13 +34,13 @@ export function UserAvatarDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem>
+        <DropdownMenuItem className="pointer-events-none select-text">
           <AtSign />
           {session.data?.user.email
             ? session.data?.user.email
             : "unknown email"}
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem className="pointer-events-none select-text">
           <User />
           {session.data?.user.name ? session.data?.user.name : "unknown user"}
         </DropdownMenuItem>
@@ -74,7 +73,7 @@ export function UserAvatar({
         src={imgUrl ? imgUrl : undefined}
         alt={userName ? userName : "user"}
       />
-      <AvatarFallback className="">
+      <AvatarFallback className="bg-primary text-primary-foreground">
         {userName ? userName[0].toUpperCase() : "?"}
       </AvatarFallback>
     </Avatar>
@@ -82,28 +81,30 @@ export function UserAvatar({
 }
 
 function useLogout() {
-  const [logoutStatus, setlogoutStatus] = React.useState<
+  const [logoutStatus, setLogoutStatus] = React.useState<
     "idle" | "loading" | "error" | "success"
   >("idle");
 
   const logoutUser = async () => {
     try {
-      setlogoutStatus("loading");
+      setLogoutStatus("loading");
       await signOut();
-      setlogoutStatus("success");
+      setLogoutStatus("success");
       toast.success("Logged out", {
         description: "You have been logged out successfully.",
       });
     } catch (error) {
+      setLogoutStatus("error");
       toast.error("Failed to Log out", {
         description:
           error instanceof Error
             ? error.message
             : "Something went wrong while logging you out",
       });
-      setlogoutStatus("error");
     }
   };
 
-  return { logoutStatus, logoutUser };
+  const resetLogoutStatus = () => setLogoutStatus("idle");
+
+  return { logoutStatus, logoutUser, resetLogoutStatus };
 }

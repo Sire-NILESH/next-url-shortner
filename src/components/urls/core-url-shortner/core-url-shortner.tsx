@@ -19,6 +19,7 @@ import {
 } from "../../ui/form";
 import { Input } from "../../ui/input";
 import ShortenedURLResultCard from "./shortened-url-result-card";
+import { Separator } from "@/components/ui/separator";
 
 export function CoreUrlShortner() {
   const { data: session } = useSession();
@@ -109,9 +110,9 @@ export function CoreUrlShortner() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 sm:space-y-8"
+            className="space-y-6 sm:space-y-8"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-2">
               <FormField
                 control={form.control}
                 name="url"
@@ -138,12 +139,20 @@ export function CoreUrlShortner() {
                 {isLoading ? (
                   <>
                     <span className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    Shortening...
+                    Shrinkifying...
                   </>
                 ) : (
-                  "Shorten"
+                  "Shrinkify"
                 )}
               </Button>
+            </div>
+
+            <div className="flex items-center mx-16">
+              <Separator className="flex-1" />
+              <p className="flex-1 text-sm text-muted-foreground">
+                Or provide your own
+              </p>
+              <Separator className="flex-1" />
             </div>
 
             <FormField
@@ -152,7 +161,7 @@ export function CoreUrlShortner() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="flex items-center">
+                    <div className="flex items-center max-w-lg mx-auto">
                       <span className="text-sm text-muted-foreground mr-2">
                         {process.env.NEXT_PUBLIC_APP_URL ||
                           window.location.origin}
@@ -172,7 +181,6 @@ export function CoreUrlShortner() {
                 </FormItem>
               )}
             />
-
             {error && (
               <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
                 {error}
@@ -199,24 +207,3 @@ export function CoreUrlShortner() {
     </>
   );
 }
-
-// function MagicButton({
-//   className,
-//   children,
-//   ...props
-// }: ComponentProps<"button">) {
-//   return (
-//     <button
-//       className={cn(
-//         "relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50",
-//         className
-//       )}
-//       {...props}
-//     >
-//       <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
-//       <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
-//         {children}
-//       </span>
-//     </button>
-//   );
-// }
