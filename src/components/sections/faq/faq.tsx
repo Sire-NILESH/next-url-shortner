@@ -16,13 +16,15 @@ function FAQ() {
           <div className="flex gap-10 flex-col">
             <div className="flex gap-4 flex-col">
               <div>
-                <Badge variant="outline">FAQ</Badge>
+                <Badge variant="outline" className="text-base">
+                  FAQ
+                </Badge>
               </div>
-              <div className="flex gap-2 flex-col">
+              <div className="flex gap-4 flex-col">
                 <h4 className="text-3xl md:text-5xl tracking-tighter max-w-xl text-left boldText !font-semibold">
                   This is the start of something new
                 </h4>
-                <p className="text-lg max-w-xl lg:max-w-lg leading-relaxed tracking-tight text-muted-foreground  text-left">
+                <p className="text-lg max-w-xl lg:max-w-lg leading-relaxed tracking-tight text-muted-foreground text-left">
                   Managing a small business today is already tough. Avoid
                   further complications by ditching outdated, tedious trade
                   methods. Our goal is to streamline SMB trade, making it easier

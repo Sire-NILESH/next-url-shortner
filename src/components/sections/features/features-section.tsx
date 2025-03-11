@@ -14,11 +14,13 @@ type Props = SectionProps & {};
 const FeatuesSection = ({ className, ...props }: Props) => {
   return (
     <Section className={cn("bg-transparent", className)} {...props}>
-      <SectionTitle>{"Here's what's on the table"}</SectionTitle>
-      <SectionDescription className="text-center">
+      <SectionTitle className="sm:text-center">
+        {"Here's what's on the table"}
+      </SectionTitle>
+      <SectionDescription className="sm:text-center">
         A plethora of features and all of these available to you at a low low{" "}
         price of a{" "}
-        <Link href="/register" className=" text-blue-600">
+        <Link href="/register" className="text-blue-600">
           free account!
         </Link>
         . And the catch? there is no none!

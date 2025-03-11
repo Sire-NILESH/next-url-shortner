@@ -8,10 +8,13 @@ type DescriptionProps = ComponentProps<"p">;
 const Section = ({ className, children, ...props }: SectionProps) => {
   return (
     <section
-      className={cn("bg-background text-foreground py-12 px-0", className)}
+      className={cn(
+        "bg-background text-foreground py-4 sm:py-12 px-0",
+        className
+      )}
       {...props}
     >
-      <div className="flex flex-col items-center gap-4 px-4 sm:gap-8">
+      <div className="flex flex-col sm:items-center gap-4 px-4 sm:gap-8">
         {children}
       </div>
     </section>
@@ -21,7 +24,7 @@ const Section = ({ className, children, ...props }: SectionProps) => {
 const SectionTitle = ({ className, ...props }: TitleProps) => (
   <h2
     className={cn(
-      "max-w-[720px] text-3xl boldText !font-semibold leading-tight sm:text-5xl sm:leading-tight",
+      "max-w-[720px] text-4xl tracking-tighter boldText !font-semibold leading-tight sm:text-5xl sm:leading-tight",
       className
     )}
     {...props}
@@ -31,7 +34,7 @@ const SectionTitle = ({ className, ...props }: TitleProps) => (
 const SectionDescription = ({ className, ...props }: DescriptionProps) => (
   <p
     className={cn(
-      "text-md max-w-[750px] font-medium text-muted-foreground sm:text-xl",
+      "text-lg max-w-[750px] leading-relaxed tracking-tight text-muted-foreground",
       className
     )}
     {...props}

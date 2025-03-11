@@ -29,24 +29,24 @@ export function CTA({
 }: CTAProps) {
   return (
     <div className={cn("overflow-hidden pt-0 md:pt-0", className)}>
-      <div className="mx-auto flex flex-col items-center gap-6 px-8 py-12 text-center sm:gap-8">
+      <div className="sm:mx-auto flex flex-col sm:items-center gap-6 sm:px-8 py-12 sm:text-center sm:gap-8">
         {/* Badge */}
         {badge && (
-          <Badge variant="outline">
-            <span className="text-muted-foreground text-base">
-              {badge.text}
-            </span>
+          <Badge variant="outline" className="w-fit">
+            <span className="text-foreground text-base">{badge.text}</span>
           </Badge>
         )}
 
         {/* Title */}
-        <h2 className="text-3xl !font-semibold boldText sm:text-5xl pb-4">
+        <h2 className="max-w-2xl text-3xl tracking-tighter !font-semibold boldText sm:text-5xl pb-4">
           {title}
         </h2>
 
         {/* Description */}
         {description && (
-          <p className="text-muted-foreground max-w-[720px]">{description}</p>
+          <p className="text-lg max-w-[750px] leading-relaxed tracking-tight text-muted-foreground pb-4">
+            {description}
+          </p>
         )}
 
         {/* Action Button */}
@@ -60,7 +60,7 @@ export function CTA({
         </div>
 
         {/* User Ratings */}
-        <UserRatings className="mt-12 scale-150" />
+        <UserRatings className="mt-12 w-fit" />
       </div>
     </div>
   );

@@ -149,8 +149,8 @@ export function CoreUrlShortner() {
 
             <div className="flex items-center mx-16">
               <Separator className="flex-1" />
-              <p className="flex-1 text-sm text-muted-foreground">
-                Or provide your own
+              <p className="flex-1 text-center text-sm text-muted-foreground">
+                Or <span className="hidden sm:inline">provide your own</span>
               </p>
               <Separator className="flex-1" />
             </div>
@@ -161,7 +161,7 @@ export function CoreUrlShortner() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="flex items-center max-w-lg mx-auto">
+                    <div className="flex items-center w-full sm:w-fit sm:max-w-lg mx-auto">
                       <span className="text-sm text-muted-foreground mr-2">
                         {process.env.NEXT_PUBLIC_APP_URL ||
                           window.location.origin}

@@ -7,7 +7,7 @@ export function UserRatings({ className, ...props }: UserRatingsProps) {
   return (
     <div
       className={cn(
-        "flex items-center rounded-full border border-border bg-background p-1 shadow shadow-black/5",
+        "flex items-center rounded-full border border-border bg-background p-4 shadow shadow-black/5",
         className
       )}
       {...props}
@@ -42,7 +42,7 @@ export function UserRatings({ className, ...props }: UserRatingsProps) {
           alt="Avatar 04"
         />
       </div>
-      <p className="px-2 text-xs text-muted-foreground">
+      <p className="px-2 text-base text-muted-foreground">
         Trusted by <strong className="font-medium text-foreground">60K+</strong>{" "}
         users
       </p>
