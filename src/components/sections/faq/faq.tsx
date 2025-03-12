@@ -19,7 +19,7 @@ function FAQ() {
               <div>
                 <Badge
                   variant="default"
-                  className="text-base uppercase text-primary-foreground"
+                  className="text-sm sm:text-base uppercase text-primary-foreground"
                 >
                   FAQ
                 </Badge>

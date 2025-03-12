@@ -11,7 +11,7 @@ const HeroSection = ({ className, ...props }: Props) => {
       <div className="space-y-16">
         <div className="w-full max-w-4xl sm:mx-auto sm:text-center py-10 space-y-12">
           <Badge variant="default" className="w-fit mb-6">
-            <span className="text-primary-foreground text-base uppercase tracking-tight">
+            <span className="text-primary-foreground text-sm sm:text-base uppercase tracking-tight">
               {"Try for free"}
             </span>
           </Badge>
