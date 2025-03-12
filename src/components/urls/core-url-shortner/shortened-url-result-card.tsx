@@ -42,7 +42,7 @@ const ShortenedURLResultCard = ({
   };
 
   return (
-    <Card className={cn("rounded-3xl", className)} {...props}>
+    <Card className={cn("rounded-xl", className)} {...props}>
       <CardContent className="space-y-6">
         <p className="tracking-wide text-sm font-semibold text-muted-foreground">
           {"✨ We Shrinkified your URL ✨"}

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Shrinkify",
-  description: "simply shorten your URLs with ease.",
+  description: "Simply shrinkify your URLs with ease.",
 };
 
 export default function RootLayout({
