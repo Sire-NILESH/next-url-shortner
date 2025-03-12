@@ -32,15 +32,15 @@ export function CTA({
       <div className="sm:mx-auto flex flex-col sm:items-center gap-6 sm:px-8 py-12 sm:text-center sm:gap-8">
         {/* Badge */}
         {badge && (
-          <Badge variant="outline" className="w-fit">
-            <span className="text-foreground text-base">{badge.text}</span>
+          <Badge variant="default" className="w-fit">
+            <span className="text-primary-foreground text-base uppercase tracking-tight">
+              {badge.text}
+            </span>
           </Badge>
         )}
 
         {/* Title */}
-        <h2 className="max-w-2xl text-3xl tracking-tighter !font-semibold boldText sm:text-5xl pb-4">
-          {title}
-        </h2>
+        <h2 className="max-w-2xl text-3xl boldText sm:text-5xl">{title}</h2>
 
         {/* Description */}
         {description && (

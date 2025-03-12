@@ -1,5 +1,5 @@
 import { Footer, FooterBottom } from "@/components/ui/footer";
-import { ThemeToggle } from "../theme-toggle";
+import { ThemeToggle } from "../theme/theme-toggle";
 import Link from "next/link";
 
 export default function FooterCompact() {

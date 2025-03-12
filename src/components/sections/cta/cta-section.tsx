@@ -15,7 +15,7 @@ const CTASection = ({ className, ...props }: Props) => {
           text: "Don't miss out",
         }}
         title="You really would not want to miss out on this"
-        description="Managing a small business today is already tough. Avoid further complications by ditching outdated, tedious trade methods. Our goal is to streamline SMB trade, making it easier and faster than ever."
+        description="Shorten links instantly, track clicks effortlessly, and share smarter. Boost engagement, enhance branding, and simplify your URLs today because every character counts. Try it now and transform the way you share links!"
         action={{
           text: "Create account",
           href: "/register",

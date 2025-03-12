@@ -1,39 +1,17 @@
-"use client";
-
-import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  Facebook,
-  Instagram,
-  Linkedin,
-  Moon,
-  Send,
-  Sun,
-  Twitter,
-} from "lucide-react";
-import Brand from "../header/brand";
+import { Facebook, Instagram, Linkedin, Send, Twitter } from "lucide-react";
 import Link from "next/link";
-import { useTheme } from "next-themes";
+import Brand from "../header/brand";
+import ThemeSwitch from "../theme/theme-switch";
 
 export function SiteFooter() {
-  const { setTheme, theme } = useTheme();
-
-  const themeSwitchHandler = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-    if (theme === "dark") {
-      return true;
-    } else return false;
-  };
-
   return (
     <footer className="relative border-t bg-background text-foreground transition-colors duration-300">
       <div className="container mx-auto px-4 py-12 md:px-6 lg:px-8">
@@ -174,18 +152,7 @@ export function SiteFooter() {
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <div className="flex items-center space-x-2">
-              <Sun className="size-4" />
-              <Switch
-                id="theme-mode"
-                checked={theme === "dark"}
-                onCheckedChange={themeSwitchHandler}
-              />
-              <Moon className="size-4" />
-              <Label htmlFor="theme-mode" className="sr-only">
-                Toggle theme
-              </Label>
-            </div>
+            <ThemeSwitch />
           </div>
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 text-center md:flex-row">

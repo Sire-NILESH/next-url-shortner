@@ -7,13 +7,7 @@ type Props = ComponentProps<"p">;
 const Brand = ({ className, ...props }: Props) => {
   return (
     <Link href="/">
-      <p
-        className={cn(
-          "text-2xl font-bold brandText tracking-tighter",
-          className
-        )}
-        {...props}
-      >
+      <p className={cn("text-2xl !font-bold brandText", className)} {...props}>
         Shrinkify
       </p>
     </Link>

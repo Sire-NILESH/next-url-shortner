@@ -6,6 +6,7 @@ import {
   Sheet,
   SheetContent,
   SheetFooter,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import Brand from "./brand";
+import ThemeSwitch from "../theme/theme-switch";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -33,22 +35,25 @@ export function MobileNav() {
       </SheetTrigger>
 
       <SheetContent side="left" className="pt-14 space-y-12">
-        <div className="pl-4">
-          <Brand className="text-4xl pb-2 max-w-fit" />
-          <p className="text-muted-foreground">
-            {"Simply shrinkify your URLs with ease"}
-          </p>
-        </div>
+        <SheetTitle>
+          <div className="pl-4">
+            <Brand className="text-4xl pb-2 max-w-fit" />
+            <p className="text-muted-foreground">
+              {"Simply shrinkify your URLs with ease"}
+            </p>
+            <p className="sr-only">Navigation menu</p>
+          </div>
+        </SheetTitle>
 
         <ScrollArea className="my-4 h-[calc(100vh-8rem)] px-4">
-          <nav className="flex flex-col text-lg font-medium space-y-2">
+          <nav className="flex flex-col text-lg space-y-2">
             {Object.values(mobileNavRoutes).map((pathObj) => (
               <Link key={pathObj.id} href={pathObj.path}>
                 <li
                   className={cn(
                     "flex items-center gap-2 hover:text-foreground text-muted-foreground hover:bg-secondary p-2 rounded-lg",
                     pathname === pathObj.path &&
-                      "text-primary-foreground bg-primary"
+                      "text-primary-foreground bg-primary font-medium"
                   )}
                 >
                   {pathObj.icon}
@@ -59,7 +64,8 @@ export function MobileNav() {
           </nav>
         </ScrollArea>
 
-        <SheetFooter className="pb-0 mb-4">
+        <SheetFooter className="pb-0 mb-4 space-y-4">
+          <ThemeSwitch className="mx-auto" />
           <p className="pl-2 text-sm text-muted-foreground text-center">
             © {new Date().getFullYear()} Sire inc. All rights reserved.
           </p>

@@ -6,6 +6,7 @@ import {
 } from "@/components/sections/Section";
 import { cn } from "@/lib/utils";
 import { TestimonialsMarquee } from "./testimonials-marquee";
+import { Badge } from "@/components/ui/badge";
 
 type Props = SectionProps & {};
 
@@ -15,6 +16,12 @@ const TestimonialsSection = ({ className, ...props }: Props) => {
       className={cn("bg-transparent sm:text-center", className)}
       {...props}
     >
+      <Badge variant="default" className="w-fit">
+        <span className="text-primary-foreground text-base uppercase tracking-tight">
+          {"Testimonials"}
+        </span>
+      </Badge>
+
       <SectionTitle className="sm:text-center">
         {"Trusted by users worldwide"}
       </SectionTitle>

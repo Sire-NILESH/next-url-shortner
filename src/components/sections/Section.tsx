@@ -24,7 +24,7 @@ const Section = ({ className, children, ...props }: SectionProps) => {
 const SectionTitle = ({ className, ...props }: TitleProps) => (
   <h2
     className={cn(
-      "max-w-[720px] text-4xl tracking-tighter boldText !font-semibold leading-tight sm:text-5xl sm:leading-tight",
+      "max-w-[720px] text-4xl boldText leading-tight sm:text-5xl sm:leading-tight",
       className
     )}
     {...props}

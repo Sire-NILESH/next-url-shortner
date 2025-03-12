@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { ComponentProps } from "react";
-import { ThemeToggle } from "../theme-toggle";
+import { ThemeToggle } from "../theme/theme-toggle";
 import AuthUser from "./auth-user";
 import Brand from "./brand";
 import MainNav from "./main-nav";
@@ -21,8 +21,6 @@ export function SiteHeader({ className, ...props }: Props) {
         <div className="flex h-20 items-center px-4 md:px-6 space-x-4 md:space-x-10">
           <Brand />
 
-          {/* <Separator orientation="vertical" className="my-4 border-1" /> */}
-
           <div className="flex flex-1">
             <div className="hidden md:block">
               <MainNav />
@@ -30,7 +28,9 @@ export function SiteHeader({ className, ...props }: Props) {
           </div>
 
           <div className="flex items-center space-x-2">
-            <ThemeToggle />
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
             <AuthUser />
             <div className="block md:hidden">
               <MobileNav />

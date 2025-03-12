@@ -135,5 +135,5 @@
 }
 
 .boldText {
-  @apply font-bold bg-clip-text text-transparent bg-gradient-to-t from-neutral-700 to-neutral-700 dark:from-neutral-500 dark:to-white;
+  @apply font-medium tracking-tighter leading-tight bg-clip-text text-transparent bg-gradient-to-t from-neutral-700 to-neutral-700 dark:from-neutral-500 dark:to-white;
 }

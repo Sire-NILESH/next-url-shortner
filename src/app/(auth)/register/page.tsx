@@ -13,8 +13,8 @@ export default function RegisterPage() {
     <div className="my-6 md:my-20 flex flex-1 flex-col">
       <div className="my-32 mx-auto flex w-full flex-col justify-center space-y-6 max-w-lg">
         <div className="flex flex-col space-y-2 text-center">
-          <h1 className="text-3xl boldText">Create an account</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-4xl boldText">Create an account</h1>
+          <p className="text-lg text-muted-foreground leading-relaxed tracking-tight">
             Enter your details and create a free account to get started.
           </p>
         </div>
