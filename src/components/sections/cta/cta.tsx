@@ -33,7 +33,7 @@ export function CTA({
         {/* Badge */}
         {badge && (
           <Badge variant="default" className="w-fit">
-            <span className="text-primary-foreground text-base uppercase tracking-tight">
+            <span className="text-primary-foreground text-sm sm:text-base uppercase tracking-tight">
               {badge.text}
             </span>
           </Badge>

@@ -16,7 +16,7 @@ const FeatuesSection = ({ className, ...props }: Props) => {
   return (
     <Section className={cn("bg-transparent", className)} {...props}>
       <Badge variant="default" className="w-fit">
-        <span className="text-primary-foreground text-base uppercase tracking-tight">
+        <span className="text-primary-foreground text-sm sm:text-base uppercase tracking-tight">
           {"Features"}
         </span>
       </Badge>
