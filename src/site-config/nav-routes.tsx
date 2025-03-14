@@ -1,4 +1,4 @@
-import { House, LayoutDashboard, LogIn, UserPlus } from "lucide-react";
+import { House, LayoutDashboard, Link, LogIn, UserPlus } from "lucide-react";
 
 export const navRoutes = {
   "/": {
@@ -28,5 +28,26 @@ export const mobileNavRoutes = {
     path: "/register",
     label: "Create Account",
     icon: <UserPlus className="size-4" />,
+  },
+};
+
+export const dashboardNavRoutes = {
+  // "/stats": {
+  //   id: "stats",
+  //   path: "/stats",
+  //   label: "Stats",
+  //   icon: <BarChart3Icon className="size-4" />,
+  // },
+  "/dashboard": {
+    id: "dashboard",
+    path: "/dashboard",
+    label: "Dashboard",
+    icon: <LayoutDashboard className="size-4" />,
+  },
+  "/my-urls": {
+    id: "my-urls",
+    path: "/my-urls",
+    label: "My URLs",
+    icon: <Link className="size-4" />,
   },
 };

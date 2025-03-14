@@ -5,7 +5,7 @@ import { shortenUrl } from "@/server/actions/urls/shorten-url";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { ComponentProps, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { SignupSuggestionDialog } from "../../dialogs/signup-suggestion-dialog";
@@ -20,8 +20,11 @@ import {
 import { Input } from "../../ui/input";
 import ShortenedURLResultCard from "./shortened-url-result-card";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
-export function CoreUrlShortner() {
+type Props = ComponentProps<"div">;
+
+export function CoreUrlShortner({ className, ...props }: Props) {
   const { data: session } = useSession();
 
   const router = useRouter();
@@ -106,11 +109,14 @@ export function CoreUrlShortner() {
 
   return (
     <>
-      <div className="w-full max-w-2xl mx-auto">
+      <div
+        className={cn("w-full max-w-2xl mx-auto @container", className)}
+        {...props}
+      >
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6 sm:space-y-8"
+            className="space-y-6 sm:space-y-8 w-full max-w-2xl mx-auto"
           >
             <div className="flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-2">
               <FormField
@@ -150,7 +156,7 @@ export function CoreUrlShortner() {
             <div className="flex items-center mx-16">
               <Separator className="flex-1" />
               <p className="flex-1 text-center text-sm text-muted-foreground">
-                Or <span className="hidden sm:inline">provide your own</span>
+                Or <span className="hidden @md:inline  ">provide your own</span>
               </p>
               <Separator className="flex-1" />
             </div>
@@ -161,7 +167,7 @@ export function CoreUrlShortner() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="flex items-center w-full sm:w-fit sm:max-w-lg mx-auto">
+                    <div className="flex items-center w-full @sm:w-fit @sm:max-w-lg mx-auto">
                       <span className="text-sm text-muted-foreground mr-2">
                         {process.env.NEXT_PUBLIC_APP_URL ||
                           window.location.origin}

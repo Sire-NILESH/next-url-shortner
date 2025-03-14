@@ -6,7 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Login | Shrinkify",
+  description: "Dashboard page",
+};
 
 export default function LoginPage() {
   return (
