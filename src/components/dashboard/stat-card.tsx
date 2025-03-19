@@ -34,17 +34,17 @@ export default function StatCard({
         {icon}
         <div className="space-y-1">
           <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
+          <CardDescription className="text-sm">{description}</CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="justify-end">
-        <p className="text-4xl font-bold font-mono">
+      <CardContent className="justify-end pl-0">
+        <p className="text-2xl md:text-4xl font-bold font-mono text-right">
           <CountUp
             useEasing
             preserveValue
             redraw={false}
             end={value}
-            decimals={hasDecimal(value) ? 2 : 0}
+            decimals={hasDecimal(value) ? 1 : 0}
             formattingFn={formatFn}
           />
         </p>

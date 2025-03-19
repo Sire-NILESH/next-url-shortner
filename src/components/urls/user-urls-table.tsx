@@ -397,7 +397,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
   }
 
   return (
-    <div className="w-full min-h-full bg-card border rounded-lg p-4 space-y-6 md:space-y-0">
+    <div className="w-full min-h-full border rounded-lg p-4 space-y-6 md:space-y-0 bg-secondary/40">
       <div className="flex flex-wrap items-end justify-between gap-4 py-4">
         <div className="relative w-full md:w-72">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

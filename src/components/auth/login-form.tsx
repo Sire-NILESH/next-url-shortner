@@ -2,9 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -20,24 +19,24 @@ import {
 import { Input } from "../ui/input";
 import GoogleLoginIcon from "./google-login-icon";
 import { loginSchema } from "./schema";
+import useGoogleAuthLogin from "./useGoogleAuthLogin";
+import useLogin from "./useLogin";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // check if user just registered
+  // Show a success message if user just registered
   useEffect(() => {
     const registered = searchParams.get("registered");
     if (registered === "true") {
       toast.success("Account created successfully", {
-        description: "You have been registered successfully. Please sign in.",
+        description: "You have been registered successfully. Please log in.",
       });
 
-      // remove the query param
+      // Remove query param to prevent re-triggering the message
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.delete("registered");
       router.replace(newUrl.toString(), undefined);
@@ -52,63 +51,33 @@ export function LoginForm() {
     },
   });
 
-  async function onSubmit(data: LoginFormValues) {
-    setIsLoading(true);
-    setError(null);
+  // Login Mutation
+  const loginMutation = useLogin();
 
-    try {
-      const result = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError("Invalid email or password");
-        toast.error("Invalid email or password", {
-          description: "Please check your email and password and try again.",
-        });
-        return;
-      }
-
-      toast.success("Signed in successfully", {
-        description: "You have been signed in successfully.",
-      });
-
-      router.push("/dashboard");
-      router.refresh();
-    } catch (error) {
-      setError("An error occurred. Please try again.");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    try {
-      await signIn("google", { callbackUrl: "/dashboard" });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Google Sign-In Mutation
+  const googleSignInMutation = useGoogleAuthLogin();
 
   return (
     <div className="space-y-10">
+      {/* Google Login */}
       <div className="grid gap-2">
         <Button
-          variant={"outline"}
-          disabled={isLoading}
-          onClick={handleGoogleSignIn}
+          variant="outline"
+          disabled={googleSignInMutation.isPending}
+          onClick={() => googleSignInMutation.mutate()}
         >
-          <GoogleLoginIcon />
-          <p className="ml-2 font-semibold">Continue with google</p>
+          {googleSignInMutation.isPending ? (
+            <Loader2 className="mr-2 size-4 animate-spin" />
+          ) : (
+            <>
+              <GoogleLoginIcon />
+              <p className="ml-2 font-semibold">Continue with Google</p>
+            </>
+          )}
         </Button>
       </div>
 
+      {/* Divider */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
@@ -120,8 +89,12 @@ export function LoginForm() {
         </div>
       </div>
 
+      {/* Email/Password Login Form */}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit((data) => loginMutation.mutate(data))}
+          className="space-y-8"
+        >
           <FormField
             control={form.control}
             name="email"
@@ -133,7 +106,7 @@ export function LoginForm() {
                     placeholder="example@example.com"
                     type="email"
                     autoComplete="email"
-                    disabled={isLoading}
+                    disabled={loginMutation.isPending}
                     {...field}
                   />
                 </FormControl>
@@ -141,6 +114,7 @@ export function LoginForm() {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="password"
@@ -152,7 +126,7 @@ export function LoginForm() {
                     placeholder="********"
                     type="password"
                     autoComplete="current-password"
-                    disabled={isLoading}
+                    disabled={loginMutation.isPending}
                     {...field}
                   />
                 </FormControl>
@@ -161,13 +135,25 @@ export function LoginForm() {
             )}
           />
 
-          {error && (
-            <div className="text-sm text-destructive font-medium">{error}</div>
+          {/* Error Message */}
+          {loginMutation.isError && (
+            <div className="text-sm text-destructive font-medium">
+              {loginMutation.error instanceof Error
+                ? loginMutation.error.message
+                : "Something went wrong"}
+            </div>
           )}
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading && <Loader2 className="mr-2 size-4 animate-spin" />}
-            Sign in
+          {/* Login Button */}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={loginMutation.isPending}
+          >
+            {loginMutation.isPending && (
+              <Loader2 className="mr-2 size-4 animate-spin" />
+            )}
+            Log in
           </Button>
         </form>
       </Form>

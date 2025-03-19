@@ -1,4 +1,5 @@
 import DashboardClient from "@/components/dashboard/dashboard-client";
+import DashboardIntroCard from "@/components/dashboard/dashboard-intro-card";
 import { getUserUrls } from "@/server/actions/urls/get-user-urls";
 import { auth } from "@/server/auth";
 import { Metadata } from "next";
@@ -17,9 +18,10 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <h1 className="text-3xl boldText !font-semibold uppercase mb-8 text-center">
-        My Dashboard
-      </h1>
+      <DashboardIntroCard
+        pageTitle={"My Dashboard"}
+        pageSubtitle="this is your shrinkify urls dashboard"
+      />
 
       <DashboardClient userUrls={userUrls} />
     </div>

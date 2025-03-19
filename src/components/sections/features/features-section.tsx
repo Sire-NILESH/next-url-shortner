@@ -25,8 +25,8 @@ const FeatuesSection = ({ className, ...props }: Props) => {
         {"Here's what's on the table"}
       </SectionTitle>
       <SectionDescription className="sm:text-center">
-        A plethora of features and all of these available to you at a low low{" "}
-        price of a{" "}
+        A plethora of features and all of these available to you at a low low
+        price of a
         <Link href="/register" className="text-blue-600">
           free account!
         </Link>

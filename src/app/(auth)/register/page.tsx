@@ -20,7 +20,7 @@ export default function RegisterPage() {
       <div className="my-32 mx-auto flex w-full flex-col justify-center space-y-6 max-w-lg">
         <div className="flex flex-col space-y-2 text-center">
           <h1 className="text-4xl boldText">Create an account</h1>
-          <p className="text-lg text-muted-foreground leading-relaxed tracking-tight">
+          <p className="text-sm md:text-lg text-muted-foreground leading-relaxed tracking-tight">
             Enter your details and create a free account to get started.
           </p>
         </div>
@@ -37,7 +37,7 @@ export default function RegisterPage() {
           </CardContent>
         </Card>
 
-        <p className="text-center">
+        <p className="text-center text-sm md:text-base">
           Already have an account?{" "}
           <Link href={"/login"} className="underline">
             Login here

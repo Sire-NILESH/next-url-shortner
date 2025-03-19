@@ -12,7 +12,7 @@ export default function RootLayout({
       <SiteHeader />
       <div className="flex flex-col min-h-screen">
         <GridBackgroundLayout>
-          <div className="container px-2 md:p-0">{children}</div>
+          <div className="container">{children}</div>
         </GridBackgroundLayout>
       </div>
       <SiteFooter />

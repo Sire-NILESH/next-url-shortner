@@ -44,7 +44,7 @@ export function CTA({
 
         {/* Description */}
         {description && (
-          <p className="text-lg max-w-[750px] leading-relaxed tracking-tight text-muted-foreground pb-4">
+          <p className="-mt-4 sm:mt-0 text-base md:text-lg max-w-[750px] leading-relaxed tracking-tight text-muted-foreground pb-4">
             {description}
           </p>
         )}

@@ -1,3 +1,4 @@
+import DashboardIntroCard from "@/components/dashboard/dashboard-intro-card";
 import {
   Card,
   CardContent,
@@ -8,6 +9,7 @@ import {
 import UserUrlsTable from "@/components/urls/user-urls-table";
 import { getUserUrls } from "@/server/actions/urls/get-user-urls";
 import { auth } from "@/server/auth";
+import { Link as LinkIcon } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -25,17 +27,21 @@ export default async function MyUrlsPage() {
 
   return (
     <div>
-      <h1 className="text-3xl boldText !font-semibold uppercase mb-8 text-center">
-        My Urls
-      </h1>
+      <DashboardIntroCard
+        pageTitle={"My URLs"}
+        pageSubtitle="here is all of your created shrinkify urls"
+      />
 
       <div className="space-y-10">
         <Card className="shadow-sm border bg-background">
-          <CardHeader className="px-4 md:px-6">
-            <CardTitle>Your URLs</CardTitle>
-            <CardDescription>
-              Manage all your shrinkify URLs here.
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center gap-3 px-4 md:px-6">
+            <LinkIcon className="size-10 md:size-12 items-center rounded-lg p-2 text-blue-500 bg-blue-500/10" />
+            <div>
+              <CardTitle>Your URLs</CardTitle>
+              <CardDescription>
+                Manage all your shrinkify URLs here.
+              </CardDescription>
+            </div>
           </CardHeader>
           <CardContent className="px-4 md:px-6">
             <UserUrlsTable urls={userUrls} />

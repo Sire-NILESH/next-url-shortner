@@ -1,7 +1,6 @@
 "use client";
 
 import { AtSign, Loader, LogOut, User } from "lucide-react";
-import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,9 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { signOut, useSession } from "next-auth/react";
-import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import useLogout from "./useLogout";
 
 export function UserAvatarDropdown() {
   const session = useSession();
@@ -45,15 +44,15 @@ export function UserAvatarDropdown() {
           {session.data?.user.name ? session.data?.user.name : "unknown user"}
         </DropdownMenuItem>
         <DropdownMenuItem
-          disabled={logoutStatus === "loading"}
+          disabled={logoutStatus === "pending"}
           onClick={async () => await logoutUser()}
         >
-          {logoutStatus === "loading" ? (
+          {logoutStatus === "pending" ? (
             <Loader className="animate-spin" />
           ) : (
             <LogOut />
           )}
-          {logoutStatus === "loading" ? "Logging out..." : "Logout"}
+          {logoutStatus === "pending" ? "Logging out..." : "Logout"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -78,33 +77,4 @@ export function UserAvatar({
       </AvatarFallback>
     </Avatar>
   );
-}
-
-function useLogout() {
-  const [logoutStatus, setLogoutStatus] = React.useState<
-    "idle" | "loading" | "error" | "success"
-  >("idle");
-
-  const logoutUser = async () => {
-    try {
-      setLogoutStatus("loading");
-      await signOut();
-      setLogoutStatus("success");
-      toast.success("Logged out", {
-        description: "You have been logged out successfully.",
-      });
-    } catch (error) {
-      setLogoutStatus("error");
-      toast.error("Failed to Log out", {
-        description:
-          error instanceof Error
-            ? error.message
-            : "Something went wrong while logging you out",
-      });
-    }
-  };
-
-  const resetLogoutStatus = () => setLogoutStatus("idle");
-
-  return { logoutStatus, logoutUser, resetLogoutStatus };
 }

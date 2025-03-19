@@ -1,10 +1,7 @@
 "use client";
 
-import { registerUser } from "@/server/actions/auth/register";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -18,13 +15,12 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { registerSchema } from "./schema";
+import useRegister from "./useRegister";
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const registerMutation = useRegister();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -36,35 +32,12 @@ export function RegisterForm() {
     },
   });
 
-  async function onSubmit(data: RegisterFormValues) {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("email", data.email);
-      formData.append("password", data.password);
-
-      const response = await registerUser(formData);
-
-      if (!response.success) {
-        setError(response.error || "An error occurred. Please try again.");
-        return;
-      }
-
-      router.push("/login?registered=true");
-    } catch (error) {
-      setError("An error occurred. Please try again.");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit((data) => registerMutation.mutate(data))}
+        className="space-y-8"
+      >
         <FormField
           control={form.control}
           name="name"
@@ -75,7 +48,7 @@ export function RegisterForm() {
                 <Input
                   placeholder="John Doe"
                   autoComplete="name"
-                  disabled={isLoading}
+                  disabled={registerMutation.isPending}
                   {...field}
                 />
               </FormControl>
@@ -94,7 +67,7 @@ export function RegisterForm() {
                   placeholder="example@example.com"
                   type="email"
                   autoComplete="email"
-                  disabled={isLoading}
+                  disabled={registerMutation.isPending}
                   {...field}
                 />
               </FormControl>
@@ -113,7 +86,7 @@ export function RegisterForm() {
                   placeholder="********"
                   type="password"
                   autoComplete="current-password"
-                  disabled={isLoading}
+                  disabled={registerMutation.isPending}
                   {...field}
                 />
               </FormControl>
@@ -132,7 +105,7 @@ export function RegisterForm() {
                   placeholder="********"
                   type="password"
                   autoComplete="new-password"
-                  disabled={isLoading}
+                  disabled={registerMutation.isPending}
                   {...field}
                 />
               </FormControl>
@@ -141,12 +114,14 @@ export function RegisterForm() {
           )}
         />
 
-        {error && (
-          <div className="text-sm text-destructive font-medium">{error}</div>
-        )}
-
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading && <Loader2 className="mr-2 size-4 animate-spin" />}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={registerMutation.isPending}
+        >
+          {registerMutation.isPending && (
+            <Loader2 className="mr-2 size-4 animate-spin" />
+          )}
           Create Account
         </Button>
       </form>
