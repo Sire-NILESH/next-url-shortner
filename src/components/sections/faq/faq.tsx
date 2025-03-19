@@ -28,13 +28,13 @@ function FAQ() {
                 <h4 className="text-3xl md:text-5xl max-w-xl text-left boldText">
                   {"Got questions? We've got answers for You!"}
                 </h4>
-                <p className="text-lg max-w-xl lg:max-w-lg leading-relaxed tracking-tight text-muted-foreground text-left">
+                <p className="-mt-3 sm:mt-0 text-base md:text-lg max-w-xl lg:max-w-lg leading-relaxed tracking-tight text-muted-foreground text-left">
                   Find answers to common questions about shrinkify, how it
                   works, tracking features, customization options, and more. Get
                   the details you need to make the most of our service today!
                 </p>
               </div>
-              <div className="">
+              <div className="mt-3 sm:mt-0">
                 <Button className="gap-4" variant="outline">
                   Any questions? Reach out <PhoneCall className="w-4 h-4" />
                 </Button>
@@ -44,7 +44,9 @@ function FAQ() {
           <Accordion type="single" collapsible className="w-full">
             {faqData.map((faqItem, index) => (
               <AccordionItem key={index} value={"index-" + index}>
-                <AccordionTrigger>{faqItem.question}</AccordionTrigger>
+                <AccordionTrigger className="text-left">
+                  {faqItem.question}
+                </AccordionTrigger>
                 <AccordionContent>{faqItem.answer}</AccordionContent>
               </AccordionItem>
             ))}

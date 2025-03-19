@@ -23,7 +23,7 @@ const shortenUrlSchema = z.object({
     .transform((val) => (val === null || val === "" ? undefined : val)),
 });
 
-export async function shortenUrl(formData: FormData): Promise<
+export async function shrinkifyUrl(formData: FormData): Promise<
   ApiResponse<{
     shortUrl: string;
     flagged: boolean;
@@ -75,21 +75,45 @@ export async function shortenUrl(formData: FormData): Promise<
       }
     }
 
-    const shortCode = validatedFields.data.customCode || nanoid(6);
+    let shortCode = validatedFields.data.customCode || nanoid(6);
 
-    // check if the short code already exists
-    const existingUrl = await db.query.urls.findFirst({
-      where: (urls, { eq }) => eq(urls.shortCode, shortCode),
-    });
+    if (validatedFields.data.customCode) {
+      // Check if the custom code already exists
+      const existingCustomCode = await db.query.urls.findFirst({
+        where: (urls, { eq }) => eq(urls.shortCode, shortCode),
+      });
 
-    if (existingUrl) {
-      if (validatedFields.data.customCode) {
+      if (existingCustomCode) {
         return {
           success: false,
           error: "Custom code already exists",
         };
       }
-      return shortenUrl(formData);
+    } else {
+      // Allow only 3 retries
+      let attempts = 0;
+      let uniqueCodeFound = false;
+
+      while (attempts < 3) {
+        const existingUrl = await db.query.urls.findFirst({
+          where: (urls, { eq }) => eq(urls.shortCode, shortCode),
+        });
+
+        if (!existingUrl) {
+          uniqueCodeFound = true;
+          break;
+        }
+
+        shortCode = nanoid(6);
+        attempts++;
+      }
+
+      if (!uniqueCodeFound) {
+        return {
+          success: false,
+          error: "Failed to generate a unique short code. Please try again.",
+        };
+      }
     }
 
     await db.insert(urls).values({

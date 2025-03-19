@@ -1,24 +1,24 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { navRoutes } from "@/site-config/nav-routes";
+import { dashboardNavRoutes } from "@/site-config/nav-routes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ComponentProps } from "react";
 
 type Props = ComponentProps<"nav"> & {};
 
-const MainNav = ({ className, ...props }: Props) => {
+const DashboardNav = ({ className, ...props }: Props) => {
   const pathname = usePathname();
   return (
     <nav
       className={cn(
-        "flex items-center space-x-4 list-none text-base font-semibold",
+        "flex items-center justify-end space-x-4 list-none text-base font-semibold",
         className
       )}
       {...props}
     >
-      {Object.values(navRoutes).map((pathObj) => (
+      {Object.values(dashboardNavRoutes).map((pathObj) => (
         <Link key={pathObj.id} href={pathObj.path}>
           <li
             className={cn(
@@ -35,4 +35,4 @@ const MainNav = ({ className, ...props }: Props) => {
   );
 };
 
-export default MainNav;
+export default DashboardNav;

@@ -34,7 +34,7 @@ const SectionTitle = ({ className, ...props }: TitleProps) => (
 const SectionDescription = ({ className, ...props }: DescriptionProps) => (
   <p
     className={cn(
-      "text-lg max-w-[750px] leading-relaxed tracking-tight text-muted-foreground",
+      "-mt-3 sm:mt-0 text-base md:text-lg max-w-[750px] leading-relaxed tracking-tight text-muted-foreground",
       className
     )}
     {...props}

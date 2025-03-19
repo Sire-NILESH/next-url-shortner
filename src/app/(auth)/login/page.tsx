@@ -6,7 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Login | Shrinkify",
+  description: "Dashboard page",
+};
 
 export default function LoginPage() {
   return (
@@ -14,7 +20,7 @@ export default function LoginPage() {
       <div className="my-32 mx-auto flex w-full flex-col justify-center space-y-6 max-w-lg">
         <div className="flex flex-col space-y-2 text-center">
           <h1 className="text-4xl boldText">Welcome back!</h1>
-          <p className="text-lg text-muted-foreground leading-relaxed tracking-tight">
+          <p className="text-base md:text-lg text-muted-foreground leading-relaxed tracking-tight">
             Login to your account to unlock full potential.
           </p>
         </div>
@@ -31,7 +37,7 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        <p className="text-center">
+        <p className="text-center text-sm md:text-base">
           New here?{" "}
           <Link href={"/register"} className="underline">
             Create a free account

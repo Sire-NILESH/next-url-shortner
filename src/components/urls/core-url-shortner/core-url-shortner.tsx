@@ -1,13 +1,13 @@
 "use client";
 
 import { UrlFormData, urlSchema } from "@/lib/URLSchema";
-import { shortenUrl } from "@/server/actions/urls/shorten-url";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { ComponentProps } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
 import { SignupSuggestionDialog } from "../../dialogs/signup-suggestion-dialog";
 import { Button } from "../../ui/button";
 import {
@@ -20,23 +20,15 @@ import {
 import { Input } from "../../ui/input";
 import ShortenedURLResultCard from "./shortened-url-result-card";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { shrinkifyUrl } from "@/server/actions/urls/shrinkify-url";
 
-export function CoreUrlShortner() {
+type Props = ComponentProps<"div">;
+
+export function CoreUrlShortner({ className, ...props }: Props) {
   const { data: session } = useSession();
-
   const router = useRouter();
   const pathname = usePathname();
-
-  const [shortUrl, setShortUrl] = useState<string | null>(null);
-  const [shortCode, setShortCode] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showSignupDialog, setShowSignupDialog] = useState(false);
-  const [flaggedInfo, setFlaggedInfo] = useState<{
-    flagged: boolean;
-    reason: string | null;
-    message: string | undefined;
-  } | null>(null);
 
   const form = useForm<UrlFormData>({
     resolver: zodResolver(urlSchema),
@@ -46,71 +38,49 @@ export function CoreUrlShortner() {
     },
   });
 
-  const onSubmit = async (data: UrlFormData) => {
-    setIsLoading(true);
-    setError(null);
-    setShortUrl(null);
-    setShortCode(null);
-    setFlaggedInfo(null);
-
-    try {
+  const mutation = useMutation({
+    mutationFn: async (data: UrlFormData) => {
       const formData = new FormData();
       formData.append("url", data.url);
 
-      // If a custom code is provided, append it to the form data
-      if (data.customCode && data.customCode.trim() !== "") {
+      if (data.customCode?.trim()) {
         formData.append("customCode", data.customCode.trim());
       }
 
-      const response = await shortenUrl(formData);
-
-      console.log({ response });
-
+      return shrinkifyUrl(formData);
+    },
+    onSuccess: (response) => {
       if (response.success && response.data) {
-        setShortUrl(response.data.shortUrl);
-        // Extract the short code from the short URL
-        const shortCodeMatch = response.data.shortUrl.match(/\/r\/([^/]+)$/);
-        if (shortCodeMatch && shortCodeMatch[1]) {
-          setShortCode(shortCodeMatch[1]);
-        }
+        toast.success("URL shortened successfully");
 
         if (response.data.flagged) {
-          setFlaggedInfo({
-            flagged: response.data.flagged,
-            reason: response.data.flagReason || null,
-            message: response.data.message,
-          });
-
           toast.warning(response.data.message || "This URL is flagged", {
             description: response.data.flagReason,
           });
-        } else {
-          toast.success("URL shortened successfully");
+        }
+
+        if (session?.user && pathname.includes("/dashboard")) {
+          router.refresh();
         }
       }
+    },
+    onError: () => {
+      toast.error("An error occurred. Please try again.");
+    },
+  });
 
-      if (session?.user && pathname.includes("/dashboard")) {
-        router.refresh();
-      }
-
-      if (!session?.user) {
-        setShowSignupDialog(true);
-      }
-    } catch (error) {
-      setError("An error occurred. Please try again.");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const onSubmit = (data: UrlFormData) => mutation.mutate(data);
 
   return (
     <>
-      <div className="w-full max-w-2xl mx-auto">
+      <div
+        className={cn("w-full max-w-2xl mx-auto @container", className)}
+        {...props}
+      >
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6 sm:space-y-8"
+            className="space-y-6 sm:space-y-8 w-full max-w-2xl mx-auto"
           >
             <div className="flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-2">
               <FormField
@@ -120,23 +90,22 @@ export function CoreUrlShortner() {
                   <FormItem className="flex-1">
                     <FormControl>
                       <Input
-                        className="h-12 bg-secondary  rounded-full"
+                        className="h-12 bg-secondary rounded-full"
                         placeholder="Paste your long URL here"
                         {...field}
-                        disabled={false}
+                        disabled={mutation.isPending}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <Button
                 type="submit"
                 className="h-12 rounded-full"
-                disabled={isLoading}
+                disabled={mutation.isPending}
               >
-                {isLoading ? (
+                {mutation.isPending ? (
                   <>
                     <span className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                     Shrinkifying...
@@ -150,7 +119,7 @@ export function CoreUrlShortner() {
             <div className="flex items-center mx-16">
               <Separator className="flex-1" />
               <p className="flex-1 text-center text-sm text-muted-foreground">
-                Or <span className="hidden sm:inline">provide your own</span>
+                Or <span className="hidden @md:inline">provide your own</span>
               </p>
               <Separator className="flex-1" />
             </div>
@@ -161,7 +130,7 @@ export function CoreUrlShortner() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="flex items-center w-full sm:w-fit sm:max-w-lg mx-auto">
+                    <div className="flex items-center w-full @sm:w-fit @sm:max-w-lg mx-auto">
                       <span className="text-sm text-muted-foreground mr-2">
                         {process.env.NEXT_PUBLIC_APP_URL ||
                           window.location.origin}
@@ -172,7 +141,7 @@ export function CoreUrlShortner() {
                         {...field}
                         value={field.value || ""}
                         onChange={(e) => field.onChange(e.target.value || "")}
-                        disabled={isLoading}
+                        disabled={mutation.isPending}
                         className="flex-1"
                       />
                     </div>
@@ -181,28 +150,29 @@ export function CoreUrlShortner() {
                 </FormItem>
               )}
             />
-            {error && (
-              <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
-                {error}
-              </div>
-            )}
           </form>
         </Form>
-
-        {shortUrl && (
+        {mutation.data?.data?.shortUrl && (
           <ShortenedURLResultCard
             className="mt-10 md:mt-16"
-            shortUrl={shortUrl}
-            shortCode={shortCode}
-            flaggedInfo={flaggedInfo}
+            shortUrl={mutation.data.data.shortUrl}
+            shortCode={mutation.data.data.shortUrl.split("/r/")[1]}
+            flaggedInfo={
+              mutation.data.data.flagged
+                ? {
+                    flagged: mutation.data.data.flagged,
+                    reason: mutation.data.data.flagReason || null,
+                    message: mutation.data.data.message,
+                  }
+                : null
+            }
           />
         )}
       </div>
-
       <SignupSuggestionDialog
-        isOpen={showSignupDialog}
-        onOpenChange={setShowSignupDialog}
-        shortUrl={shortUrl || ""}
+        isOpen={!session?.user && !!mutation.data?.data?.shortUrl}
+        onOpenChange={() => {}}
+        shortUrl={mutation.data?.data?.shortUrl || ""}
       />
     </>
   );
