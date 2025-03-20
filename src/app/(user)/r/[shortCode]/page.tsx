@@ -6,7 +6,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Redirecting...",
+  title: "Redirecting... | Shrinkify",
   description: "You are being redirected to the original URL",
 };
 
@@ -31,7 +31,7 @@ export default async function RedirectPage(props: { params: Params }) {
               Caution: Flagged URL
             </h1>
             <p className="text-muted-foreground mb-2">
-              This link has been flagged by our safety system and is pending
+              This link has been flagged by our safety system and is pending for
               review by an administrator.
             </p>
             {response.data.flagReason && (
@@ -73,8 +73,8 @@ export default async function RedirectPage(props: { params: Params }) {
           URL Not Found
         </h1>
         <p className="text-muted-foreground mb-6">
-          The short link you&apos;re trying to access doesn&apos;t exist or has
-          been removed.
+          The shrinkify link you&apos;re trying to access doesn&apos;t exist or
+          has been removed.
         </p>
         <Button asChild>
           <Link href={"/"}>Return to Homepage</Link>

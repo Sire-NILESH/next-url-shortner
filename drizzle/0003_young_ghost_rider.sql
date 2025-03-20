@@ -1,0 +1,1 @@
+ALTER TABLE "urls" ALTER COLUMN "short_code" SET DATA TYPE varchar(30);

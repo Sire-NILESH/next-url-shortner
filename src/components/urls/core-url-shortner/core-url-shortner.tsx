@@ -47,11 +47,17 @@ export function CoreUrlShortner({ className, ...props }: Props) {
         formData.append("customCode", data.customCode.trim());
       }
 
-      return shrinkifyUrl(formData);
+      const response = await shrinkifyUrl(formData);
+
+      if (!response.success) {
+        throw new Error(response.error);
+      }
+
+      return response;
     },
     onSuccess: (response) => {
       if (response.success && response.data) {
-        toast.success("URL shortened successfully");
+        toast.success("URL shrinkified successfully");
 
         if (response.data.flagged) {
           toast.warning(response.data.message || "This URL is flagged", {
@@ -64,8 +70,11 @@ export function CoreUrlShortner({ className, ...props }: Props) {
         }
       }
     },
-    onError: () => {
-      toast.error("An error occurred. Please try again.");
+    onError: (error) => {
+      const message = error.message
+        ? error.message
+        : "An error occurred. Please try again.";
+      toast.error(message);
     },
   });
 

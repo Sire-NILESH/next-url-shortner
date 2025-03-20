@@ -6,6 +6,7 @@ import { Copy, QrCode } from "lucide-react";
 import FlaggedURLInfo from "./flagged-url-info";
 import { cn } from "@/lib/utils";
 import { QRCodeModal } from "../../modals/qr-code-modal";
+import { toast } from "sonner";
 
 type Props = ComponentProps<"div"> & {
   shortUrl: string;
@@ -36,6 +37,7 @@ const ShortenedURLResultCard = ({
 
     try {
       await navigator.clipboard.writeText(shortUrl);
+      toast.success("URL copied to clipboard");
     } catch (error) {
       console.error(error);
     }
