@@ -10,7 +10,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/server/auth";
 import { checkUrlSafety } from "./check-url-safety";
 
-const shortenUrlSchema = z.object({
+const shrinkifyUrlSchema = z.object({
   url: z.string().refine(isValidUrl, {
     message: "Please enter a valid URL",
   }),
@@ -38,7 +38,7 @@ export async function shrinkifyUrl(formData: FormData): Promise<
     const url = formData.get("url") as string;
     const customCode = formData.get("customCode") as string;
 
-    const validatedFields = shortenUrlSchema.safeParse({
+    const validatedFields = shrinkifyUrlSchema.safeParse({
       url,
       customCode: customCode ? customCode : undefined,
     });
@@ -56,6 +56,7 @@ export async function shrinkifyUrl(formData: FormData): Promise<
     const originalUrl = ensureHttps(validatedFields.data.url);
 
     const safetyCheck = await checkUrlSafety(originalUrl);
+
     let flagged = false;
     let flagReason = null;
 
@@ -145,10 +146,10 @@ export async function shrinkifyUrl(formData: FormData): Promise<
       },
     };
   } catch (error) {
-    console.error("Failed to shorten URL", error);
+    console.error("Failed to shrinkify URL", error);
     return {
       success: false,
-      error: "Failed to shorten URL",
+      error: "Failed to shrinkify URL",
     };
   }
 }

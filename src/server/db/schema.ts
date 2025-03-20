@@ -87,7 +87,7 @@ export const verificationTokens = pgTable(
 export const urls = pgTable("urls", {
   id: serial("id").primaryKey(),
   originalUrl: varchar("original_url", { length: 2000 }).notNull(),
-  shortCode: varchar("short_code", { length: 10 }).notNull().unique(),
+  shortCode: varchar("short_code", { length: 30 }).notNull().unique(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
   clicks: integer("clicks").default(0).notNull(),

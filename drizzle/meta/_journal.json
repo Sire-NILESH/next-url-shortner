@@ -22,6 +22,13 @@
       "when": 1741189681355,
       "tag": "0002_mature_namor",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1742463820345,
+      "tag": "0003_young_ghost_rider",
+      "breakpoints": true
     }
   ]
 }

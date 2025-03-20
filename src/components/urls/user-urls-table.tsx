@@ -286,7 +286,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
     {
       accessorKey: "shortCode",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Short URL" />
+        <DataTableColumnHeader column={column} title="Shrinkify URL" />
       ),
       cell: ({ row }) => {
         const baseUrl =
@@ -310,7 +310,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Copy short URL</p>
+                  <p>Copy shrinkify URL</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
