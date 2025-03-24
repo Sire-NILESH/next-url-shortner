@@ -1,4 +1,15 @@
-import { House, LayoutDashboard, Link, LogIn, UserPlus } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  DatabaseIcon,
+  House,
+  LayoutDashboard,
+  LayoutDashboardIcon,
+  Link,
+  Link2Icon,
+  LogIn,
+  UserPlus,
+  UsersIcon,
+} from "lucide-react";
 
 export const navRoutes = {
   "/": {
@@ -32,12 +43,6 @@ export const mobileNavRoutes = {
 };
 
 export const dashboardNavRoutes = {
-  // "/stats": {
-  //   id: "stats",
-  //   path: "/stats",
-  //   label: "Stats",
-  //   icon: <BarChart3Icon className="size-4" />,
-  // },
   "/dashboard": {
     id: "dashboard",
     path: "/dashboard",
@@ -51,3 +56,43 @@ export const dashboardNavRoutes = {
     icon: <Link className="size-4" />,
   },
 };
+
+export type AdminDashboardNavItem = {
+  label: string;
+  path: string;
+  icon: React.ReactNode;
+  exact: boolean;
+};
+
+export const adminDashboardNavItems: AdminDashboardNavItem[] = [
+  {
+    label: "Overview",
+    path: "/admin",
+    icon: <LayoutDashboardIcon className="size-4" />,
+    exact: true,
+  },
+  {
+    label: "URLs",
+    path: "/admin/urls",
+    icon: <Link2Icon className="size-4" />,
+    exact: true,
+  },
+  {
+    label: "Flagged URLs",
+    path: "/admin/urls/flagged",
+    icon: <AlertTriangleIcon className="size-4" />,
+    exact: true,
+  },
+  {
+    label: "Users",
+    path: "/admin/users",
+    icon: <UsersIcon className="size-4" />,
+    exact: true,
+  },
+  {
+    label: "Database",
+    path: "/admin/database",
+    icon: <DatabaseIcon className="size-4" />,
+    exact: true,
+  },
+];

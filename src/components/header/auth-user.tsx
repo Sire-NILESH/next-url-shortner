@@ -14,7 +14,10 @@ const AuthUser = ({ className, ...props }: Props) => {
   const session = useSession();
 
   return (
-    <div className={cn("", className)} {...props}>
+    <div
+      className={cn("flex items-center justify-center", className)}
+      {...props}
+    >
       {session.status === "loading" ? (
         <Skeleton className="size-9 rounded-full" />
       ) : session.status === "authenticated" ? (

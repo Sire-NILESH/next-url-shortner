@@ -7,7 +7,8 @@ import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import { z } from "zod";
 import { db } from "./db";
-import { users } from "./db/schema";
+import { accounts, sessions, users, verificationTokens } from "./db/schema";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
 
 // extend the types to include role
 declare module "next-auth" {
@@ -72,7 +73,12 @@ export const authConfig: NextAuthConfig = {
       return session;
     },
   },
-
+  adapter: DrizzleAdapter(db, {
+    usersTable: users,
+    accountsTable: accounts,
+    sessionsTable: sessions,
+    verificationTokensTable: verificationTokens,
+  }),
   providers: [
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID,
