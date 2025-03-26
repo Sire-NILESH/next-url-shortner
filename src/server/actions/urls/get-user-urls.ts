@@ -1,8 +1,8 @@
 "use server";
 
-import { ApiResponse } from "@/lib/types";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
+import { ApiResponse } from "@/types/server/types";
 
 export async function getUserUrls(userId: string): Promise<
   ApiResponse<
@@ -28,17 +28,18 @@ export async function getUserUrls(userId: string): Promise<
     const userUrls = await db.query.urls.findMany({
       where: (urls, { eq }) => eq(urls.userId, userId),
       orderBy: (urls, { desc }) => [desc(urls.createdAt)],
+      columns: {
+        id: true,
+        originalUrl: true,
+        shortCode: true,
+        createdAt: true,
+        clicks: true,
+      },
     });
 
     return {
       success: true,
-      data: userUrls.map((url) => ({
-        id: url.id,
-        originalUrl: url.originalUrl,
-        shortCode: url.shortCode,
-        createdAt: url.createdAt,
-        clicks: url.clicks,
-      })),
+      data: userUrls,
     };
   } catch (error) {
     console.error("Error getting user URLs", error);

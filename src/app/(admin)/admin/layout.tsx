@@ -1,13 +1,6 @@
+import AdminLayoutBreadCrumb from "@/components/admin/admin-layout-breadcrum";
 import { AppSidebar } from "@/components/admin/admin-sidebar";
 import FooterCompact from "@/components/footer/footer-compact";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -42,17 +35,8 @@ export default async function AdminLayout({ children }: Props) {
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">Admin</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Overview</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+
+            <AdminLayoutBreadCrumb />
           </div>
         </header>
 

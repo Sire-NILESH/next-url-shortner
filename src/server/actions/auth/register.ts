@@ -1,8 +1,8 @@
 "use server";
 
-import { ApiResponse } from "@/lib/types";
 import { db } from "@/server/db";
 import { users } from "@/server/db/schema";
+import { ApiResponse } from "@/types/server/types";
 import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
 import { z } from "zod";

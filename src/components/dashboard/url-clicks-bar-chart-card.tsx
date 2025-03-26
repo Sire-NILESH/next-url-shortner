@@ -16,7 +16,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { UrlClicksBarChartDataType } from "@/types/types";
+import { UrlClicksBarChartDataType } from "@/types/client/types";
 
 interface UrlClicksBarChartCardProps extends ComponentProps<"div"> {
   barChartConfig: ChartConfig;

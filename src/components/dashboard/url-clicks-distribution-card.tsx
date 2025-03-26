@@ -16,7 +16,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { UrlClicksPieChartDataType } from "@/types/types";
+import { UrlClicksPieChartDataType } from "@/types/client/types";
 
 interface UrlClicksDistributionCardProps extends ComponentProps<"div"> {
   pieChartConfig: ChartConfig;

@@ -1,6 +1,5 @@
 "use server";
 
-import { ApiResponse } from "@/lib/types";
 import { ensureHttps, isValidUrl } from "@/lib/utils";
 import { z } from "zod";
 import { nanoid } from "nanoid";
@@ -9,6 +8,7 @@ import { urls } from "@/server/db/schema";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/server/auth";
 import { checkUrlSafety } from "./check-url-safety";
+import { ApiResponse } from "@/types/server/types";
 
 const shrinkifyUrlSchema = z.object({
   url: z.string().refine(isValidUrl, {
@@ -129,8 +129,6 @@ export async function shrinkifyUrl(formData: FormData): Promise<
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const shortUrl = `${baseUrl}/r/${shortCode}`;
-
-    console.log({ server: shortUrl, baseUrl });
 
     revalidatePath("/");
 

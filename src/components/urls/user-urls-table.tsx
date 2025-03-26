@@ -332,7 +332,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
         <DataTableColumnHeader column={column} title="Clicks" />
       ),
       cell: ({ row }) => (
-        <p className="text-md rounded-lg bg-gray-400/5 p-2 text-center font-medium">
+        <p className="text-md rounded-lg bg-secondary/50 p-2 text-center font-medium">
           {row.original.clicks}
         </p>
       ),

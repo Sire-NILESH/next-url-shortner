@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChartConfig } from "@/components/ui/chart";
-import { Url } from "@/types/types";
+import { Url } from "@/types/client/types";
 import { EqualApproximately, Link, MousePointerClick } from "lucide-react";
 import { useMemo } from "react";
 import { NewShrinkifyURLCard } from "./new-shrinkify-url-card";
@@ -123,36 +123,37 @@ export default function DashboardClient({ userUrls }: { userUrls: Url[] }) {
           </CardDescription>
         </CardHeader>
         <CardContent className="px-4 md:px-6">
-          {barChartData.length > 0 ? (
-            <>
-              <div className="flex flex-col xl:flex-row gap-10">
-                <NewShrinkifyURLCard className="bg-secondary/40" />
+          <>
+            <div className="flex flex-col xl:flex-row gap-10">
+              <NewShrinkifyURLCard className="bg-secondary/40" />
+              {barChartData.length > 0 ? (
+                <>
+                  <UrlClicksBarChartCard
+                    className="bg-secondary/40"
+                    avgClicks={avgClicks}
+                    barChartConfig={barChartConfig}
+                    barChartData={barChartData}
+                    topUrlsLen={topUrls.length}
+                  />
 
-                <UrlClicksBarChartCard
-                  className="bg-secondary/40"
-                  avgClicks={avgClicks}
-                  barChartConfig={barChartConfig}
-                  barChartData={barChartData}
-                  topUrlsLen={topUrls.length}
-                />
-
-                <UrlClicksDistributionCard
-                  className="bg-secondary/40"
-                  avgClicks={avgClicks}
-                  pieChartConfig={pieChartConfig}
-                  pieChartData={pieChartData}
-                  topUrlsLen={topUrls.length}
-                  userUrlsLen={userUrls.length}
-                  totalClicks={totalClicks}
-                />
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No URL data available yet. Create some short URLs to see the
-              stats.
+                  <UrlClicksDistributionCard
+                    className="bg-secondary/40"
+                    avgClicks={avgClicks}
+                    pieChartConfig={pieChartConfig}
+                    pieChartData={pieChartData}
+                    topUrlsLen={topUrls.length}
+                    userUrlsLen={userUrls.length}
+                    totalClicks={totalClicks}
+                  />
+                </>
+              ) : (
+                <div className="flex-1 rounded-xl text-center py-8 bg-muted text-muted-foreground">
+                  No URL data available yet. Create some shrinkify URLs to see
+                  the stats.
+                </div>
+              )}
             </div>
-          )}
+          </>
         </CardContent>
       </Card>
     </>

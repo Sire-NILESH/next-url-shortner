@@ -1,9 +1,9 @@
 "use server";
 
-import { ApiResponse } from "@/lib/types";
 import { auth } from "@/server/auth";
 import { db, eq } from "@/server/db";
 import { urls } from "@/server/db/schema";
+import { ApiResponse } from "@/types/server/types";
 
 export async function deleteUrl(urlId: number): Promise<ApiResponse<null>> {
   try {

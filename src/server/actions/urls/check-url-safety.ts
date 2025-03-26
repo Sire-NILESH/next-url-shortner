@@ -1,7 +1,7 @@
 "use server";
 
+import { ApiResponse } from "@/types/server/types";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { ApiResponse } from "@/lib/types";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY!);
 
