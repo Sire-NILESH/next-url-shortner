@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,6 +27,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { UrlWithUser } from "@/server/actions/admin/urls/get-all-urls";
 import { manageFlaggedUrl } from "@/server/actions/admin/urls/manage-flagged-url";
 import {
@@ -250,12 +257,12 @@ export function AdminUrlsTable({
   const copyToClipboard = async (id: number, shortCode: string) => {
     try {
       setCopyingId(id);
-      const shortUrl = `${window.location.origin}/r/${shortCode}`;
-      await navigator.clipboard.writeText(shortUrl);
-      toast.success("Short URL copied to clipboard.");
+      const shrinkifyUrl = `${window.location.origin}/r/${shortCode}`;
+      await navigator.clipboard.writeText(shrinkifyUrl);
+      toast.success("Shrinkify URL copied to clipboard.");
     } catch (error) {
-      console.error("Error copying URL to clipboard", error);
-      toast.error("Failed to copy short URL to clipboard.");
+      console.error("Error copying Shrinkify URL to clipboard", error);
+      toast.error("Failed to copy Shrinkify URL to clipboard.");
     } finally {
       setTimeout(() => {
         setCopyingId(null);
@@ -362,22 +369,37 @@ export function AdminUrlsTable({
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <code className="bg-muted px-1 py-0.5 rounded text-sm">
-                        {url.shortCode}
-                      </code>
-                      <Button
-                        variant={"ghost"}
-                        size={"icon"}
-                        className="size-6"
-                        onClick={() => copyToClipboard(url.id, url.shortCode)}
-                        disabled={copyingId === url.id}
+                      <Badge
+                        variant="secondary"
+                        className="px-1 py-0.5 rounded text-sm"
                       >
-                        {copyingId === url.id ? (
-                          <Loader2 className="size-3 animate-spin" />
-                        ) : (
-                          <Copy className="size-3" />
-                        )}
-                      </Button>
+                        {url.shortCode}
+                      </Badge>
+
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant={"ghost"}
+                              size={"icon"}
+                              className="size-6"
+                              onClick={() =>
+                                copyToClipboard(url.id, url.shortCode)
+                              }
+                              disabled={copyingId === url.id}
+                            >
+                              {copyingId === url.id ? (
+                                <Loader2 className="size-3 animate-spin" />
+                              ) : (
+                                <Copy className="size-3" />
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Copy Shrinkify URL</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   </TableCell>
                   <TableCell>
