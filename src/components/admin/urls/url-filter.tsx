@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Flag, FlagIcon, ShieldIcon } from "lucide-react";
+import { AlertTriangle, Flag, FlagIcon, ShieldAlert } from "lucide-react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback } from "react";
 
@@ -43,7 +43,6 @@ export function UrlFilter({ initialFilter }: UrlFilterProps) {
         variant={initialFilter === "flagged" ? "secondary" : "outline"}
         size={"sm"}
         onClick={() => handleFilterChange("flagged")}
-        // className="gap-2 text-red-600 dark:text-red-400"
       >
         <FlagIcon className="size-4" />
         All Flagged
@@ -55,7 +54,7 @@ export function UrlFilter({ initialFilter }: UrlFilterProps) {
         onClick={() => handleFilterChange("security")}
         className="gap-2 text-red-600 dark:text-red-400"
       >
-        <ShieldIcon className="size-4" />
+        <ShieldAlert className="size-4" />
         Security Risks
       </Button>
 

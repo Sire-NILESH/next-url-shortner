@@ -15,6 +15,7 @@ export type UrlWithUser = {
   userId: string | null;
   userName: string | null;
   userEmail: string | null;
+  userRole: "user" | "admin" | null;
   flagged: boolean;
   flagReason: string | null;
 };
@@ -121,6 +122,9 @@ export async function getAllUrls(
         userEmail: sql<string | null>`COALESCE(${users.email}, NULL)`.as(
           "userEmail"
         ),
+        userRole: sql<
+          "user" | "admin" | null
+        >`COALESCE(${users.role}, NULL)`.as("userEmail"),
         flagged: urls.flagged,
         flagReason: urls.flagReason,
       })

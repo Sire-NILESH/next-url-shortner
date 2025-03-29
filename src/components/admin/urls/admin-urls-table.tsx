@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/tooltip";
 import { UrlWithUser } from "@/server/actions/admin/urls/get-all-urls";
 import { manageFlaggedUrl } from "@/server/actions/admin/urls/manage-flagged-url";
+import { useMutation } from "@tanstack/react-query";
 import {
   AlertTriangle,
   ArrowDown,
@@ -46,7 +47,11 @@ import {
   ExternalLink,
   Loader2,
   MoreHorizontal,
+  ShieldIcon,
+  User,
+  VenetianMask,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -72,7 +77,6 @@ export function AdminUrlsTable({
 }: UrlsTableProps) {
   const router = useRouter();
   const [copyingId, setCopyingId] = useState<number | null>(null);
-  const [actionLoading, setActionLoading] = useState<number | null>(null);
   const basePath = "/admin/urls";
 
   const limit = 10;
@@ -223,36 +227,38 @@ export function AdminUrlsTable({
     }
   };
 
-  const handleManageFlaggedUrl = async (
-    urlId: number,
-    action: "approve" | "delete"
-  ) => {
-    try {
-      setActionLoading(urlId);
-
-      const response = await manageFlaggedUrl(urlId, action);
-      if (response.success) {
-        toast.success(
-          action === "approve"
+  const {
+    mutate: handleManageFlaggedUrl,
+    variables: currentActionParams,
+    isPending: iscurrentActionPending,
+  } = useMutation({
+    mutationFn: async ({
+      urlId,
+      action,
+    }: {
+      urlId: number;
+      action: "approve" | "delete";
+    }) => {
+      return await manageFlaggedUrl(urlId, action);
+    },
+    onSuccess: (data, { action }) => {
+      toast.success(
+        data.success
+          ? action === "approve"
             ? "URL approved successfully."
             : "URL deleted successfully."
-        );
+          : "Failed to manage flagged URL."
+      );
 
-        router.refresh();
-      } else {
-        toast.error("Failed to manage flagged URL.", {
-          description: response.error || "Unknown error",
-        });
-      }
-    } catch (error) {
+      router.refresh();
+    },
+    onError: (error) => {
       console.error("Error managing flagged URL", error);
       toast.error("Failed to manage flagged URL.", {
         description: "Internal server error",
       });
-    } finally {
-      setActionLoading(null);
-    }
-  };
+    },
+  });
 
   const copyToClipboard = async (id: number, shortCode: string) => {
     try {
@@ -411,6 +417,11 @@ export function AdminUrlsTable({
                     {url.userId ? (
                       <div>
                         <div className="flex items-center gap-2">
+                          {url.userRole === "admin" ? (
+                            <ShieldIcon className="text-foreground size-3.5" />
+                          ) : (
+                            <User className="text-foreground size-3.5" />
+                          )}
                           <span>{url.userName || "Unknown User"}</span>
                         </div>
                         <span className="text-muted-foreground">
@@ -418,9 +429,11 @@ export function AdminUrlsTable({
                         </span>
                       </div>
                     ) : (
-                      <span className="text-muted-foreground text-sm">
-                        Anyonymous
-                      </span>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <VenetianMask className="text-foreground size-3.5" />{" "}
+                        Anonymous
+                        <span className="text-sm"></span>
+                      </div>
                     )}
                   </TableCell>
                   <TableCell>
@@ -448,6 +461,7 @@ export function AdminUrlsTable({
                             href={`${window.location.origin}/r/${url.shortCode}`}
                             target="_blank"
                             rel="noopener noreferrer"
+                            className="w-full"
                           >
                             Visit <span className="brandText">Shrinkify</span>{" "}
                             URL
@@ -459,34 +473,70 @@ export function AdminUrlsTable({
                             href={url.originalUrl}
                             target="_blank"
                             rel="noopener noreferrer"
+                            className="w-full"
                           >
                             Visit Original URL
                           </a>
                         </DropdownMenuItem>
+                        {url.userEmail ? (
+                          <DropdownMenuItem>
+                            <User />
+                            <Link
+                              href={`${
+                                window.location.origin
+                              }/admin/users?search=${encodeURIComponent(
+                                url.userEmail
+                              )}&page=1`}
+                              className="w-full"
+                            >
+                              Go to User
+                            </Link>
+                          </DropdownMenuItem>
+                        ) : null}
                         {url.flagged && (
                           <>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
+                              disabled={
+                                iscurrentActionPending &&
+                                currentActionParams?.urlId === url.id &&
+                                currentActionParams?.action === "approve"
+                              }
                               className="text-green-600 dark:text-green-400"
                               onClick={() =>
-                                handleManageFlaggedUrl(url.id, "approve")
+                                handleManageFlaggedUrl({
+                                  urlId: url.id,
+                                  action: "approve",
+                                })
                               }
                             >
-                              {actionLoading === url.id && (
-                                <Loader2 className="size-4 mr-1" />
-                              )}
+                              {iscurrentActionPending &&
+                                currentActionParams?.urlId === url.id &&
+                                currentActionParams?.action === "approve" && (
+                                  <Loader2 className="size-4 mr-1 animate-spin" />
+                                )}
                               <CheckCircle className="size-4 mr-1 text-green-700" />
                               Approve URL
                             </DropdownMenuItem>
                             <DropdownMenuItem
+                              disabled={
+                                iscurrentActionPending &&
+                                currentActionParams?.urlId === url.id &&
+                                currentActionParams?.action === "delete"
+                              }
                               className="text-red-600 dark:text-red-400"
                               onClick={() =>
-                                handleManageFlaggedUrl(url.id, "delete")
+                                handleManageFlaggedUrl({
+                                  urlId: url.id,
+                                  action: "delete",
+                                })
                               }
                             >
-                              {actionLoading === url.id && (
-                                <Loader2 className="size-4 mr-1" />
-                              )}
+                              {iscurrentActionPending &&
+                                currentActionParams?.urlId === url.id &&
+                                currentActionParams?.action === "delete" && (
+                                  <Loader2 className="size-4 mr-1 animate-spin" />
+                                )}
                               <Ban className="size-4 mr-1 text-red-700" />
                               Delete URL
                             </DropdownMenuItem>
