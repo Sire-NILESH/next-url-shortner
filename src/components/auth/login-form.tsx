@@ -1,12 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeClosed, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import PasswordInput from "../password-input";
 import { Button } from "../ui/button";
 import {
   Form,
@@ -27,8 +28,6 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const [showPassword, setShowPassword] = useState(false);
 
   // Show a success message if user just registered
   useEffect(() => {
@@ -124,30 +123,10 @@ export function LoginForm() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <Input
-                      id="login__password"
-                      placeholder="********"
-                      type={showPassword ? "text" : "password"}
-                      autoComplete="current-password"
-                      disabled={loginMutation.isPending}
-                      {...field}
-                    />
-                    <Button
-                      type="button"
-                      variant={"ghost"}
-                      size={"sm"}
-                      title={showPassword ? "Hide Password" : "Show Password"}
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
-                      aria-controls="login__password"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      className={"absolute right-2 top-1/2 -translate-y-1/2"}
-                    >
-                      {showPassword ? <EyeClosed /> : <Eye />}
-                    </Button>
-                  </div>
+                  <PasswordInput
+                    disabled={loginMutation.isPending}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
