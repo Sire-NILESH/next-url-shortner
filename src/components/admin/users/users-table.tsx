@@ -31,8 +31,8 @@ import {
 import {
   GetAllUsersOptions,
   UserWithoutPassword,
-} from "@/server/actions/users/get-all-users";
-import { updateUserRole } from "@/server/actions/users/update-user-role";
+} from "@/server/actions/admin/users/get-all-users";
+import { updateUserRole } from "@/server/actions/admin/users/update-user-role";
 import { useMutation } from "@tanstack/react-query";
 
 import {

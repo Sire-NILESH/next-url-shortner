@@ -7,16 +7,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getAllUsers } from "@/server/actions/users/get-all-users";
+import { getAllUsers } from "@/server/actions/admin/users/get-all-users";
 
+import AdminPageHeader from "@/components/admin/admin-page-header";
 import { auth } from "@/server/auth";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { adminModules } from "../page";
 
 export const metadata: Metadata = {
   title: "User Management | Admin | ShortLink",
   description: "Manage users in the ShortLink application",
 };
+
+const [adminUsersPageModule] = adminModules.filter(
+  (module) => module.id === "admin-users"
+);
 
 export default async function UserManagementPage({
   searchParams,
@@ -63,9 +69,7 @@ export default async function UserManagementPage({
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
-      </div>
+      <AdminPageHeader className="mb-6" module={adminUsersPageModule} />
 
       <div className="">
         <Card className="shadow-sm">

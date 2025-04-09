@@ -13,7 +13,7 @@ const MainNav = ({ className, ...props }: Props) => {
   return (
     <nav
       className={cn(
-        "flex items-center space-x-4 list-none text-base font-semibold",
+        "flex items-center space-x-4 list-none text-base font-normal",
         className
       )}
       {...props}

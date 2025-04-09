@@ -18,7 +18,7 @@ export function SiteHeader({ className, ...props }: Props) {
       {...props}
     >
       <div className="max-w-5xl mx-2 md:mx-auto">
-        <div className="flex h-20 items-center px-4 md:px-6 space-x-4 md:space-x-10">
+        <div className="flex h-16 items-center px-4 md:px-6 space-x-4 md:space-x-10">
           <Brand />
 
           <div className="flex flex-1">

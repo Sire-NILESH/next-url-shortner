@@ -41,14 +41,7 @@ export function AdminNavMain({
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.label}>
-            <Link
-              href={item.path}
-              // className={cn(
-              //   isActive(item)
-              //     ? "!bg-primary !text-primary-foreground"
-              //     : "hover:bg-muted"
-              // )}
-            >
+            <Link href={item.path}>
               <SidebarMenuButton tooltip={item.label} isActive={isActive(item)}>
                 {item.icon && item.icon}
                 <span>{item.label}</span>

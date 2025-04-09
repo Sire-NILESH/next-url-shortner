@@ -1,6 +1,7 @@
+import AdminPageHeader from "@/components/admin/admin-page-header";
+import { AdminUrlsTable } from "@/components/admin/urls/admin-urls-table";
 import { UrlFilter } from "@/components/admin/urls/url-filter";
 import { UrlSearch } from "@/components/admin/urls/url-search";
-import { AdminUrlsTable } from "@/components/admin/urls/admin-urls-table";
 import {
   Card,
   CardContent,
@@ -12,11 +13,16 @@ import { getAllUrls } from "@/server/actions/admin/urls/get-all-urls";
 import { auth } from "@/server/auth";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { adminModules } from "../page";
 
 export const metadata: Metadata = {
   title: "URL Management - Admin | Shrinkify",
   description: "Manage URLs in the Shrinkify application",
 };
+
+const [adminUrlsPageModule] = adminModules.filter(
+  (module) => module.id === "admin-urls"
+);
 
 export default async function AdminUrlsPage({
   searchParams,
@@ -83,9 +89,7 @@ export default async function AdminUrlsPage({
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">URL Management</h1>
-      </div>
+      <AdminPageHeader className="mb-6" module={adminUrlsPageModule} />
 
       <div className="">
         <Card className="shadow-sm">

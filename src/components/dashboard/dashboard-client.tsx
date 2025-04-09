@@ -73,7 +73,7 @@ export default function DashboardClient({ userUrls }: { userUrls: Url[] }) {
 
   // pie chart config
   const pieChartConfig = {
-    visitors: {
+    clicks: {
       label: "Clicks",
     },
     ...topUrls.reduce((acc, url, index) => {

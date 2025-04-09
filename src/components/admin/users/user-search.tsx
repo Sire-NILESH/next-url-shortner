@@ -1,5 +1,6 @@
 "use client";
 
+import RefreshButton from "@/components/refresh-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
@@ -40,27 +41,30 @@ export function UserSearch({ initialSearch }: UserSearchProps) {
   };
 
   return (
-    <form onSubmit={handleSearch} className="flex gap-2">
-      <div className="relative flex-1">
-        <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Search users"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-9"
-        />
-        {searchTerm && (
-          <button
-            type="button"
-            onClick={clearSearch}
-            className="absolute right-2.5 top-2.5 size-4 text-muted-foreground"
-          >
-            <X className="size-4" />
-          </button>
-        )}
-      </div>
-      <Button type="submit">Search</Button>
-    </form>
+    <div className="flex gap-2 items-center">
+      <form onSubmit={handleSearch} className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search users"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={clearSearch}
+              className="absolute right-2.5 top-2.5 size-4 text-muted-foreground"
+            >
+              <X className="size-4" />
+            </button>
+          )}
+        </div>
+        <Button type="submit">Search</Button>
+      </form>
+      <RefreshButton />
+    </div>
   );
 }

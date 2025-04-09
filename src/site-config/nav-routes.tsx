@@ -1,11 +1,13 @@
 import {
   AlertTriangleIcon,
+  ChartSpline,
   DatabaseIcon,
   House,
   LayoutDashboard,
   LayoutDashboardIcon,
   Link,
   Link2Icon,
+  LinkIcon,
   LogIn,
   UserPlus,
   UsersIcon,
@@ -68,31 +70,52 @@ export const adminDashboardNavItems: AdminDashboardNavItem[] = [
   {
     label: "Overview",
     path: "/admin",
-    icon: <LayoutDashboardIcon className="size-4" />,
+    icon: <LayoutDashboardIcon />,
+    exact: true,
+  },
+  {
+    label: "Analytics",
+    path: "/admin/analytics",
+    icon: <ChartSpline />,
     exact: true,
   },
   {
     label: "URLs",
     path: "/admin/urls",
-    icon: <Link2Icon className="size-4" />,
+    icon: <Link2Icon />,
     exact: true,
   },
   {
     label: "Flagged URLs",
     path: "/admin/urls/flagged",
-    icon: <AlertTriangleIcon className="size-4" />,
+    icon: <AlertTriangleIcon />,
     exact: true,
   },
   {
     label: "Users",
     path: "/admin/users",
-    icon: <UsersIcon className="size-4" />,
+    icon: <UsersIcon />,
     exact: true,
   },
   {
     label: "Database",
     path: "/admin/database",
-    icon: <DatabaseIcon className="size-4" />,
+    icon: <DatabaseIcon />,
+    exact: true,
+  },
+];
+
+export const adminDashboardPlatformNavItems: AdminDashboardNavItem[] = [
+  {
+    label: "Dashboard",
+    path: "/dashboard",
+    icon: <LayoutDashboardIcon />,
+    exact: true,
+  },
+  {
+    label: "My URLs",
+    path: "/my-urls",
+    icon: <LinkIcon />,
     exact: true,
   },
 ];

@@ -1,8 +1,9 @@
 "use client";
 
+import RefreshButton from "@/components/refresh-button";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Flag, FlagIcon, ShieldAlert } from "lucide-react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
 interface UrlFilterProps {
@@ -77,6 +78,8 @@ export function UrlFilter({ initialFilter }: UrlFilterProps) {
         <Flag className="size-4" />
         Other Flags
       </Button>
+
+      <RefreshButton size={"sm"} />
     </div>
   );
 }

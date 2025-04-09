@@ -94,7 +94,7 @@ export async function getAllUsers(
             "flaggedUrlCount"
           ),
         providerType:
-          sql<string>`COALESCE(MIN(${accounts.provider}), 'email')`.as(
+          sql<string>`COALESCE(MIN(${accounts.provider}), 'credentials')`.as(
             "providerType"
           ),
       })

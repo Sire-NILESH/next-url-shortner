@@ -3,6 +3,7 @@
 import { db, eq } from "@/server/db";
 import { urls } from "@/server/db/schema";
 import { ApiResponse } from "@/types/server/types";
+import { sql } from "drizzle-orm";
 
 export async function getUrlByShortCode(shortCode: string): Promise<
   ApiResponse<{
@@ -12,31 +13,32 @@ export async function getUrlByShortCode(shortCode: string): Promise<
   }>
 > {
   try {
-    const url = await db.query.urls.findFirst({
-      where: (urls, { eq }) => eq(urls.shortCode, shortCode),
-    });
+    const [updatedUrl] = await db
+      .update(urls)
+      .set({
+        clicks: sql`${urls.clicks} + 1`,
+        updatedAt: new Date(),
+      })
+      .where(eq(urls.shortCode, shortCode))
+      .returning({
+        originalUrl: urls.originalUrl,
+        flagged: urls.flagged,
+        flagReason: urls.flagReason,
+      });
 
-    if (!url) {
+    if (!updatedUrl) {
       return {
         success: false,
         error: "URL not found",
       };
     }
 
-    await db
-      .update(urls)
-      .set({
-        clicks: url.clicks + 1,
-        updatedAt: new Date(),
-      })
-      .where(eq(urls.shortCode, shortCode));
-
     return {
       success: true,
       data: {
-        originalUrl: url.originalUrl,
-        flagged: url.flagged || false,
-        flagReason: url.flagReason || null,
+        originalUrl: updatedUrl.originalUrl,
+        flagged: updatedUrl.flagged || false,
+        flagReason: updatedUrl.flagReason || null,
       },
     };
   } catch (error) {

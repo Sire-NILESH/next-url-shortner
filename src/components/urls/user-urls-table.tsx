@@ -405,7 +405,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
             placeholder="Search URLs..."
             value={globalFilter ?? ""}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            className="pl-8 h-10"
+            className="pl-8"
           />
         </div>
         <div className="flex flex-wrap gap-2">
