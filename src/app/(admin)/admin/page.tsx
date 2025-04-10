@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getUsersByProviderOverTime } from "@/server/actions/admin/users/get-users-by-provider-over-time";
 import {
   AlertTriangle,
   ArrowRight,
@@ -90,12 +89,6 @@ export const adminModules: AdminModule[] = [
 ];
 
 export default async function AdminPage() {
-  // TODO: DELETE LATER
-  const res = await getUsersByProviderOverTime({
-    timeRange: "30D",
-  });
-  console.log(res);
-
   return (
     <>
       <div className="grid gap-6">

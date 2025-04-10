@@ -35,12 +35,16 @@ const AdminAnalyticsParallelRoutesLayout = ({
                 <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                   {sectionCards}
 
-                  <div className="">{urlCreationChart}</div>
+                  <div className="min-h-98">{urlCreationChart}</div>
 
-                  <div className="@6xl/main:grid-cols-3 @3xl/main:grid-cols-2 grid grid-cols-1 gap-4 ">
-                    <div className="flex-1">{clicksStackedBarChart}</div>
-                    <div className="flex-1">{userByProviderChart}</div>
-                    <div className="@6xl/main:col-span-1 @3xl/main:col-span-2 col-span-1">
+                  <div className="@6xl/main:grid-cols-3 @3xl/main:grid-cols-2 grid grid-cols-1 gap-4">
+                    <div className="flex-1 min-h-108">
+                      {clicksStackedBarChart}
+                    </div>
+                    <div className="flex-1 min-h-108">
+                      {userByProviderChart}
+                    </div>
+                    <div className="@6xl/main:col-span-1 @3xl/main:col-span-2 col-span-1 min-h-108">
                       {userGrowthChart}
                     </div>
                   </div>

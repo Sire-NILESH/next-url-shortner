@@ -59,7 +59,12 @@ export function SectionCards() {
   return (
     <div className="*:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4 grid grid-cols-1 gap-4 bg-card">
       {cardData.map((data, index) => (
-        <SectionCard key={index} data={data} data-slot="card" />
+        <SectionCard
+          className="min-h-46"
+          key={index}
+          data={data}
+          data-slot="card"
+        />
       ))}
     </div>
   );

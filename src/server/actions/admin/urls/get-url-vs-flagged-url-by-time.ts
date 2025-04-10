@@ -4,22 +4,23 @@ import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 import { ApiResponse } from "@/types/server/types";
 import { sql } from "drizzle-orm";
-import { add, sub } from "date-fns";
+import { sub, add } from "date-fns";
 import timeRanges from "@/lib/timeRanges";
 
 type TimeRange = keyof typeof timeRanges | "all time";
 
-interface GetUsersOverTimeOptions {
+interface GetUrlVsFlaggedUrlByTimeOptions {
   timeRange?: TimeRange;
 }
 
-export const getUsersOverTime = async (
-  options: GetUsersOverTimeOptions = { timeRange: "all time" }
+export const getUrlVsFlaggedUrlByTime = async (
+  options: GetUrlVsFlaggedUrlByTimeOptions = { timeRange: "all time" }
 ): Promise<
   ApiResponse<
     {
       period: string;
-      users: number;
+      urls: number;
+      flaggedUrls: number;
     }[]
   >
 > => {
@@ -77,7 +78,8 @@ export const getUsersOverTime = async (
 
     const result = await db.execute<{
       period: string;
-      users: number;
+      urls: number;
+      flaggedUrls: number;
     }>(sql`
       WITH periods AS (
         SELECT generate_series(
@@ -86,21 +88,23 @@ export const getUsersOverTime = async (
           INTERVAL '${sql.raw(interval)}'
         ) AS period
       ),
-      user_counts AS (
-        SELECT 
+      url_counts AS (
+        SELECT
           date_trunc(${sql.raw(
             `'${interval.split(" ")[1]}'`
           )}, "created_at") AS grouped,
-          COUNT(*) AS count
-        FROM users
+          COUNT(*) AS urls,
+          COUNT(*) FILTER (WHERE "flagged" = true) AS flagged
+        FROM urls
         WHERE "created_at" >= ${fromDate.toISOString()}::timestamp
         GROUP BY grouped
       )
       SELECT 
         TO_CHAR(p.period, '${sql.raw(format)}') AS period,
-        COALESCE(u.count, 0)::int AS users
+        COALESCE(u.urls, 0)::int AS urls,
+        COALESCE(u.flagged, 0)::int AS "flaggedUrls"
       FROM periods p
-      LEFT JOIN user_counts u
+      LEFT JOIN url_counts u
         ON date_trunc(${sql.raw(
           `'${interval.split(" ")[1]}'`
         )}, p.period) = u.grouped
@@ -109,10 +113,10 @@ export const getUsersOverTime = async (
 
     return {
       success: true,
-      data: result ?? [{ period: "unknown", users: 0 }],
+      data: result ?? [],
     };
   } catch (error) {
-    console.error("Error fetching getUsersOverTime:", error);
+    console.error("Error fetching getUrlVsFlaggedUrlByTime:", error);
     return { success: false, error: "Internal Server Error" };
   }
 };

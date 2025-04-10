@@ -39,12 +39,12 @@ const UserByProviderDistribution = ({ className, ...props }: Props) => {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          Target growing OAuth providers user base
+          Target OAuth providers user base growth
         </div>
         <div className="leading-none text-muted-foreground">
           {timeRange === "all time"
-            ? "Showing total users per Providers till today"
-            : `Showing total users per Providers for the last ${timeRanges[timeRange]}`}
+            ? "Showing users per Providers till today"
+            : `Showing users per Providers for the last ${timeRanges[timeRange]}`}
         </div>
       </CardFooter>
     </Card>
