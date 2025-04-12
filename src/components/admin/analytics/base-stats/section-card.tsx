@@ -40,7 +40,10 @@ const SectionCard = ({
   ...props
 }: Props) => {
   return (
-    <Card className={cn("@container/card", className)} {...props}>
+    <Card
+      className={cn("@container/card bg-secondary/20", className)}
+      {...props}
+    >
       <CardHeader className="relative">
         {title && (
           <CardDescription className="text-card-foreground">

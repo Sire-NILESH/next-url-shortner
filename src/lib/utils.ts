@@ -17,13 +17,13 @@ export function isValidUrl(url: string): boolean {
 }
 
 export function ensureHttps(url: string): string {
-  if (!url.startsWith("https://") && !url.startsWith("https://")) {
-    return `https://${url}`;
+  if (url.startsWith("https://")) {
+    return url;
   }
 
   if (url.startsWith("http://")) {
     return url.replace("http://", "https://");
   }
 
-  return url;
+  return `https://${url}`;
 }
