@@ -52,7 +52,9 @@ export default async function FlaggedURLsPage({
     | "shortCode"
     | "createdAt"
     | "clicks"
-    | "userName";
+    | "userName"
+    | "threat"
+    | "flagCategory";
   const sortOrder = (params.sortOrder || "desc") as "asc" | "desc";
 
   const response = await getAllUrls({

@@ -6,6 +6,10 @@ import { useMutation } from "@tanstack/react-query";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import {
+  AuthErrorCodes,
+  AuthErrorKey,
+} from "@/lib/auth/errors/auth-error-codes";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -17,7 +21,11 @@ async function loginUser(data: LoginFormValues) {
   });
 
   if (result?.error) {
-    throw new Error("Invalid email or password");
+    if (result.error === "CredentialsSignin" && result.code) {
+      const message = AuthErrorCodes[result.code as AuthErrorKey].message;
+      throw new Error(message);
+    }
+    throw new Error("Could not log you in");
   }
 }
 
@@ -38,7 +46,7 @@ const useLogin = () => {
       router.refresh();
     },
     onError: (error) => {
-      toast.error("Invalid email or password", {
+      toast.error("Login failed", {
         description: error instanceof Error ? error.message : "Try again.",
       });
     },

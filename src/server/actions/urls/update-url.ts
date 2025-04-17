@@ -13,8 +13,8 @@ const updateUrlSchema = z.object({
     .string()
     .max(255, "Custom code must be less than 255 characters")
     .regex(/^[a-zA-Z0-9_-]+$/, "Custom code must be alphanumeric or hyphen"),
+  name: z.string().max(255, "Name must be less than 255 characters").optional(),
 });
-
 export async function updateUrl(
   formData: FormData
 ): Promise<ApiResponse<{ shortUrl: string }>> {
@@ -32,6 +32,7 @@ export async function updateUrl(
     const validatedFields = updateUrlSchema.safeParse({
       id: formData.get("id"),
       customCode: formData.get("customCode"),
+      name: formData.get("name"),
     });
 
     if (!validatedFields.success) {
@@ -74,6 +75,7 @@ export async function updateUrl(
       .update(urls)
       .set({
         shortCode: customCode,
+        name: validatedFields.data.name || null,
         updatedAt: new Date(),
       })
       .where(eq(urls.id, id));

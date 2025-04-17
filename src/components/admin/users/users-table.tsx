@@ -8,7 +8,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -28,11 +34,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatNumber } from "@/lib/formatNum";
 import {
   GetAllUsersOptions,
   UserWithoutPassword,
 } from "@/server/actions/admin/users/get-all-users";
 import { updateUserRole } from "@/server/actions/admin/users/update-user-role";
+import { updateUserStatus } from "@/server/actions/admin/users/update-user-status";
 import { useMutation } from "@tanstack/react-query";
 
 import {
@@ -43,6 +51,7 @@ import {
   MoreHorizontalIcon,
   ShieldIcon,
   User,
+  UserRoundPen,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -57,6 +66,14 @@ interface UsersTableProps {
   currentSortBy: SortBy;
   currentSortOrder: string;
 }
+
+type UserStatus = "active" | "suspended" | "inactive";
+
+const USER_STATUS_OPTIONS = [
+  { status: "active", label: "Active" },
+  { status: "suspended", label: "Suspended" },
+  { status: "inactive", label: "Inactive" },
+];
 
 export function UsersTable({
   users,
@@ -215,8 +232,8 @@ export function UsersTable({
 
   const {
     mutate: handleRoleToggle,
-    variables: currentActionParams,
-    isPending: isCurrentActionPending,
+    variables: roleActionParams,
+    isPending: isRoleActionPending,
   } = useMutation({
     mutationFn: async ({
       userId,
@@ -250,6 +267,48 @@ export function UsersTable({
       });
     },
   });
+
+  const {
+    mutate: handleUserStatus,
+    variables: statusActionParams,
+    isPending: isUserStatusActionPending,
+  } = useMutation({
+    mutationFn: async ({
+      userId,
+      newUserStatus,
+    }: {
+      userId: string;
+      newUserStatus: UserStatus;
+    }) => {
+      return await updateUserStatus(userId, newUserStatus);
+    },
+    onSuccess: (data, { newUserStatus }) => {
+      if (data.success) {
+        toast.success("User status updated successfully", {
+          description: `User status has been updated to ${newUserStatus}`,
+        });
+
+        router.refresh();
+      } else {
+        toast.error("Failed to update user status", {
+          description: data.error || "An error occurred",
+        });
+      }
+    },
+    onError: () => {
+      console.error("Error updating user status");
+      toast.error("Failed to update user status", {
+        description: "An error occurred",
+      });
+    },
+  });
+
+  function isCurrentRowPerformingAction(userId: string) {
+    return (
+      (isRoleActionPending && roleActionParams?.userId === userId) ||
+      (isUserStatusActionPending && statusActionParams?.userId === userId)
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -296,7 +355,7 @@ export function UsersTable({
                   onClick={() => handleSort("flaggedUrlCount")}
                   className="-ml-2"
                 >
-                  Flagged Urls
+                  Flagged
                   {getSortIcon("flaggedUrlCount")}
                 </Button>
               </TableHead>
@@ -310,7 +369,16 @@ export function UsersTable({
                   {getSortIcon("providerType")}
                 </Button>
               </TableHead>
-
+              <TableHead>
+                <Button
+                  variant={"ghost"}
+                  onClick={() => handleSort("status")}
+                  className="-ml-2"
+                >
+                  Status
+                  {getSortIcon("providerType")}
+                </Button>
+              </TableHead>
               <TableHead className="w-[120px]">
                 <Button
                   variant={"ghost"}
@@ -367,16 +435,32 @@ export function UsersTable({
                   <TableCell>
                     {" "}
                     <p className="text-md rounded-lg bg-secondary/50 p-2 text-center font-medium">
-                      {user.urlCount}
+                      {formatNumber(user.urlCount)}
                     </p>
                   </TableCell>
                   <TableCell>
                     <p className="text-md rounded-lg bg-secondary/50 p-2 text-center font-medium">
-                      {user.flaggedUrlCount}
+                      {formatNumber(user.flaggedUrlCount)}
                     </p>
                   </TableCell>
                   <TableCell>
                     <p className="text-md">{user.providerType}</p>
+                  </TableCell>
+                  <TableCell>
+                    <p className="text-md">
+                      <Badge
+                        className="rounded-sm"
+                        variant={
+                          user.status === "active"
+                            ? "secondary"
+                            : user.status === "suspended"
+                            ? "destructive"
+                            : "outline"
+                        }
+                      >
+                        {user.status}
+                      </Badge>
+                    </p>
                   </TableCell>
                   <TableCell>
                     <Badge
@@ -400,13 +484,9 @@ export function UsersTable({
                         <Button
                           variant={"outline"}
                           size={"icon"}
-                          disabled={
-                            isCurrentActionPending &&
-                            currentActionParams?.userId === user.id
-                          }
+                          disabled={isCurrentRowPerformingAction(user.id)}
                         >
-                          {isCurrentActionPending &&
-                          currentActionParams?.userId === user.id ? (
+                          {isCurrentRowPerformingAction(user.id) ? (
                             <Loader2 className="size-4 animate-spin" />
                           ) : (
                             <MoreHorizontalIcon />
@@ -428,10 +508,7 @@ export function UsersTable({
                               currentRole: user.role,
                             })
                           }
-                          disabled={
-                            isCurrentActionPending &&
-                            currentActionParams?.userId === user.id
-                          }
+                          disabled={isCurrentRowPerformingAction(user.id)}
                         >
                           {user.role === "user" ? (
                             <ShieldIcon className="size-3.5 text-blue-600" />
@@ -442,6 +519,40 @@ export function UsersTable({
                             user.role === "admin" ? "Demote" : "Promote"
                           } to ${user.role === "admin" ? "User" : "Admin"}`}
                         </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger className="gap-2">
+                            <UserRoundPen className="size-4 text-muted-foreground" />
+                            <span>User Status</span>
+                          </DropdownMenuSubTrigger>
+                          <DropdownMenuPortal>
+                            <DropdownMenuSubContent>
+                              <DropdownMenuRadioGroup
+                                value={user.status}
+                                onValueChange={(status) => {
+                                  handleUserStatus({
+                                    userId: user.id,
+                                    newUserStatus: status as UserStatus,
+                                  });
+                                }}
+                              >
+                                {USER_STATUS_OPTIONS.map((statusOption) => (
+                                  <DropdownMenuRadioItem
+                                    key={statusOption.status}
+                                    disabled={isCurrentRowPerformingAction(
+                                      user.id
+                                    )}
+                                    value={statusOption.status}
+                                  >
+                                    {statusOption.label}
+                                  </DropdownMenuRadioItem>
+                                ))}
+                              </DropdownMenuRadioGroup>
+                            </DropdownMenuSubContent>
+                          </DropdownMenuPortal>
+                        </DropdownMenuSub>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

@@ -10,6 +10,7 @@ export async function getUserUrls(userId: string): Promise<
       id: number;
       originalUrl: string;
       shortCode: string;
+      name: string | null;
       createdAt: Date;
       clicks: number;
     }>
@@ -32,6 +33,7 @@ export async function getUserUrls(userId: string): Promise<
         id: true,
         originalUrl: true,
         shortCode: true,
+        name: true,
         createdAt: true,
         clicks: true,
       },

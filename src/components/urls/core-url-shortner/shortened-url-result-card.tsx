@@ -7,10 +7,12 @@ import FlaggedURLInfo from "./flagged-url-info";
 import { cn } from "@/lib/utils";
 import { QRCodeModal } from "../../modals/qr-code-modal";
 import { toast } from "sonner";
+import { ThreatTypeEnum } from "@/types/server/types";
 
 type Props = ComponentProps<"div"> & {
   shortUrl: string;
   shortCode: string | null;
+  threat: ThreatTypeEnum;
   flaggedInfo: null | {
     flagged: boolean;
     reason: string | null;
@@ -22,6 +24,7 @@ const ShortenedURLResultCard = ({
   className,
   shortUrl,
   shortCode,
+  threat,
   flaggedInfo,
   ...props
 }: Props) => {
@@ -60,6 +63,7 @@ const ShortenedURLResultCard = ({
           <Button
             type="button"
             variant={"outline"}
+            disabled={!!threat}
             className="flex-shrink-0"
             onClick={copyToClipboard}
           >
@@ -68,6 +72,7 @@ const ShortenedURLResultCard = ({
           </Button>
           <Button
             type="button"
+            disabled={!!threat}
             variant={"outline"}
             className="flex-shrink-0"
             onClick={showQrCode}

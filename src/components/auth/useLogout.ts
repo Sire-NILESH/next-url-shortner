@@ -4,14 +4,14 @@ import { useMutation } from "@tanstack/react-query";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
 
-async function logOutUser() {
-  return await signOut();
+async function logOutUser(redirect?: false | undefined) {
+  return await signOut({ redirect });
 }
 
-function useLogout() {
+function useLogout(redirect?: false | undefined) {
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await logOutUser();
+      await logOutUser(redirect);
     },
     onSuccess: () => {
       toast.success("Logged out", {

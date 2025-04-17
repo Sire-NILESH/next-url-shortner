@@ -56,6 +56,7 @@ export async function registerUser(
       email: email.toLowerCase(),
       password: hashedPassword,
       role: "user",
+      status: "active",
       createdAt: new Date(),
       updatedAt: new Date(),
     });

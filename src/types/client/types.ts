@@ -2,6 +2,7 @@ export type Url = {
   id: number;
   originalUrl: string;
   shortCode: string;
+  name: string | null;
   createdAt: Date;
   clicks: number;
 };

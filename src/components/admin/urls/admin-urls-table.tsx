@@ -7,7 +7,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -33,21 +39,29 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { UrlWithUser } from "@/server/actions/admin/urls/get-all-urls";
+import { formatNumber } from "@/lib/formatNum";
+import { cn } from "@/lib/utils";
+import {
+  GetAllUrlsOptions,
+  UrlWithUser,
+} from "@/server/actions/admin/urls/get-all-urls";
 import { manageFlaggedUrl } from "@/server/actions/admin/urls/manage-flagged-url";
+import { updateUrlStatus } from "@/server/actions/admin/urls/update-url-status";
+import { BASE_URL } from "@/site-config/base-url";
 import { useMutation } from "@tanstack/react-query";
 import {
   AlertTriangle,
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
-  Ban,
   CheckCircle,
   Copy,
   ExternalLink,
   Loader2,
-  MoreHorizontal,
+  MoreHorizontalIcon,
+  PencilLine,
   ShieldIcon,
+  Trash2,
   User,
   VenetianMask,
 } from "lucide-react";
@@ -56,15 +70,25 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
+type SortBy = GetAllUrlsOptions["sortBy"];
+
 interface UrlsTableProps {
   urls: UrlWithUser[];
   total: number;
   currentPage: number;
   currentSearch: string;
-  currentSortBy: string;
+  currentSortBy: SortBy;
   currentSortOrder: string;
   highlightStyle?: "security" | "inappropriate" | "other" | "none";
 }
+
+type URLStatus = "active" | "suspended" | "inactive";
+
+const URL_STATUS_OPTIONS = [
+  { status: "active", label: "Active" },
+  { status: "suspended", label: "Suspended" },
+  { status: "inactive", label: "Inactive" },
+];
 
 export function AdminUrlsTable({
   urls,
@@ -82,14 +106,16 @@ export function AdminUrlsTable({
   const limit = 10;
   const totalPage = Math.ceil(total / limit);
 
-  const handleSort = (column: string) => {
+  const handleSort = (column: SortBy) => {
     const params = new URLSearchParams();
 
     if (currentSearch) {
       params.set("search", currentSearch);
     }
 
-    params.set("sortBy", column);
+    if (column !== undefined) {
+      params.set("sortBy", column);
+    }
 
     if (currentSortBy === column) {
       params.set("sortOrder", currentSortOrder === "asc" ? "desc" : "asc");
@@ -186,7 +212,7 @@ export function AdminUrlsTable({
     return items;
   };
 
-  const getSortIcon = (column: string) => {
+  const getSortIcon = (column: SortBy) => {
     if (currentSortBy !== column) {
       return <ArrowUpDown className="ml-2 size-4" />;
     }
@@ -227,10 +253,18 @@ export function AdminUrlsTable({
     }
   };
 
+  function isCurrentRowPerformingAction(urlId: number) {
+    return (
+      (isUrlApprovalActionPending &&
+        urlApprovalActionParams?.urlId === urlId) ||
+      (isUrlStatusActionPending && urlStatusActionParams?.urlId === urlId)
+    );
+  }
+
   const {
-    mutate: handleManageFlaggedUrl,
-    variables: currentActionParams,
-    isPending: iscurrentActionPending,
+    mutate: handleUrlApproval,
+    variables: urlApprovalActionParams,
+    isPending: isUrlApprovalActionPending,
   } = useMutation({
     mutationFn: async ({
       urlId,
@@ -260,10 +294,45 @@ export function AdminUrlsTable({
     },
   });
 
+  const {
+    mutate: handleUrlStatus,
+    variables: urlStatusActionParams,
+    isPending: isUrlStatusActionPending,
+  } = useMutation({
+    mutationFn: async ({
+      urlId,
+      newUrlStatus,
+    }: {
+      urlId: number;
+      newUrlStatus: URLStatus;
+    }) => {
+      return await updateUrlStatus(urlId, newUrlStatus);
+    },
+    onSuccess: (data, { newUrlStatus }) => {
+      if (data.success) {
+        toast.success("URL status updated successfully", {
+          description: `URL status has been updated to ${newUrlStatus}`,
+        });
+
+        router.refresh();
+      } else {
+        toast.error("Failed to update URL status", {
+          description: data.error || "An error occurred",
+        });
+      }
+    },
+    onError: (error) => {
+      console.error("Error updating URL status", error);
+      toast.error("Failed to update URL status.", {
+        description: "An error occurred",
+      });
+    },
+  });
+
   const copyToClipboard = async (id: number, shortCode: string) => {
     try {
       setCopyingId(id);
-      const shrinkifyUrl = `${window.location.origin}/r/${shortCode}`;
+      const shrinkifyUrl = `${BASE_URL}/r/${shortCode}`;
       await navigator.clipboard.writeText(shrinkifyUrl);
       toast.success("Shrinkify URL copied to clipboard.");
     } catch (error) {
@@ -306,9 +375,39 @@ export function AdminUrlsTable({
                 <Button
                   variant={"ghost"}
                   className="-m-2 flex items-center font-medium"
+                  onClick={() => handleSort("flagCategory")}
+                >
+                  Category
+                  {getSortIcon("flagCategory")}
+                </Button>
+              </TableHead>
+              <TableHead className="w-[100px]">
+                <Button
+                  variant={"ghost"}
+                  className="-m-2 flex items-center font-medium"
+                  onClick={() => handleSort("threat")}
+                >
+                  Threat
+                  {getSortIcon("threat")}
+                </Button>
+              </TableHead>
+              <TableHead className="w-[100px]">
+                <Button
+                  variant={"ghost"}
+                  className="-m-2 flex items-center font-medium"
                   onClick={() => handleSort("clicks")}
                 >
                   Clicks
+                  {getSortIcon("clicks")}
+                </Button>
+              </TableHead>
+              <TableHead className="w-[100px]">
+                <Button
+                  variant={"ghost"}
+                  className="-m-2 flex items-center font-medium"
+                  onClick={() => handleSort("status")}
+                >
+                  Status
                   {getSortIcon("clicks")}
                 </Button>
               </TableHead>
@@ -368,7 +467,10 @@ export function AdminUrlsTable({
                       <ExternalLink className="ml-1 text-blue-600 size-3.5" />
                     </div>
                     {url.flagged && url.flagReason && (
-                      <div className="mt-1 text-xs text-yellow-600 dark:text-yellow-400 max-w-[450px] truncate">
+                      <div
+                        title={url.flagReason}
+                        className="mt-1 text-xs text-yellow-600 dark:text-yellow-400 max-w-[450px] truncate"
+                      >
                         Reason: {url.flagReason}
                       </div>
                     )}
@@ -409,22 +511,62 @@ export function AdminUrlsTable({
                     </div>
                   </TableCell>
                   <TableCell>
+                    <Badge
+                      variant="secondary"
+                      className="mx-auto rounded-sm uppercase"
+                    >
+                      {url.flagCategory}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={url.threat ? "destructive" : "outline"}
+                      className={cn("mx-auto rounded-sm uppercase")}
+                    >
+                      {url.threat ?? "none"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
                     <p className="text-md rounded-lg bg-secondary/50 p-2 text-center font-medium">
-                      {url.clicks}
+                      {formatNumber(url.clicks)}
+                    </p>
+                  </TableCell>
+                  <TableCell>
+                    <p className="text-md">
+                      <Badge
+                        className="rounded-sm"
+                        variant={
+                          url.status === "active"
+                            ? "secondary"
+                            : url.status === "suspended"
+                            ? "destructive"
+                            : "outline"
+                        }
+                      >
+                        {url.status}
+                      </Badge>
                     </p>
                   </TableCell>
                   <TableCell>
                     {url.userId ? (
-                      <div>
+                      <div className="max-w-50">
                         <div className="flex items-center gap-2">
                           {url.userRole === "admin" ? (
                             <ShieldIcon className="text-foreground size-3.5" />
                           ) : (
                             <User className="text-foreground size-3.5" />
                           )}
-                          <span>{url.userName || "Unknown User"}</span>
+                          <span
+                            title={url.userName || "Unknown User"}
+                            className="line-clamp-1"
+                          >
+                            {url.userName || "Unknown User"}
+                          </span>
                         </div>
-                        <span className="text-muted-foreground">
+                        <span
+                          title={url.userEmail || "Unknown email"}
+                          className="text-muted-foreground line-clamp-1"
+                        >
                           {url.userEmail || "Unknown email"}
                         </span>
                       </div>
@@ -442,8 +584,16 @@ export function AdminUrlsTable({
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant={"outline"} size={"icon"}>
-                          <MoreHorizontal className="size-4" />
+                        <Button
+                          variant={"outline"}
+                          size={"icon"}
+                          disabled={isCurrentRowPerformingAction(url.id)}
+                        >
+                          {isCurrentRowPerformingAction(url.id) ? (
+                            <Loader2 className="size-4 animate-spin" />
+                          ) : (
+                            <MoreHorizontalIcon />
+                          )}
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -456,9 +606,9 @@ export function AdminUrlsTable({
                           Copy <span className="brandText">Shrinkify</span> URL
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <ExternalLink className="text-blue-600" />
+                          <ExternalLink />
                           <a
-                            href={`${window.location.origin}/r/${url.shortCode}`}
+                            href={`${BASE_URL}/r/${url.shortCode}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-full"
@@ -468,7 +618,7 @@ export function AdminUrlsTable({
                           </a>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <ExternalLink className="text-blue-600" />
+                          <ExternalLink />
                           <a
                             href={url.originalUrl}
                             target="_blank"
@@ -478,14 +628,12 @@ export function AdminUrlsTable({
                             Visit Original URL
                           </a>
                         </DropdownMenuItem>
-                        {url.userEmail ? (
+                        {url.userId ? (
                           <DropdownMenuItem>
                             <User />
                             <Link
-                              href={`${
-                                window.location.origin
-                              }/admin/users?search=${encodeURIComponent(
-                                url.userEmail
+                              href={`${BASE_URL}/admin/users?search=${encodeURIComponent(
+                                url.userId
                               )}&page=1`}
                               className="w-full"
                             >
@@ -498,21 +646,20 @@ export function AdminUrlsTable({
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               disabled={
-                                iscurrentActionPending &&
-                                currentActionParams?.urlId === url.id &&
-                                currentActionParams?.action === "approve"
+                                isCurrentRowPerformingAction(url.id) &&
+                                urlApprovalActionParams?.action === "approve"
                               }
                               className="text-green-600 dark:text-green-400"
                               onClick={() =>
-                                handleManageFlaggedUrl({
+                                handleUrlApproval({
                                   urlId: url.id,
                                   action: "approve",
                                 })
                               }
                             >
-                              {iscurrentActionPending &&
-                                currentActionParams?.urlId === url.id &&
-                                currentActionParams?.action === "approve" && (
+                              {isCurrentRowPerformingAction(url.id) &&
+                                urlApprovalActionParams?.action ===
+                                  "approve" && (
                                   <Loader2 className="size-4 mr-1 animate-spin" />
                                 )}
                               <CheckCircle className="size-4 mr-1 text-green-700" />
@@ -520,28 +667,61 @@ export function AdminUrlsTable({
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               disabled={
-                                iscurrentActionPending &&
-                                currentActionParams?.urlId === url.id &&
-                                currentActionParams?.action === "delete"
+                                isCurrentRowPerformingAction(url.id) &&
+                                urlApprovalActionParams?.action === "delete"
                               }
                               className="text-red-600 dark:text-red-400"
                               onClick={() =>
-                                handleManageFlaggedUrl({
+                                handleUrlApproval({
                                   urlId: url.id,
                                   action: "delete",
                                 })
                               }
                             >
-                              {iscurrentActionPending &&
-                                currentActionParams?.urlId === url.id &&
-                                currentActionParams?.action === "delete" && (
+                              {isCurrentRowPerformingAction(url.id) &&
+                                urlApprovalActionParams?.action ===
+                                  "delete" && (
                                   <Loader2 className="size-4 mr-1 animate-spin" />
                                 )}
-                              <Ban className="size-4 mr-1 text-red-700" />
+                              <Trash2 className="size-4 mr-1 text-red-700" />
                               Delete URL
                             </DropdownMenuItem>
                           </>
                         )}
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger className="gap-2">
+                            <PencilLine className="size-4 text-muted-foreground" />
+                            <span>URL Status</span>
+                          </DropdownMenuSubTrigger>
+                          <DropdownMenuPortal>
+                            <DropdownMenuSubContent>
+                              <DropdownMenuRadioGroup
+                                value={url.status}
+                                onValueChange={(status) => {
+                                  handleUrlStatus({
+                                    urlId: url.id,
+                                    newUrlStatus: status as URLStatus,
+                                  });
+                                }}
+                              >
+                                {URL_STATUS_OPTIONS.map((statusOption) => (
+                                  <DropdownMenuRadioItem
+                                    key={statusOption.status}
+                                    disabled={isCurrentRowPerformingAction(
+                                      url.id
+                                    )}
+                                    value={statusOption.status}
+                                  >
+                                    {statusOption.label}
+                                  </DropdownMenuRadioItem>
+                                ))}
+                              </DropdownMenuRadioGroup>
+                            </DropdownMenuSubContent>
+                          </DropdownMenuPortal>
+                        </DropdownMenuSub>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

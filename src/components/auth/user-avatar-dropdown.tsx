@@ -45,7 +45,7 @@ export function UserAvatarDropdown() {
         </DropdownMenuItem>
         <DropdownMenuItem
           disabled={logoutStatus === "pending"}
-          onClick={async () => await logoutUser()}
+          onClick={() => logoutUser()}
         >
           {logoutStatus === "pending" ? (
             <Loader className="animate-spin" />

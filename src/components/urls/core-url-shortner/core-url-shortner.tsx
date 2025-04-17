@@ -1,14 +1,17 @@
 "use client";
 
+import { Separator } from "@/components/ui/separator";
 import { UrlFormData, urlSchema } from "@/lib/URLSchema";
+import { cn } from "@/lib/utils";
+import { shrinkifyUrl } from "@/server/actions/urls/shrinkify-url";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
-import { ComponentProps } from "react";
+import { ComponentProps, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
-import { SignupSuggestionDialog } from "../../dialogs/signup-suggestion-dialog";
+import { DashboardSuggestionDialog } from "../../dialogs/dashboard-suggestion-dialog";
 import { Button } from "../../ui/button";
 import {
   Form,
@@ -19,13 +22,12 @@ import {
 } from "../../ui/form";
 import { Input } from "../../ui/input";
 import ShortenedURLResultCard from "./shortened-url-result-card";
-import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
-import { shrinkifyUrl } from "@/server/actions/urls/shrinkify-url";
+import { BASE_URL } from "@/site-config/base-url";
 
 type Props = ComponentProps<"div">;
 
 export function CoreUrlShortner({ className, ...props }: Props) {
+  const [showDashboardSuggestion, setShowDashboardSuggestion] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -50,6 +52,11 @@ export function CoreUrlShortner({ className, ...props }: Props) {
       const response = await shrinkifyUrl(formData);
 
       if (!response.success) {
+        // 🔁 Perform redirect on client side if redicrect url is present
+        if (response.redirect) {
+          window.location.href = response.redirect;
+        }
+
         throw new Error(response.error);
       }
 
@@ -77,6 +84,28 @@ export function CoreUrlShortner({ className, ...props }: Props) {
       toast.error(message);
     },
   });
+
+  useEffect(() => {
+    const hasSeenDashboardSuggestion = sessionStorage.getItem(
+      "hasSeenDashboardSuggestion"
+    );
+
+    if (
+      !hasSeenDashboardSuggestion &&
+      pathname === "/" &&
+      session?.user &&
+      mutation.data?.success &&
+      !mutation.data.data.threat
+    ) {
+      setShowDashboardSuggestion(true);
+      sessionStorage.setItem("hasSeenDashboardSuggestion", "true");
+    }
+  }, [
+    mutation?.data?.data.threat,
+    mutation.data?.success,
+    pathname,
+    session?.user,
+  ]);
 
   const onSubmit = (data: UrlFormData) => mutation.mutate(data);
 
@@ -141,8 +170,7 @@ export function CoreUrlShortner({ className, ...props }: Props) {
                   <FormControl>
                     <div className="flex items-center w-full @sm:w-fit @sm:max-w-lg mx-auto">
                       <span className="text-sm text-muted-foreground mr-2">
-                        {process.env.NEXT_PUBLIC_APP_URL ||
-                          window.location.origin}
+                        {BASE_URL}
                         /r/
                       </span>
                       <Input
@@ -164,6 +192,7 @@ export function CoreUrlShortner({ className, ...props }: Props) {
         {mutation.data?.data?.shortUrl && (
           <ShortenedURLResultCard
             className="mt-10 md:mt-16"
+            threat={mutation.data.data.threat}
             shortUrl={mutation.data.data.shortUrl}
             shortCode={mutation.data.data.shortUrl.split("/r/")[1]}
             flaggedInfo={
@@ -178,9 +207,9 @@ export function CoreUrlShortner({ className, ...props }: Props) {
           />
         )}
       </div>
-      <SignupSuggestionDialog
-        isOpen={!session?.user && !!mutation.data?.data?.shortUrl}
-        onOpenChange={() => {}}
+      <DashboardSuggestionDialog
+        isOpen={showDashboardSuggestion}
+        onOpenChange={() => setShowDashboardSuggestion((prev) => !prev)}
         shortUrl={mutation.data?.data?.shortUrl || ""}
       />
     </>

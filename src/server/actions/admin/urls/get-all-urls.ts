@@ -4,7 +4,13 @@ import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 import { and, asc, desc, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
 import { urls, users } from "@/server/db/schema";
-import { ApiResponse } from "@/types/server/types";
+import {
+  ApiResponse,
+  FlagCategoryTypeEnum,
+  ThreatTypeEnum,
+  UrlStatusTypeEnum,
+  UserRoleTypeEnum,
+} from "@/types/server/types";
 
 export type UrlWithUser = {
   id: number;
@@ -15,15 +21,26 @@ export type UrlWithUser = {
   userId: string | null;
   userName: string | null;
   userEmail: string | null;
-  userRole: "user" | "admin" | null;
+  userRole: UserRoleTypeEnum;
   flagged: boolean;
+  flagCategory: FlagCategoryTypeEnum;
   flagReason: string | null;
+  threat: ThreatTypeEnum;
+  status: UrlStatusTypeEnum;
 };
 
-type GetAllUrlsOptions = {
+export type GetAllUrlsOptions = {
   page?: number;
   limit?: number;
-  sortBy?: "originalUrl" | "shortCode" | "createdAt" | "clicks" | "userName";
+  sortBy?:
+    | "originalUrl"
+    | "shortCode"
+    | "createdAt"
+    | "clicks"
+    | "userName"
+    | "threat"
+    | "flagCategory"
+    | "status";
   sortOrder?: "asc" | "desc";
   search?: string;
   filter?: "all" | "flagged" | "security" | "inappropriate" | "other";
@@ -122,11 +139,14 @@ export async function getAllUrls(
         userEmail: sql<string | null>`COALESCE(${users.email}, NULL)`.as(
           "userEmail"
         ),
-        userRole: sql<
-          "user" | "admin" | null
-        >`COALESCE(${users.role}, NULL)`.as("userEmail"),
+        userRole: sql<UserRoleTypeEnum>`COALESCE(${users.role}, NULL)`.as(
+          "userRole"
+        ),
         flagged: urls.flagged,
         flagReason: urls.flagReason,
+        flagCategory: urls.flagCategory,
+        threat: urls.threat,
+        status: urls.status,
       })
       .from(urls)
       .leftJoin(users, eq(urls.userId, users.id))

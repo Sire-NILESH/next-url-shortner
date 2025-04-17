@@ -4,11 +4,15 @@ import { ensureHttps, isValidUrl } from "@/lib/utils";
 import { z } from "zod";
 import { nanoid } from "nanoid";
 import { db } from "@/server/db";
-import { urls } from "@/server/db/schema";
-import { revalidatePath } from "next/cache";
+import { eq } from "drizzle-orm";
+import { urls, users } from "@/server/db/schema";
 import { auth } from "@/server/auth";
 import { checkUrlSafety } from "./check-url-safety";
-import { ApiResponse } from "@/types/server/types";
+import {
+  ApiResponse,
+  FlagCategoryTypeEnum,
+  ThreatTypeEnum,
+} from "@/types/server/types";
 
 const shrinkifyUrlSchema = z.object({
   url: z.string().refine(isValidUrl, {
@@ -26,6 +30,7 @@ const shrinkifyUrlSchema = z.object({
 export async function shrinkifyUrl(formData: FormData): Promise<
   ApiResponse<{
     shortUrl: string;
+    threat: ThreatTypeEnum;
     flagged: boolean;
     flagReason?: string | null;
     message?: string;
@@ -34,6 +39,31 @@ export async function shrinkifyUrl(formData: FormData): Promise<
   try {
     const session = await auth();
     const userId = session?.user?.id;
+
+    if (!userId) {
+      return { success: false, error: "You need to be logged in" };
+    }
+
+    // Fetch fresh user data and check user status
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+
+    if (!user) {
+      return { success: false, error: "User not found" };
+    }
+
+    if (user.status === "suspended") {
+      return {
+        success: false,
+        error: "Your account is suspended and cannot create shrinkify URLs.",
+      };
+    }
+
+    if (user.status === "inactive") {
+      return {
+        success: false,
+        redirect: "/inactive-user",
+      };
+    }
 
     const url = formData.get("url") as string;
     const customCode = formData.get("customCode") as string;
@@ -58,28 +88,38 @@ export async function shrinkifyUrl(formData: FormData): Promise<
     const safetyCheck = await checkUrlSafety(originalUrl);
 
     let flagged = false;
-    let flagReason = null;
+    let flagReason: string | null = null;
+    let threatType: ThreatTypeEnum = null;
+    let flagCategory: FlagCategoryTypeEnum = null;
 
     if (safetyCheck.success && safetyCheck.data) {
-      flagged = safetyCheck.data.flagged;
-      flagReason = safetyCheck.data.reason;
+      const ai = safetyCheck.data;
 
+      flagged = ai.flagged;
+      flagReason = ai.reason;
+      flagCategory = ai.category;
+
+      // Set to malicious only if confidence is high
       if (
-        safetyCheck.data.category === "malicious" &&
-        safetyCheck.data.confidence > 0.7 &&
+        ai.category === "malicious" &&
+        ai.confidence > 0.7 &&
         session?.user?.role !== "admin"
       ) {
         return {
           success: false,
-          error: "This URL is flagged as malicious",
+          error: "This URL is flagged as malicious and cannot be shortened.",
         };
       }
     }
 
+    // Get threat type from Safe Browsing
+    threatType = safetyCheck.success
+      ? (safetyCheck.data?.threat as ThreatTypeEnum) ?? null
+      : null;
+
     let shortCode = validatedFields.data.customCode || nanoid(6);
 
     if (validatedFields.data.customCode) {
-      // Check if the custom code already exists
       const existingCustomCode = await db.query.urls.findFirst({
         where: (urls, { eq }) => eq(urls.shortCode, shortCode),
       });
@@ -91,28 +131,21 @@ export async function shrinkifyUrl(formData: FormData): Promise<
         };
       }
     } else {
-      // Allow only 3 retries
+      // Retry up to 3 times
       let attempts = 0;
-      let uniqueCodeFound = false;
-
       while (attempts < 3) {
-        const existingUrl = await db.query.urls.findFirst({
+        const exists = await db.query.urls.findFirst({
           where: (urls, { eq }) => eq(urls.shortCode, shortCode),
         });
-
-        if (!existingUrl) {
-          uniqueCodeFound = true;
-          break;
-        }
-
+        if (!exists) break;
         shortCode = nanoid(6);
         attempts++;
       }
 
-      if (!uniqueCodeFound) {
+      if (attempts >= 3) {
         return {
           success: false,
-          error: "Failed to generate a unique short code. Please try again.",
+          error: "Failed to generate unique short code. Please try again.",
         };
       }
     }
@@ -124,18 +157,21 @@ export async function shrinkifyUrl(formData: FormData): Promise<
       updatedAt: new Date(),
       userId: userId || null,
       flagged,
+      threat: threatType,
+      flagCategory,
       flagReason,
     });
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const shortUrl = `${baseUrl}/r/${shortCode}`;
 
-    revalidatePath("/");
+    // revalidatePath("/");
 
     return {
       success: true,
       data: {
         shortUrl,
+        threat: threatType,
         flagged,
         flagReason,
         message: flagged

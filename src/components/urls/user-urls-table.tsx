@@ -63,12 +63,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "../data-table/column-header";
 import { DataTableViewOptions } from "../data-table/column-toggle";
+import { formatNumber } from "@/lib/formatNum";
+import { BASE_URL } from "@/site-config/base-url";
 
 // Types
 interface Url {
   id: number;
   originalUrl: string;
   shortCode: string;
+  name: string | null;
   createdAt: Date;
   clicks: number;
 }
@@ -105,6 +108,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
   const [urlToEdit, setUrlToEdit] = useState<{
     id: number;
     shortCode: string;
+    name: string | null;
   } | null>(null);
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -157,15 +161,14 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
   };
 
   const showQrCode = (shortCode: string) => {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
-    const shortUrl = `${baseUrl}/r/${shortCode}`;
+    const shortUrl = `${BASE_URL}/r/${shortCode}`;
     setQrCodeUrl(shortUrl);
     setQrCodeShortCode(shortCode);
     setIsQrCodeModalOpen(true);
   };
 
-  const handleEdit = (id: number, shortCode: string) => {
-    setUrlToEdit({ id, shortCode });
+  const handleEdit = (id: number, shortCode: string, name: string | null) => {
+    setUrlToEdit({ id, shortCode, name });
     setIsEditModalOpen(true);
   };
 
@@ -213,7 +216,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
             </DropdownMenuItem>
             <DropdownMenuItem
               className="flex items-center gap-2"
-              onSelect={() => handleEdit(url.id, url.shortCode)}
+              onSelect={() => handleEdit(url.id, url.shortCode, url.name)}
             >
               <Edit className="h-4 w-4 text-muted-foreground" />
               Edit
@@ -244,6 +247,19 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
       cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
       enableSorting: false,
       enableHiding: false,
+    },
+    {
+      accessorKey: "name",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Name" />
+      ),
+      cell: ({ row }) => (
+        <div className="truncate max-w-xs" title={row.original.name ?? ""}>
+          {row.original.name ?? (
+            <span className="italic text-muted-foreground">Unnamed</span>
+          )}
+        </div>
+      ),
     },
     {
       accessorKey: "originalUrl",
@@ -289,9 +305,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
         <DataTableColumnHeader column={column} title="Shrinkify URL" />
       ),
       cell: ({ row }) => {
-        const baseUrl =
-          process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
-        const shortUrl = `${baseUrl}/r/${row.original.shortCode}`;
+        const shortUrl = `${BASE_URL}/r/${row.original.shortCode}`;
         return (
           <div className="flex items-center">
             <div className="truncate" title={shortUrl}>
@@ -333,7 +347,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
       ),
       cell: ({ row }) => (
         <p className="text-md rounded-lg bg-secondary/50 p-2 text-center font-medium">
-          {row.original.clicks}
+          {formatNumber(row.original.clicks)}
         </p>
       ),
     },
@@ -417,9 +431,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
               const data = table.getFilteredRowModel().rows.map((row) => ({
                 index: row.index + 1,
                 originalUrl: row.original.originalUrl,
-                shortUrl: `${
-                  process.env.NEXT_PUBLIC_APP_URL || window.location.origin
-                }/r/${row.original.shortCode}`,
+                shortUrl: `${BASE_URL}/r/${row.original.shortCode}`,
                 clicks: row.original.clicks,
                 createdAt: new Date(
                   row.original.createdAt
@@ -517,6 +529,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
           isOpen={isEditModalOpen}
           onOpenChange={setIsEditModalOpen}
           urlId={urlToEdit.id}
+          urlName={urlToEdit.name}
           currentShortCode={urlToEdit.shortCode}
           onSuccess={handleEditSuccess}
         />

@@ -1,5 +1,5 @@
 import { CardTitle } from "@/components/ui/card";
-import { formatNumber } from "@/lib/helpers";
+import { formatNumber } from "@/lib/formatNum";
 import timeRanges from "@/lib/timeRanges";
 import { cn } from "@/lib/utils";
 import { getTotalFlaggedUrlStat } from "@/server/actions/admin/urls/get-total-flagged-urls-stat";

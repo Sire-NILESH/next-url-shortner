@@ -11,6 +11,7 @@ export type UserWithoutPassword = {
   name: string | null;
   email: string;
   role: string;
+  status: string;
   createdAt: Date;
   image: string | null;
   urlCount: number;
@@ -25,6 +26,7 @@ export type GetAllUsersOptions = {
     | "name"
     | "email"
     | "role"
+    | "status"
     | "createdAt"
     | "urlCount"
     | "flaggedUrlCount"
@@ -58,7 +60,11 @@ export async function getAllUsers(
     // Search condition
     if (search) {
       conditions.push(
-        or(ilike(users.email, `%${search}%`), ilike(users.name, `%${search}%`))
+        or(
+          ilike(users.id, `%${search}%`),
+          ilike(users.email, `%${search}%`),
+          ilike(users.name, `%${search}%`)
+        )
       );
     }
 
@@ -86,6 +92,7 @@ export async function getAllUsers(
         name: users.name,
         email: users.email,
         role: users.role,
+        status: users.status,
         createdAt: users.createdAt,
         image: users.image,
         urlCount: sql<number>`COUNT(${urls.id})`.as("urlCount"),

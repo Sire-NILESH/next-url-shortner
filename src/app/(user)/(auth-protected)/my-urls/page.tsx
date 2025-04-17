@@ -11,7 +11,6 @@ import { getUserUrls } from "@/server/actions/urls/get-user-urls";
 import { auth } from "@/server/auth";
 import { Link as LinkIcon } from "lucide-react";
 import { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "My URLs | Shrinkify",
@@ -47,18 +46,6 @@ export default async function MyUrlsPage() {
             <UserUrlsTable urls={userUrls} />
           </CardContent>
         </Card>
-
-        {process.env.NODE_ENV === "development" &&
-          session?.user.role === "admin" && (
-            <div className="text-center mt-4">
-              <Link
-                href={"/admin"}
-                className="text-sm text-muted-foreground hover:text-primary underline"
-              >
-                Admin Tools
-              </Link>
-            </div>
-          )}
       </div>
     </div>
   );

@@ -2,13 +2,13 @@
 
 import { auth } from "@/server/auth";
 import { db, eq } from "@/server/db";
-import { userRoleEnum, users } from "@/server/db/schema";
-import { ApiResponse, UserRoleTypeEnum } from "@/types/server/types";
+import { users, userStatusEnum } from "@/server/db/schema";
+import { ApiResponse, UserStatusTypeEnum } from "@/types/server/types";
 // import { revalidatePath } from "next/cache";
 
-export async function updateUserRole(
+export async function updateUserStatus(
   userId: string,
-  role: UserRoleTypeEnum
+  status: UserStatusTypeEnum
 ): Promise<ApiResponse<null>> {
   try {
     // Verify authentication and admin role
@@ -27,18 +27,18 @@ export async function updateUserRole(
       };
     }
 
-    // Prevent changing own role
+    // Prevent changing own status
     if (session.user.id === userId) {
       return {
         success: false,
-        error: "You cannot change your own role",
+        error: "You cannot change your own status",
       };
     }
 
-    if (!userRoleEnum.enumValues.includes(role)) {
+    if (!userStatusEnum.enumValues.includes(status)) {
       return {
         success: false,
-        error: "Invalid role",
+        error: "Invalid status",
       };
     }
 
@@ -56,22 +56,22 @@ export async function updateUserRole(
     await db
       .update(users)
       .set({
-        role,
+        status,
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId));
 
-    // revalidatePath("/admin/users");
+    //  revalidatePath("/admin/users");
 
     return {
       success: true,
       data: null,
     };
   } catch (error) {
-    console.error("Error updating user role:", error);
+    console.error("Error updating user status:", error);
     return {
       success: false,
-      error: "An error occurred while updating user role",
+      error: "An error occurred while updating user status",
     };
   }
 }

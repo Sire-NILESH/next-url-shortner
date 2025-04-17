@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -9,32 +8,32 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Check, Megaphone } from "lucide-react";
+import { Button, buttonVariants } from "../ui/button";
+import { Check, Copy, LayoutDashboard, Megaphone } from "lucide-react";
+import Link from "next/link";
+import { toast } from "sonner";
 
-interface SignupSuggestionDialogProps {
+interface DashboardSuggestionDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   shortUrl: string;
 }
 
-export function SignupSuggestionDialog({
+export function DashboardSuggestionDialog({
   isOpen,
   onOpenChange,
   shortUrl,
-}: SignupSuggestionDialogProps) {
-  const router = useRouter();
+}: DashboardSuggestionDialogProps) {
+  const copyToClipboard = async () => {
+    if (!shortUrl) return;
 
-  const handleSignup = () => {
-    onOpenChange(false);
-    router.push("/register");
+    try {
+      await navigator.clipboard.writeText(shortUrl);
+      toast.success("URL copied to clipboard");
+    } catch (error) {
+      console.error(error);
+    }
   };
-
-  const handleSignin = () => {
-    onOpenChange(false);
-    router.push("/login");
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="py-10 sm:max-w-md space-y-3">
@@ -70,7 +69,7 @@ export function SignupSuggestionDialog({
           <div className="space-y-3">
             <p>
               <strong className="text-sm font-medium">
-                Create an account to:
+                Visit your dashboard to:
               </strong>
             </p>
             <ul className="space-y-2 text-sm text-muted-foreground">
@@ -81,7 +80,7 @@ export function SignupSuggestionDialog({
                   className="mt-0.5 shrink-0 text-primary"
                   aria-hidden="true"
                 />
-                Save all your shrinkified links
+                View all your shrinkified links
               </li>
               <li className="flex gap-2">
                 <Check
@@ -90,7 +89,7 @@ export function SignupSuggestionDialog({
                   className="mt-0.5 shrink-0 text-primary"
                   aria-hidden="true"
                 />
-                Track links with analytics
+                Visualise performance with analytics
               </li>
               <li className="flex gap-2">
                 <Check
@@ -105,12 +104,24 @@ export function SignupSuggestionDialog({
           </div>
         </div>
         <DialogFooter className="flex flex-col gap-2 sm:flex-col">
-          <Button variant={"outline"} onClick={handleSignin}>
-            Log In
+          <Button
+            type="button"
+            variant={"outline"}
+            className="flex-shrink-0"
+            onClick={copyToClipboard}
+          >
+            <Copy className="size-4 mr-1" />
+            Copy
           </Button>
-          <Button onClick={handleSignup}>Sign Up</Button>
-          <Button variant={"secondary"} onClick={() => onOpenChange(false)}>
-            Maybe Later
+          <Link
+            href="/dashboard"
+            className={buttonVariants({ variant: "default" })}
+          >
+            <LayoutDashboard className="size-4" />
+            My Dashboard
+          </Link>
+          <Button variant="secondary" onClick={() => onOpenChange(false)}>
+            Close
           </Button>
         </DialogFooter>
       </DialogContent>

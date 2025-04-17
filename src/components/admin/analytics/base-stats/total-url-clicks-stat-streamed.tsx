@@ -1,5 +1,5 @@
 import { CardTitle } from "@/components/ui/card";
-import { formatNumber } from "@/lib/helpers";
+import { formatNumber } from "@/lib/formatNum";
 import { cn } from "@/lib/utils";
 import { getTotalUrlClickStat } from "@/server/actions/admin/urls/get-total-url-clicks-stat";
 import { ComponentProps } from "react";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { RefreshCw } from "lucide-react";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
@@ -16,7 +16,7 @@ type RefreshButtonProps = {
   VariantProps<typeof buttonVariants>;
 
 export default function RefreshButton({
-  delayInMS = 500,
+  delayInMS = 5000,
   showText = false,
   className,
   variant = "outline",
@@ -24,12 +24,15 @@ export default function RefreshButton({
   ...props
 }: RefreshButtonProps) {
   const router = useRouter();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isThrottled, setIsThrottled] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const throttledRefresh = useThrottle(() => {
-    setIsRefreshing(true);
-    router.refresh();
-    setTimeout(() => setIsRefreshing(false), delayInMS);
+    setIsThrottled(true);
+    startTransition(() => {
+      router.refresh();
+    });
+    setTimeout(() => setIsThrottled(false), delayInMS);
   }, delayInMS);
 
   return (
@@ -37,17 +40,18 @@ export default function RefreshButton({
       variant={variant}
       size={size}
       onClick={throttledRefresh}
-      disabled={isRefreshing}
-      className={cn("gap-2", className)}
+      disabled={isThrottled || isPending}
+      title={isThrottled || isPending ? "Disabled" : "Click to refresh"}
+      className={cn(
+        "gap-2",
+        isThrottled ? "cursor-not-allowed" : null,
+        className
+      )}
       type="button"
       {...props}
     >
-      {isRefreshing ? (
-        <RefreshCw className="size-4 animate-spin" />
-      ) : (
-        <RefreshCw className="size-4" />
-      )}
-      {showText && (isRefreshing ? "Refreshing..." : "Refresh")}
+      <RefreshCw className={cn("size-4", isPending ? "animate-spin" : null)} />
+      {showText && (isPending ? "Refreshing..." : "Refresh")}
     </Button>
   );
 }

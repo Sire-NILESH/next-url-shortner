@@ -1,15 +1,19 @@
-"use server";
+import "server-only";
 
-import { ApiResponse } from "@/types/server/types";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY!);
+import { analyzeWithGemini } from "@/lib/gemini-check";
+import { checkWithGoogleSafeBrowsing } from "@/lib/google-safe-browsing-check";
+import {
+  ApiResponse,
+  FlagCategoryTypeEnum,
+  ThreatTypeEnum,
+} from "@/types/server/types";
 
 export type UrlSafetyCheck = {
   isSafe: boolean;
   flagged: boolean;
   reason: string | null;
-  category: "safe" | "suspicious" | "malicious" | "inappropriate" | "unknown";
+  category: FlagCategoryTypeEnum;
+  threat: ThreatTypeEnum;
   confidence: number;
 };
 
@@ -17,70 +21,47 @@ export async function checkUrlSafety(
   url: string
 ): Promise<ApiResponse<UrlSafetyCheck>> {
   try {
-    // validate URL Format
-    try {
-      new URL(url);
+    new URL(url);
+  } catch {
+    return { success: false, error: "Invalid URL format" };
+  }
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+  try {
+    const threatCheck = await checkWithGoogleSafeBrowsing(url);
+
+    if (process.env.GOOGLE_GEMINI_API_KEY) {
+      const withGeminiResponse = await analyzeWithGemini(url, threatCheck);
+
       return {
-        success: false,
-        error: "Invalid URL format",
+        success: true,
+        data: withGeminiResponse,
       };
     }
 
-    if (!process.env.GOOGLE_GEMINI_API_KEY) {
-      console.log("Missing Google Gemini API Key");
+    if (threatCheck) {
       return {
         success: true,
         data: {
-          isSafe: true,
-          flagged: false,
+          isSafe: false,
+          flagged: true,
           reason: null,
-          category: "unknown",
-          confidence: 0,
-        },
+          category: null,
+          threat: threatCheck.threatType,
+          confidence: 1,
+        } satisfies UrlSafetyCheck,
       };
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    const prompt = `
-    Analyze this URL for safety concerns: "${url}"
-    
-    Consider the following aspects:
-    1. Is it a known phishing site?
-    2. Does it contain malware or suspicious redirects?
-    3. Is it associated with scams or fraud?
-    4. Does it contain inappropriate content (adult, violence, etc.)?
-    5. Is the domain suspicious or newly registered?
-    
-    Respond in JSON format with the following structure:
-    {
-      "isSafe": boolean,
-      "flagged": boolean,
-      "reason": string or null,
-      "category": "safe" | "suspicious" | "malicious" | "inappropriate" | "unknown",
-      "confidence": number between 0 and 1
-    }
-    
-    Only respond with the JSON object, no additional text.
-  `;
-
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
-
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error("Failed to parse JSON response");
-    }
-
-    const jsonResponse = JSON.parse(jsonMatch[0]) as UrlSafetyCheck;
-
     return {
       success: true,
-      data: jsonResponse,
+      data: {
+        isSafe: true,
+        flagged: false,
+        reason: null,
+        category: "safe",
+        threat: null,
+        confidence: 1,
+      } satisfies UrlSafetyCheck,
     };
   } catch (error) {
     console.error(error);

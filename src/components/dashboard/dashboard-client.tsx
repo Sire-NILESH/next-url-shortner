@@ -64,7 +64,7 @@ export default function DashboardClient({ userUrls }: { userUrls: Url[] }) {
     },
     ...topUrls.reduce((acc, url, index) => {
       acc[url.shortCode] = {
-        label: url.shortCode,
+        label: url.name ?? url.shortCode,
         color: `var(--chart-${index + 1})`,
       };
       return acc;
@@ -78,7 +78,7 @@ export default function DashboardClient({ userUrls }: { userUrls: Url[] }) {
     },
     ...topUrls.reduce((acc, url, index) => {
       acc[url.shortCode] = {
-        label: url.shortCode,
+        label: url.name ?? url.shortCode,
         color: `var(--chart-${index + 1})`,
       };
       return acc;
@@ -147,9 +147,14 @@ export default function DashboardClient({ userUrls }: { userUrls: Url[] }) {
                   />
                 </>
               ) : (
-                <div className="flex-1 rounded-xl text-center py-8 bg-muted text-muted-foreground">
-                  No URL data available yet. Create some shrinkify URLs to see
-                  the stats.
+                <div className="flex-1 flex flex-col items-center justify-center space-y-2 rounded-xl text-center py-8 bg-muted">
+                  <p className="text-lg font-semibold">
+                    No url data available yet.
+                  </p>
+
+                  <p className="text-base text-muted-foreground">
+                    Create some shrinkify URLs to see the stats.
+                  </p>
                 </div>
               )}
             </div>

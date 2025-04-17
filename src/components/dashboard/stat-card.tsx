@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { formatNumberValue } from "@/lib/helpers";
+import { formatNumberValue } from "@/lib/formatNum";
 import CountUp from "react-countup";
 
 function hasDecimal(num: number) {
