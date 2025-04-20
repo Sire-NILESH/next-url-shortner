@@ -138,12 +138,15 @@ export const authConfig: NextAuthConfig = {
 
         if (!user) throw new InvalidLoginError("INVALID_CREDENTIALS");
 
-        if (user.status !== "active")
-          throw new InvalidLoginError(
-            user.status === "suspended"
-              ? "ACCOUNT_SUSPENDED"
-              : "ACCOUNT_INACTIVE"
-          );
+        // if (user.status !== "active")
+        //   throw new InvalidLoginError(
+        //     user.status === "suspended"
+        //       ? "ACCOUNT_SUSPENDED"
+        //       : "ACCOUNT_INACTIVE"
+        //   );
+
+        if (user.status === "inactive")
+          throw new InvalidLoginError("ACCOUNT_INACTIVE");
 
         const passwordsMatch = await bcrypt.compare(
           password,

@@ -44,9 +44,9 @@ import { updateUserStatus } from "@/server/actions/admin/users/update-user-statu
 import { useMutation } from "@tanstack/react-query";
 
 import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
+  ChevronDown,
+  ChevronsUpDown,
+  ChevronUp,
   Loader2,
   MoreHorizontalIcon,
   ShieldIcon,
@@ -208,13 +208,13 @@ export function UsersTable({
 
   const getSortIcon = (column: SortBy) => {
     if (currentSortBy !== column) {
-      return <ArrowUpDown className="ml-2 size-4" />;
+      return <ChevronsUpDown className="ml-2 size-4" />;
     }
 
     return currentSortOrder === "asc" ? (
-      <ArrowUp className="ml-2 size-4" />
+      <ChevronUp className="ml-2 size-4" />
     ) : (
-      <ArrowDown className="ml-2 size-4" />
+      <ChevronDown className="ml-2 size-4" />
     );
   };
 
@@ -426,11 +426,15 @@ export function UsersTable({
                         </AvatarFallback>
                       </Avatar>
                       <div className="font-medium">
-                        {user.name || "Unknown User"}
+                        <p title={user.name || "Unknown User"}>
+                          {user.name || "Unknown User"}
+                        </p>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <p title={user.email}>{user.email}</p>
+                  </TableCell>
                   <TableCell>{user.id}</TableCell>
                   <TableCell>
                     {" "}

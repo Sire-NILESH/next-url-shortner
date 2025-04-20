@@ -1,8 +1,8 @@
 "use server";
 
-import { auth } from "@/server/auth";
 import { db, eq } from "@/server/db";
 import { urls } from "@/server/db/schema";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -19,15 +19,12 @@ export async function updateUrl(
   formData: FormData
 ): Promise<ApiResponse<{ shortUrl: string }>> {
   try {
-    const session = await auth();
-    const userId = session?.user?.id;
+    const authResponse = await authorizeRequest();
 
-    if (!userId) {
-      return {
-        success: false,
-        error: "You must be logged in to update a URL",
-      };
-    }
+    if (!authResponse.success) return authResponse;
+
+    const { data: session } = authResponse;
+    const userId = session?.user?.id;
 
     const validatedFields = updateUrlSchema.safeParse({
       id: formData.get("id"),

@@ -51,10 +51,10 @@ import { BASE_URL } from "@/site-config/base-url";
 import { useMutation } from "@tanstack/react-query";
 import {
   AlertTriangle,
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
   CheckCircle,
+  ChevronDown,
+  ChevronsUpDown,
+  ChevronUp,
   Copy,
   ExternalLink,
   Loader2,
@@ -214,13 +214,13 @@ export function AdminUrlsTable({
 
   const getSortIcon = (column: SortBy) => {
     if (currentSortBy !== column) {
-      return <ArrowUpDown className="ml-2 size-4" />;
+      return <ChevronsUpDown className="ml-2 size-4" />;
     }
 
     return currentSortOrder === "asc" ? (
-      <ArrowUp className="ml-2 size-4" />
+      <ChevronUp className="ml-2 size-4" />
     ) : (
-      <ArrowDown className="ml-2 size-4" />
+      <ChevronDown className="ml-2 size-4" />
     );
   };
 
@@ -421,7 +421,7 @@ export function AdminUrlsTable({
                   {getSortIcon("userName")}
                 </Button>
               </TableHead>
-              <TableHead className="w-[150px]">
+              <TableHead className="min-w-[150px]">
                 <Button
                   variant={"ghost"}
                   className="-m-2 flex items-center font-medium"
@@ -467,12 +467,12 @@ export function AdminUrlsTable({
                       <ExternalLink className="ml-1 text-blue-600 size-3.5" />
                     </div>
                     {url.flagged && url.flagReason && (
-                      <div
+                      <p
                         title={url.flagReason}
-                        className="mt-1 text-xs text-yellow-600 dark:text-yellow-400 max-w-[450px] truncate"
+                        className="font-sans tracking-wide mt-1 text-xs text-yellow-600 dark:text-yellow-400 max-w-[450px] truncate"
                       >
-                        Reason: {url.flagReason}
-                      </div>
+                        {url.flagReason}
+                      </p>
                     )}
                   </TableCell>
                   <TableCell>
@@ -532,20 +532,18 @@ export function AdminUrlsTable({
                     </p>
                   </TableCell>
                   <TableCell>
-                    <p className="text-md">
-                      <Badge
-                        className="rounded-sm"
-                        variant={
-                          url.status === "active"
-                            ? "secondary"
-                            : url.status === "suspended"
-                            ? "destructive"
-                            : "outline"
-                        }
-                      >
-                        {url.status}
-                      </Badge>
-                    </p>
+                    <Badge
+                      className="rounded-sm text-md"
+                      variant={
+                        url.status === "active"
+                          ? "secondary"
+                          : url.status === "suspended"
+                          ? "destructive"
+                          : "outline"
+                      }
+                    >
+                      {url.status}
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     {url.userId ? (
@@ -628,12 +626,12 @@ export function AdminUrlsTable({
                             Visit Original URL
                           </a>
                         </DropdownMenuItem>
-                        {url.userId ? (
+                        {url.userEmail ? (
                           <DropdownMenuItem>
                             <User />
                             <Link
                               href={`${BASE_URL}/admin/users?search=${encodeURIComponent(
-                                url.userId
+                                url.userEmail
                               )}&page=1`}
                               className="w-full"
                             >

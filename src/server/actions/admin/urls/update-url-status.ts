@@ -1,8 +1,8 @@
 "use server";
 
-import { auth } from "@/server/auth";
 import { db, eq } from "@/server/db";
 import { urls, urlStatusEnum } from "@/server/db/schema";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse, UrlStatusTypeEnum } from "@/types/server/types";
 import { revalidatePath } from "next/cache";
 
@@ -11,20 +11,9 @@ export async function updateUrlStatus(
   status: UrlStatusTypeEnum
 ): Promise<ApiResponse<null>> {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return {
-        success: false,
-        error: "You need to be logged in to perform this action",
-      };
-    }
+    const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
 
-    if (session?.user?.role !== "admin") {
-      return {
-        success: false,
-        error: "You are not unauthorized to perform this action",
-      };
-    }
+    if (!authResponse.success) return authResponse;
 
     if (!urlStatusEnum.enumValues.includes(status)) {
       return {

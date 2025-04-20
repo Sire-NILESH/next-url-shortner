@@ -1,10 +1,10 @@
 "use server";
 
-import { auth } from "@/server/auth";
 import { db } from "@/server/db";
-import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
-import { users, urls, accounts } from "@/server/db/schema";
+import { accounts, urls, users } from "@/server/db/schema";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
+import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 
 export type UserWithoutPassword = {
   id: string;
@@ -39,10 +39,9 @@ export async function getAllUsers(
   options: GetAllUsersOptions = {}
 ): Promise<ApiResponse<{ users: UserWithoutPassword[]; total: number }>> {
   try {
-    const session = await auth();
-    if (!session?.user || session.user.role !== "admin") {
-      return { success: false, error: "Not authorized" };
-    }
+    const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
+
+    if (!authResponse.success) return authResponse;
 
     const {
       page = 1,

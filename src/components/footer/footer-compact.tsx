@@ -10,8 +10,8 @@ export default function FooterCompact() {
           <FooterBottom className="mt-0 flex flex-col items-center gap-4 sm:flex-row md:flex-row">
             <div>© 2025 Sire inc. All rights reserved</div>
             <nav className="flex items-center gap-4">
-              <Link href="/login">Login</Link>
-              <Link href="/register">Register</Link>|
+              <Link href="/">Home</Link>
+              <Link href="/login">Login</Link>|
               <Link href="#">Privacy Policy</Link>
               <Link href="#">Terms of Service</Link>
               <ThemeToggle />

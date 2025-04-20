@@ -1,8 +1,8 @@
 "use server";
 
-import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 import { urls } from "@/server/db/schema";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 import { sql } from "drizzle-orm";
 
@@ -12,10 +12,9 @@ export const getTotalUrlClickStat = async (): Promise<
   }>
 > => {
   try {
-    const session = await auth();
-    if (!session?.user || session.user.role !== "admin") {
-      return { success: false, error: "Unauthorized" };
-    }
+    const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
+
+    if (!authResponse.success) return authResponse;
 
     const urlsResponse = await db
       .select({

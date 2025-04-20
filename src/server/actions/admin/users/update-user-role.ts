@@ -1,8 +1,8 @@
 "use server";
 
-import { auth } from "@/server/auth";
 import { db, eq } from "@/server/db";
 import { userRoleEnum, users } from "@/server/db/schema";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse, UserRoleTypeEnum } from "@/types/server/types";
 // import { revalidatePath } from "next/cache";
 
@@ -11,21 +11,13 @@ export async function updateUserRole(
   role: UserRoleTypeEnum
 ): Promise<ApiResponse<null>> {
   try {
-    // Verify authentication and admin role
-    const session = await auth();
-    if (!session?.user) {
-      return {
-        success: false,
-        error: "Unauthorized",
-      };
-    }
+    const authResponse = await authorizeRequest({
+      allowedRoles: ["admin"],
+    });
 
-    if (session.user.role !== "admin") {
-      return {
-        success: false,
-        error: "Insufficient permissions",
-      };
-    }
+    if (!authResponse.success) return authResponse;
+
+    const { data: session } = authResponse;
 
     // Prevent changing own role
     if (session.user.id === userId) {

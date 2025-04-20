@@ -1,12 +1,12 @@
 import "server-only";
 
-import { analyzeWithGemini } from "@/lib/gemini-check";
-import { checkWithGoogleSafeBrowsing } from "@/lib/google-safe-browsing-check";
+import { checkWithGoogleSafeBrowsing } from "@/server/services/url/google-safe-browsing-check-service";
 import {
   ApiResponse,
   FlagCategoryTypeEnum,
   ThreatTypeEnum,
 } from "@/types/server/types";
+import { analyzeWithGemini } from "@/server/services/url/gemini-check-service";
 
 export type UrlSafetyCheck = {
   isSafe: boolean;

@@ -3,7 +3,8 @@
 import { Separator } from "@/components/ui/separator";
 import { UrlFormData, urlSchema } from "@/lib/URLSchema";
 import { cn } from "@/lib/utils";
-import { shrinkifyUrl } from "@/server/actions/urls/shrinkify-url";
+import { createShrinkifyUrl } from "@/server/actions/urls/create-shrinkify-url";
+import { BASE_URL } from "@/site-config/base-url";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
@@ -22,7 +23,6 @@ import {
 } from "../../ui/form";
 import { Input } from "../../ui/input";
 import ShortenedURLResultCard from "./shortened-url-result-card";
-import { BASE_URL } from "@/site-config/base-url";
 
 type Props = ComponentProps<"div">;
 
@@ -49,7 +49,7 @@ export function CoreUrlShortner({ className, ...props }: Props) {
         formData.append("customCode", data.customCode.trim());
       }
 
-      const response = await shrinkifyUrl(formData);
+      const response = await createShrinkifyUrl(formData);
 
       if (!response.success) {
         // 🔁 Perform redirect on client side if redicrect url is present

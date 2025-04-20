@@ -1,8 +1,8 @@
 "use server";
 
-import { auth } from "@/server/auth";
 import { db, eq } from "@/server/db";
 import { urls } from "@/server/db/schema";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 import { revalidatePath } from "next/cache";
 
@@ -13,14 +13,9 @@ export async function manageFlaggedUrl(
   action: Action
 ): Promise<ApiResponse<null>> {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return { success: false, error: "Unauthorized" };
-    }
+    const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
 
-    if (session?.user?.role !== "admin") {
-      return { success: false, error: "Unauthorized" };
-    }
+    if (!authResponse.success) return authResponse;
 
     const urlToManage = await db.query.urls.findFirst({
       where: (urls, { eq }) => eq(urls.id, urlId),

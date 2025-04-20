@@ -1,9 +1,8 @@
 "use server";
 
-import { auth } from "@/server/auth";
 import { db } from "@/server/db";
-import { and, asc, desc, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
 import { urls, users } from "@/server/db/schema";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import {
   ApiResponse,
   FlagCategoryTypeEnum,
@@ -11,6 +10,7 @@ import {
   UrlStatusTypeEnum,
   UserRoleTypeEnum,
 } from "@/types/server/types";
+import { and, asc, desc, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
 
 export type UrlWithUser = {
   id: number;
@@ -50,10 +50,9 @@ export async function getAllUrls(
   options: GetAllUrlsOptions = {}
 ): Promise<ApiResponse<{ urls: UrlWithUser[]; total: number }>> {
   try {
-    const session = await auth();
-    if (!session?.user || session.user.role !== "admin") {
-      return { success: false, error: "Unauthorized" };
-    }
+    const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
+
+    if (!authResponse.success) return authResponse;
 
     const {
       page = 1,

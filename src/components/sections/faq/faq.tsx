@@ -25,7 +25,7 @@ function FAQ() {
                 </Badge>
               </div>
               <div className="flex gap-4 flex-col">
-                <h4 className="text-3xl md:text-5xl max-w-xl text-left boldText">
+                <h4 className="text-3xl sm:text-5xl max-w-xl text-left boldText">
                   {"Got questions? We've got answers for You!"}
                 </h4>
                 <p className="-mt-3 sm:mt-0 text-base md:text-lg max-w-xl lg:max-w-lg leading-relaxed tracking-tight text-muted-foreground text-left">

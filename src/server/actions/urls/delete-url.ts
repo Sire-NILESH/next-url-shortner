@@ -1,19 +1,17 @@
 "use server";
 
-import { auth } from "@/server/auth";
 import { db, eq } from "@/server/db";
 import { urls } from "@/server/db/schema";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 
 export async function deleteUrl(urlId: number): Promise<ApiResponse<null>> {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return {
-        success: false,
-        error: "Unauthorized",
-      };
-    }
+    const authResponse = await authorizeRequest();
+
+    if (!authResponse.success) return authResponse;
+
+    const { data: session } = authResponse;
 
     const [url] = await db.select().from(urls).where(eq(urls.id, urlId));
 

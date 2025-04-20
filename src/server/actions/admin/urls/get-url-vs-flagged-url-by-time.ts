@@ -1,11 +1,11 @@
 "use server";
 
-import { auth } from "@/server/auth";
-import { db } from "@/server/db";
-import { ApiResponse } from "@/types/server/types";
-import { sql } from "drizzle-orm";
-import { sub, add } from "date-fns";
 import timeRanges from "@/lib/timeRanges";
+import { db } from "@/server/db";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
+import { ApiResponse } from "@/types/server/types";
+import { add, sub } from "date-fns";
+import { sql } from "drizzle-orm";
 
 type TimeRange = keyof typeof timeRanges | "all time";
 
@@ -25,10 +25,9 @@ export const getUrlVsFlaggedUrlByTime = async (
   >
 > => {
   try {
-    const session = await auth();
-    if (!session?.user || session.user.role !== "admin") {
-      return { success: false, error: "Unauthorized" };
-    }
+    const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
+
+    if (!authResponse.success) return authResponse;
 
     const range = options.timeRange ?? "all time";
     let now = new Date();

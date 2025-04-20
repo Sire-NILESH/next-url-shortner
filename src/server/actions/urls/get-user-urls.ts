@@ -1,7 +1,7 @@
 "use server";
 
-import { auth } from "@/server/auth";
 import { db } from "@/server/db";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 
 export async function getUserUrls(userId: string): Promise<
@@ -17,13 +17,9 @@ export async function getUserUrls(userId: string): Promise<
   >
 > {
   try {
-    const session = await auth();
-    if (!session?.user || session.user.id !== userId) {
-      return {
-        success: false,
-        error: "Unauthorized",
-      };
-    }
+    const authResponse = await authorizeRequest({ requireUserId: userId });
+
+    if (!authResponse.success) return authResponse;
 
     // Get all URLs for the user
     const userUrls = await db.query.urls.findMany({

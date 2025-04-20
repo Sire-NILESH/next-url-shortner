@@ -1,29 +1,46 @@
-"use client";
+import AutoLogoutByStatus from "@/components/auth/auto-logout-by-status";
+import { getUserStatus } from "@/server/actions/users/get-user-status";
+import { UserRoundX } from "lucide-react";
+import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import useLogout from "@/components/auth/useLogout";
-import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+export const metadata: Metadata = {
+  title: "Inactive User | Shrinkify",
+  description:
+    "Your account is currently inactive, please contact support to enquire further.",
+};
 
-const InactiveUserPage = () => {
-  const session = useSession();
-  const { logoutUser } = useLogout(false);
+const InactiveUserPage = async () => {
+  const userStatus = await getUserStatus();
 
-  useEffect(() => {
-    if (session.status === "authenticated") {
-      logoutUser();
-    }
-  }, [logoutUser, session.status]);
+  if (!userStatus.success) {
+    return null;
+  }
+
+  if (userStatus.data != "inactive") redirect("/");
 
   return (
-    <div className="my-6 md:my-20 flex flex-1 flex-col items-center justify-center">
-      <div className="space-y-2 text-center max-w-2xl">
-        <h2 className="font-semibold text-2xl">Your Account is inactive</h2>
-        <p className="text-lg text-muted-foreground">
-          Your account is currently inactive, please contact support to enquire
-          further.
-        </p>
+    <>
+      <AutoLogoutByStatus userStatus={userStatus.data} />
+
+      <div className="my-6 md:my-20 flex flex-1 flex-col items-center justify-center">
+        <div className="w-full max-w-xl mx-auto text-center">
+          <div className="flex flex-col items-center justify-center mb-6 gap-4">
+            <div className="size-16 rounded-full flex items-center justify-center bg-muted">
+              <UserRoundX className="size-8 text-foreground" />
+            </div>
+          </div>
+
+          <h1 className="text-4xl mb-4 !font-bold boldText">
+            Your Account is inactive
+          </h1>
+          <p className="text-muted-foreground mb-6">
+            Your account is currently inactive, please contact support to
+            enquire further.
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

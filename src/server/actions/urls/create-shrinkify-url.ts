@@ -1,18 +1,18 @@
 "use server";
 
 import { ensureHttps, isValidUrl } from "@/lib/utils";
-import { z } from "zod";
-import { nanoid } from "nanoid";
 import { db } from "@/server/db";
-import { eq } from "drizzle-orm";
-import { urls, users } from "@/server/db/schema";
-import { auth } from "@/server/auth";
-import { checkUrlSafety } from "./check-url-safety";
+import { urls } from "@/server/db/schema";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
+import { ensureValidUserStatus } from "@/server/services/user/ensure-valid-user-status";
 import {
   ApiResponse,
   FlagCategoryTypeEnum,
   ThreatTypeEnum,
 } from "@/types/server/types";
+import { nanoid } from "nanoid";
+import { z } from "zod";
+import { checkUrlSafety } from "../../services/url/check-url-safety-service";
 
 const shrinkifyUrlSchema = z.object({
   url: z.string().refine(isValidUrl, {
@@ -27,7 +27,7 @@ const shrinkifyUrlSchema = z.object({
     .transform((val) => (val === null || val === "" ? undefined : val)),
 });
 
-export async function shrinkifyUrl(formData: FormData): Promise<
+export async function createShrinkifyUrl(formData: FormData): Promise<
   ApiResponse<{
     shortUrl: string;
     threat: ThreatTypeEnum;
@@ -37,33 +37,16 @@ export async function shrinkifyUrl(formData: FormData): Promise<
   }>
 > {
   try {
-    const session = await auth();
-    const userId = session?.user?.id;
+    const authResponse = await authorizeRequest();
 
-    if (!userId) {
-      return { success: false, error: "You need to be logged in" };
-    }
+    if (!authResponse.success) return authResponse;
 
-    // Fetch fresh user data and check user status
-    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    const { data: session } = authResponse;
+    const userId = session.user.id;
 
-    if (!user) {
-      return { success: false, error: "User not found" };
-    }
+    const validUserStatusResponse = await ensureValidUserStatus(userId);
 
-    if (user.status === "suspended") {
-      return {
-        success: false,
-        error: "Your account is suspended and cannot create shrinkify URLs.",
-      };
-    }
-
-    if (user.status === "inactive") {
-      return {
-        success: false,
-        redirect: "/inactive-user",
-      };
-    }
+    if (!validUserStatusResponse.success) return validUserStatusResponse;
 
     const url = formData.get("url") as string;
     const customCode = formData.get("customCode") as string;
