@@ -9,12 +9,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSession } from "next-auth/react";
+import { Session } from "next-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import useLogout from "./useLogout";
 
-export function UserAvatarDropdown() {
-  const session = useSession();
+export function UserAvatarDropdown({ session }: { session: Session | null }) {
   const { logoutStatus, logoutUser } = useLogout();
 
   return (
@@ -26,8 +25,8 @@ export function UserAvatarDropdown() {
           className="overflow-hidden rounded-full"
         >
           <UserAvatar
-            userName={session.data?.user.name}
-            imgUrl={session.data?.user.image}
+            userName={session?.user.name}
+            imgUrl={session?.user.image}
           />
           <span className="sr-only">User dropdown settings</span>
         </Button>
@@ -35,13 +34,11 @@ export function UserAvatarDropdown() {
       <DropdownMenuContent align="end">
         <DropdownMenuItem className="pointer-events-none select-text">
           <AtSign />
-          {session.data?.user.email
-            ? session.data?.user.email
-            : "unknown email"}
+          {session?.user.email ? session?.user.email : "unknown email"}
         </DropdownMenuItem>
         <DropdownMenuItem className="pointer-events-none select-text">
           <User />
-          {session.data?.user.name ? session.data?.user.name : "unknown user"}
+          {session?.user.name ? session?.user.name : "unknown user"}
         </DropdownMenuItem>
         <DropdownMenuItem
           disabled={logoutStatus === "pending"}

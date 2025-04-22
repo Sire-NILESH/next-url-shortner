@@ -62,7 +62,9 @@ export function UserSearch({ initialSearch }: UserSearchProps) {
             </button>
           )}
         </div>
-        <Button type="submit">Search</Button>
+        <Button type="submit">
+          <Search />
+        </Button>
       </form>
       <RefreshButton />
     </div>

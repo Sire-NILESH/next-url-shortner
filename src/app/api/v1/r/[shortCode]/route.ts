@@ -1,47 +1,67 @@
 import { recordClickEvent } from "@/server/actions/clicks/record-click-event";
 import { NextRequest, NextResponse, userAgent } from "next/server";
+import { checkUrlAccess } from "@/server/services/url/check-url-access-service";
 import { WarnRedirectSearchParams } from "@/types/server/types";
 
 type Params = Promise<{ shortCode: string }>;
 
 export async function GET(req: NextRequest, props: { params: Params }) {
-  const userAgentParsed = userAgent(req);
-  const { shortCode } = await props.params;
+  const notFound = req.nextUrl.clone();
+  notFound.pathname = "/redirect/url/not-found";
 
-  const response = await recordClickEvent(shortCode, userAgentParsed);
+  try {
+    const userAgentParsed = userAgent(req);
+    const { shortCode } = await props.params;
 
-  if (response.success && response.data) {
-    const url = response.data;
+    const accessResult = await checkUrlAccess(shortCode);
 
-    if (url.flagged) {
-      const warnRedirectRUrl = req.nextUrl.clone();
-      warnRedirectRUrl.pathname = "/redirect/url/warn";
-
-      const redirectUrl = url.originalUrl;
-      const obj: WarnRedirectSearchParams = {
-        flagged: encodeURIComponent(url.flagged),
-      };
-
-      if (url.threat) {
-        obj.threat = encodeURIComponent(url.threat);
-        // if threat is detected we do not proceed or even show the resolved URL.
-      } else {
-        obj.redirect = encodeURIComponent(redirectUrl);
+    if (!accessResult.allowed) {
+      const redirect = req.nextUrl.clone();
+      switch (accessResult.reason) {
+        case "not_found":
+          redirect.pathname = "/redirect/url/not-found";
+          break;
+        case "suspended":
+        case "inactive":
+        case "flagged_limit_reached":
+          redirect.pathname = "/redirect/url/blocked";
+          break;
       }
-
-      if (url.flagReason) obj.reason = encodeURIComponent(url.flagReason);
-
-      const searchParams = new URLSearchParams(obj).toString();
-
-      warnRedirectRUrl.search = searchParams;
-      return NextResponse.redirect(warnRedirectRUrl, 302);
+      return NextResponse.redirect(redirect, 302);
     }
 
-    return NextResponse.redirect(url.originalUrl, 302);
+    const url = accessResult.url;
+    const response = await recordClickEvent(url, userAgentParsed);
+
+    if (response.success && response.data) {
+      if (url.flagged) {
+        const warnRedirectUrl = req.nextUrl.clone();
+        warnRedirectUrl.pathname = "/redirect/url/warn";
+
+        const obj: WarnRedirectSearchParams = {
+          flagged: String(url.flagged),
+        };
+
+        if (url.threat) {
+          obj.threat = encodeURIComponent(url.threat);
+        } else {
+          obj.redirect = encodeURIComponent(url.originalUrl);
+        }
+
+        if (url.flagReason) {
+          obj.reason = encodeURIComponent(url.flagReason);
+        }
+
+        warnRedirectUrl.search = new URLSearchParams(obj).toString();
+        return NextResponse.redirect(warnRedirectUrl, 302);
+      }
+
+      return NextResponse.redirect(url.originalUrl, 302);
+    }
+
+    return NextResponse.redirect(notFound, 302);
+  } catch (error) {
+    console.error("GET /r/[shortCode] error:", error);
+    return NextResponse.redirect(notFound, 302);
   }
-
-  const notFoundRedirectRUrl = req.nextUrl.clone();
-  notFoundRedirectRUrl.pathname = "/redirect/url/not-found";
-
-  return NextResponse.redirect(notFoundRedirectRUrl, 302);
 }

@@ -27,3 +27,6 @@ export function ensureHttps(url: string): string {
 
   return `https://${url}`;
 }
+
+export const capitalizeFirstLetter = (str: string): string =>
+  str.charAt(0).toUpperCase() + str.slice(1);

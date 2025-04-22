@@ -1,5 +1,5 @@
 import { UserGrowthLineAreaChart } from "@/components/admin/analytics/user-growth-chart/user-growth-chart";
-import { getUsersOverTime } from "@/server/actions/admin/users/get-users-over-time";
+import { getUserGrowthChartData } from "@/server/services/admin/user/get-user-growth-chart-data.service";
 import {
   dehydrate,
   HydrationBoundary,
@@ -11,7 +11,8 @@ export default async function UserGrowthChartSlot() {
 
   await queryClient.prefetchQuery({
     queryKey: ["user-growth", "6M"],
-    queryFn: () => getUsersOverTime({ timeRange: "6M" }),
+    queryFn: () => getUserGrowthChartData({ timeRange: "6M" }),
+    staleTime: 1000 * 60,
   });
 
   return (

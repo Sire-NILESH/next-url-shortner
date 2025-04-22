@@ -18,3 +18,19 @@ export type UrlClicksPieChartDataType = {
   clicks: number;
   fill: string;
 };
+
+export type UrlVsFlaggedRouteResType = {
+  period: string;
+  urls: number;
+  flaggedUrls: number;
+}[];
+
+export type UsersByProviderResType = {
+  providerType: string;
+  users: number;
+}[];
+
+export type UserGrowthResType = {
+  period: string;
+  users: number;
+}[];

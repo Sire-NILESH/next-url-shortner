@@ -1,20 +1,19 @@
-"use server";
+import "server-only";
 
-import timeRanges from "@/lib/timeRanges";
 import { db } from "@/server/db";
-import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
-import { ApiResponse } from "@/types/server/types";
 import { add, sub } from "date-fns";
 import { sql } from "drizzle-orm";
+import timeRanges from "@/lib/timeRanges";
+import { ApiResponse } from "@/types/server/types";
 
 type TimeRange = keyof typeof timeRanges | "all time";
 
-interface GetUsersOverTimeOptions {
-  timeRange?: TimeRange;
+interface GetUserGrowthChartDataOptions {
+  timeRange?: TimeRange | null;
 }
 
-export const getUsersOverTime = async (
-  options: GetUsersOverTimeOptions = { timeRange: "all time" }
+export const getUserGrowthChartData = async (
+  options: GetUserGrowthChartDataOptions = { timeRange: "all time" }
 ): Promise<
   ApiResponse<
     {
@@ -24,13 +23,9 @@ export const getUsersOverTime = async (
   >
 > => {
   try {
-    const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
-
-    if (!authResponse.success) return authResponse;
-
     const range = options.timeRange ?? "all time";
-    let now = new Date();
 
+    let now = new Date();
     let fromDate = new Date(2000, 0);
     let interval = "1 year";
     let format = "YYYY";
@@ -67,6 +62,7 @@ export const getUsersOverTime = async (
         format = "Mon YYYY";
         break;
       case "all time":
+      default:
         fromDate = new Date(2023, 0);
         now = add(now, { years: 1 });
         interval = "1 year";
@@ -78,40 +74,40 @@ export const getUsersOverTime = async (
       period: string;
       users: number;
     }>(sql`
-      WITH periods AS (
-        SELECT generate_series(
-          ${fromDate.toISOString()}::timestamp,
-          ${now.toISOString()}::timestamp,
-          INTERVAL '${sql.raw(interval)}'
-        ) AS period
-      ),
-      user_counts AS (
-        SELECT 
-          date_trunc(${sql.raw(
-            `'${interval.split(" ")[1]}'`
-          )}, "created_at") AS grouped,
-          COUNT(*) AS count
-        FROM users
-        WHERE "created_at" >= ${fromDate.toISOString()}::timestamp
-        GROUP BY grouped
-      )
+    WITH periods AS (
+      SELECT generate_series(
+        ${fromDate.toISOString()}::timestamp,
+        ${now.toISOString()}::timestamp,
+        INTERVAL '${sql.raw(interval)}'
+      ) AS period
+    ),
+    user_counts AS (
       SELECT 
-        TO_CHAR(p.period, '${sql.raw(format)}') AS period,
-        COALESCE(u.count, 0)::int AS users
-      FROM periods p
-      LEFT JOIN user_counts u
-        ON date_trunc(${sql.raw(
+        date_trunc(${sql.raw(
           `'${interval.split(" ")[1]}'`
-        )}, p.period) = u.grouped
-      ORDER BY p.period;
-    `);
+        )}, "created_at") AS grouped,
+        COUNT(*) AS count
+      FROM users
+      WHERE "created_at" >= ${fromDate.toISOString()}::timestamp
+      GROUP BY grouped
+    )
+    SELECT 
+      TO_CHAR(p.period, '${sql.raw(format)}') AS period,
+      COALESCE(u.count, 0)::int AS users
+    FROM periods p
+    LEFT JOIN user_counts u
+      ON date_trunc(${sql.raw(
+        `'${interval.split(" ")[1]}'`
+      )}, p.period) = u.grouped
+    ORDER BY p.period;
+  `);
 
     return {
       success: true,
       data: result ?? [{ period: "unknown", users: 0 }],
     };
   } catch (error) {
-    console.error("Error fetching getUsersOverTime:", error);
+    console.error("Error fetching getUserGrowthChartData:", error);
     return { success: false, error: "Internal Server Error" };
   }
 };

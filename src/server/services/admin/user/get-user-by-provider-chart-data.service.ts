@@ -1,21 +1,20 @@
-"use server";
+import "server-only";
 
 import timeRanges from "@/lib/timeRanges";
 import { db } from "@/server/db";
 import { accounts, users } from "@/server/db/schema";
-import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 import { add, sub } from "date-fns";
 import { count, eq, gte, sql } from "drizzle-orm";
 
 type TimeRange = keyof typeof timeRanges | "all time";
 
-interface GetUsersByProviderOptions {
-  timeRange?: TimeRange;
+interface GetUsersByProviderChartDataOptions {
+  timeRange?: TimeRange | null;
 }
 
-export const getUsersByProviderOverTime = async (
-  options: GetUsersByProviderOptions = { timeRange: "all time" }
+export const getUsersByProviderChartData = async (
+  options: GetUsersByProviderChartDataOptions = { timeRange: "all time" }
 ): Promise<
   ApiResponse<
     {
@@ -25,12 +24,9 @@ export const getUsersByProviderOverTime = async (
   >
 > => {
   try {
-    const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
-
-    if (!authResponse.success) return authResponse;
-
     const range = options.timeRange ?? "all time";
     let now = new Date();
+
     let fromDate = new Date(2000, 0);
 
     switch (range) {
@@ -77,7 +73,7 @@ export const getUsersByProviderOverTime = async (
             [{ providerType: "None", users: 1 }],
     };
   } catch (error) {
-    console.error("Error fetching getUsersByProviderOverTime:", error);
+    console.error("Error fetching getUsersByProviderChartData:", error);
     return { success: false, error: "Internal Server Error" };
   }
 };

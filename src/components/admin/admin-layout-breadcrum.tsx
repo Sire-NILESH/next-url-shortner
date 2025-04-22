@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { capitalizeFirstLetter, cn } from "@/lib/utils";
 import React, { ComponentProps } from "react";
 import {
   Breadcrumb,
@@ -13,9 +13,6 @@ import {
 import { usePathname } from "next/navigation";
 
 type Props = ComponentProps<"div">;
-
-const capitalizeFirstLetter = (str: string): string =>
-  str.charAt(0).toUpperCase() + str.slice(1);
 
 const AdminLayoutBreadCrumb = ({ className, ...props }: Props) => {
   const pathNames = usePathname().split("/").slice(1);

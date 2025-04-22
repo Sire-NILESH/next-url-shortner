@@ -21,11 +21,7 @@ export function UserGrowthLineAreaChart() {
     <Card>
       <CardHeader className="relative">
         <CardTitle>Audience Growth</CardTitle>
-        <CardDescription>
-          {timeRange === "all time"
-            ? "Showing user growth till today"
-            : `Showing new users for the last ${timeRanges[timeRange]}`}
-        </CardDescription>
+        <CardDescription>{getTimeRangeLabel(timeRange)}</CardDescription>
 
         <TimeRangeSelect
           className="absolute right-4 top-0"
@@ -45,7 +41,9 @@ export function UserGrowthLineAreaChart() {
               Target 180+ new users per month
             </div>
             <div className="flex items-center gap-2 leading-none text-muted-foreground">
-              {getTimeRangeLabel(timeRange)}
+              {timeRange === "all time"
+                ? "Showing user growth till today"
+                : `Showing new users for the last ${timeRanges[timeRange]}`}
             </div>
           </div>
         </div>

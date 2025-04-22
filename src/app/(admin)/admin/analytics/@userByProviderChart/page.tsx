@@ -1,5 +1,5 @@
 import UserByProviderDistribution from "@/components/admin/analytics/user-by-provider-distribution/user-by-provider-distribution";
-import { getUsersByProviderOverTime } from "@/server/actions/admin/users/get-users-by-provider-over-time";
+import { getUsersByProviderChartData } from "@/server/services/admin/user/get-user-by-provider-chart-data.service";
 import {
   dehydrate,
   HydrationBoundary,
@@ -11,7 +11,8 @@ export default async function UserByProviderChartSlot() {
 
   await queryClient.prefetchQuery({
     queryKey: ["user-by-provider-distribution", "6M"],
-    queryFn: () => getUsersByProviderOverTime({ timeRange: "6M" }),
+    queryFn: () => getUsersByProviderChartData({ timeRange: "6M" }),
+    staleTime: 1000 * 60,
   });
 
   return (

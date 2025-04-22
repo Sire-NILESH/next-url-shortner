@@ -1,20 +1,19 @@
-"use server";
+import "server-only";
 
 import timeRanges from "@/lib/timeRanges";
 import { db } from "@/server/db";
-import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 import { add, sub } from "date-fns";
 import { sql } from "drizzle-orm";
 
 type TimeRange = keyof typeof timeRanges | "all time";
 
-interface GetUrlVsFlaggedUrlByTimeOptions {
-  timeRange?: TimeRange;
+interface GetUrlVsFlaggedChartDataOptions {
+  timeRange?: TimeRange | null;
 }
 
-export const getUrlVsFlaggedUrlByTime = async (
-  options: GetUrlVsFlaggedUrlByTimeOptions = { timeRange: "all time" }
+export const getUrlVsFlaggedChartData = async (
+  options: GetUrlVsFlaggedChartDataOptions = { timeRange: "all time" }
 ): Promise<
   ApiResponse<
     {
@@ -25,10 +24,6 @@ export const getUrlVsFlaggedUrlByTime = async (
   >
 > => {
   try {
-    const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
-
-    if (!authResponse.success) return authResponse;
-
     const range = options.timeRange ?? "all time";
     let now = new Date();
 
@@ -115,7 +110,7 @@ export const getUrlVsFlaggedUrlByTime = async (
       data: result ?? [],
     };
   } catch (error) {
-    console.error("Error fetching getUrlVsFlaggedUrlByTime:", error);
+    console.error("Error fetching getUrlVsFlaggedChartData:", error);
     return { success: false, error: "Internal Server Error" };
   }
 };

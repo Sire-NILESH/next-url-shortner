@@ -15,7 +15,7 @@ import TimeRangeSelect from "../time-range-select";
 import GetUserByProvider from "./get-user-by-provider";
 import UserByProviderSkeleton from "./user-by-provider-skeleton";
 
-type Props = ComponentProps<"div"> & {};
+type Props = ComponentProps<"div">;
 
 const UserByProviderDistribution = ({ className, ...props }: Props) => {
   const [timeRange, setTimeRange] = useState<TimeRange>("6M");

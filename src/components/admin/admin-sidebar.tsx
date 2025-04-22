@@ -18,6 +18,8 @@ import {
 } from "@/site-config/nav-routes";
 import { Home } from "lucide-react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import SkeletonWrapper from "../skeleton-wrapper";
 
 const data = {
   user: {
@@ -28,6 +30,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const session = useSession();
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="mt-2">
@@ -48,7 +51,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <SkeletonWrapper isLoading={session.status === "loading"}>
+          <NavUser session={session.data} />
+        </SkeletonWrapper>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

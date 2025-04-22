@@ -1,5 +1,5 @@
 import UrlVsFlaggedChart from "@/components/admin/analytics/url-vs-flagged-chart/url-vs-flagged-chart";
-import { getUrlVsFlaggedUrlByTime } from "@/server/actions/admin/urls/get-url-vs-flagged-url-by-time";
+import { getUrlVsFlaggedChartData } from "@/server/services/admin/url/get-url-vs-flagged-chart-data.service";
 import {
   dehydrate,
   HydrationBoundary,
@@ -11,8 +11,10 @@ export default async function UrlCreationChartSlot() {
 
   await queryClient.prefetchQuery({
     queryKey: ["url-vs-flagged-chart-data", "6M"],
-    queryFn: () => getUrlVsFlaggedUrlByTime({ timeRange: "6M" }),
+    queryFn: () => getUrlVsFlaggedChartData({ timeRange: "6M" }),
+    staleTime: 1000 * 60,
   });
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <UrlVsFlaggedChart />

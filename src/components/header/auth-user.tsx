@@ -21,7 +21,7 @@ const AuthUser = ({ className, ...props }: Props) => {
       {session.status === "loading" ? (
         <Skeleton className="size-9 rounded-full" />
       ) : session.status === "authenticated" ? (
-        <UserAvatarDropdown />
+        <UserAvatarDropdown session={session.data} />
       ) : (
         <Link
           href={"/login"}

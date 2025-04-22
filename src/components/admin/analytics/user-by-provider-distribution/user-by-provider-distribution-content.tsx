@@ -1,9 +1,11 @@
-import { cn } from "@/lib/utils";
+import { capitalizeFirstLetter, cn } from "@/lib/utils";
 import React, { ComponentProps, useMemo } from "react";
 import { Label, Pie, PieChart } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -33,7 +35,7 @@ const UserByProviderDistributionContent = ({
     },
     ...chartData.reduce((acc, curr, index) => {
       acc[curr.providerType] = {
-        label: curr.providerType,
+        label: capitalizeFirstLetter(curr.providerType),
         color: `var(--chart-${index + 1})`,
       };
       return acc;
@@ -63,6 +65,9 @@ const UserByProviderDistributionContent = ({
               content={<ChartTooltipContent hideLabel />}
             />
           )}
+
+          <ChartLegend content={<ChartLegendContent />} />
+
           <Pie
             data={pieChartData}
             dataKey="users"

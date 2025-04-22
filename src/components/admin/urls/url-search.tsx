@@ -65,7 +65,9 @@ export function UrlSearch({ initialSearch }: UrlSearchProps) {
           </Button>
         )}
       </div>
-      <Button type="submit">Search</Button>
+      <Button type="submit">
+        <Search />
+      </Button>
     </form>
   );
 }

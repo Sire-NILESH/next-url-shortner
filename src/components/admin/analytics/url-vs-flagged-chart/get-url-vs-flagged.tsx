@@ -1,30 +1,36 @@
 import { TimeRange } from "@/lib/timeRanges";
-import { getUrlVsFlaggedUrlByTime } from "@/server/actions/admin/urls/get-url-vs-flagged-url-by-time";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ComponentProps } from "react";
 import UrlVsFlaggedContent from "./url-vs-flagged-content";
 import { cn } from "@/lib/utils";
+import { fetchUrlVsFlaggedChartData } from "@/lib/api/fetch-url-vs-flagged-chart-data";
+import { UrlVsFlaggedRouteResType } from "@/types/client/types";
+import { ApiResponse } from "@/types/server/types";
+// import UrlVsFlaggedSkeleton from "./url-vs-flagged-skeleton";
 
 type Props = ComponentProps<"div"> & {
   timeRange: TimeRange;
 };
 
+type ResponseType = ApiResponse<UrlVsFlaggedRouteResType>;
+
 const GetUrlVsFlagged = ({ className, timeRange, ...props }: Props) => {
-  const { data } = useSuspenseQuery({
+  const { data } = useSuspenseQuery<ResponseType>({
     queryKey: ["url-vs-flagged-chart-data", timeRange],
     queryFn: () =>
-      getUrlVsFlaggedUrlByTime({
+      fetchUrlVsFlaggedChartData({
         timeRange: timeRange,
       }),
+    staleTime: 1000 * 60,
   });
 
-  // if (isPending) {
-  //   return <UserGrowthSkeleton />;
+  // if (isLoading) {
+  //   return <UrlVsFlaggedSkeleton />;
   // }
 
   return (
     <UrlVsFlaggedContent
-      chartData={data?.data ?? []}
+      chartData={data.success ? data.data : []}
       className={cn("", className)}
       {...props}
     />

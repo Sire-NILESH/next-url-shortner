@@ -254,7 +254,10 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
         <DataTableColumnHeader column={column} title="Name" />
       ),
       cell: ({ row }) => (
-        <div className="truncate max-w-xs" title={row.original.name ?? ""}>
+        <div
+          className="truncate max-w-xs"
+          title={row.original.name ?? "Unnamed"}
+        >
           {row.original.name ?? (
             <span className="italic text-muted-foreground">Unnamed</span>
           )}
@@ -302,10 +305,10 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
     {
       accessorKey: "shortCode",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Shrinkify URL" />
+        <DataTableColumnHeader column={column} title="Shrinkify Code" />
       ),
       cell: ({ row }) => {
-        const shortUrl = `${BASE_URL}/r/${row.original.shortCode}`;
+        const shortUrl = `${row.original.shortCode}`;
         return (
           <div className="flex items-center">
             <div className="truncate" title={shortUrl}>
