@@ -17,7 +17,7 @@ export const NewShrinkifyURLCard = ({
   ...props
 }: NewShrinkifyURLCardProps) => {
   return (
-    <Card className={cn("flex-1", className)} {...props}>
+    <Card className={cn("h-116 overflow-hidden", className)} {...props}>
       <CardHeader className="flex flex-row gap-3 items-center pb-2">
         <Plus className="size-10 md:size-12 items-center rounded-lg p-2 text-purple-500 bg-purple-400/10" />
         <div className="space-y-1">
@@ -27,8 +27,8 @@ export const NewShrinkifyURLCard = ({
           </CardDescription>
         </div>
       </CardHeader>
-      <CardContent>
-        <CoreUrlShortner />
+      <CardContent className="pb-0 overflow-y-scroll">
+        <CoreUrlShortner className="h-full mx-auto aspect-auto p-1" />
       </CardContent>
     </Card>
   );

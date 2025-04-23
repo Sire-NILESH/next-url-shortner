@@ -21,7 +21,7 @@ const UserByProviderDistribution = ({ className, ...props }: Props) => {
   const [timeRange, setTimeRange] = useState<TimeRange>("6M");
 
   return (
-    <Card className={cn("flex flex-col", className)} {...props}>
+    <Card className={cn("flex flex-col bg-secondary/20", className)} {...props}>
       <CardHeader className="relative pb-0">
         <CardTitle>Users By Providers</CardTitle>
         <CardDescription>{getTimeRangeLabel(timeRange)}</CardDescription>

@@ -18,7 +18,7 @@ export function UserGrowthLineAreaChart() {
   const [timeRange, setTimeRange] = useState<TimeRange>("6M");
 
   return (
-    <Card>
+    <Card className="bg-secondary/20">
       <CardHeader className="relative">
         <CardTitle>Audience Growth</CardTitle>
         <CardDescription>{getTimeRangeLabel(timeRange)}</CardDescription>

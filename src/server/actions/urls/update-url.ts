@@ -15,6 +15,7 @@ const updateUrlSchema = z.object({
     .regex(/^[a-zA-Z0-9_-]+$/, "Custom code must be alphanumeric or hyphen"),
   name: z.string().max(255, "Name must be less than 255 characters").optional(),
 });
+
 export async function updateUrl(
   formData: FormData
 ): Promise<ApiResponse<{ shortUrl: string }>> {

@@ -1,26 +1,39 @@
 "use client";
 
-import { useState } from "react";
 import {
-  useMutation,
-  useQueryClient,
   QueryClient,
   QueryClientProvider,
+  useMutation,
+  useQueryClient,
 } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import {
+  AlertTriangle,
   Copy,
+  DownloadIcon,
   Edit,
   ExternalLink,
-  QrCode,
-  Trash2Icon,
   MoreHorizontal,
-  DownloadIcon,
+  QrCode,
   Search,
+  ShieldAlert,
+  Trash2Icon,
 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 // shadcn components
+import SkeletonWrapper from "@/components/skeleton-wrapper";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -30,41 +43,32 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  SortingState,
-  getPaginationRowModel,
-  ColumnFiltersState,
-  getFilteredRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Input } from "@/components/ui/input";
-import { QRCodeModal } from "../modals/qr-code-modal";
-import { EditUrlModal } from "../modals/edit-url-modal";
+import { formatNumber } from "@/lib/formatNum";
+import { getShrinkifyUrl, stripHttp } from "@/lib/utils";
 import { deleteUrl } from "@/server/actions/urls/delete-url";
-import SkeletonWrapper from "@/components/skeleton-wrapper";
-import { download, generateCsv, mkConfig } from "export-to-csv";
+import { FlagCategoryTypeEnum, ThreatTypeEnum } from "@/types/server/types";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  ColumnDef,
+  ColumnFiltersState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+} from "@tanstack/react-table";
+import { download, generateCsv, mkConfig } from "export-to-csv";
 import { DataTableColumnHeader } from "../data-table/column-header";
 import { DataTableViewOptions } from "../data-table/column-toggle";
-import { formatNumber } from "@/lib/formatNum";
-import { BASE_URL } from "@/site-config/base-url";
+import { EditUrlModal } from "../modals/edit-url-modal";
+import { QRCodeModal } from "../modals/qr-code-modal";
+import { Badge } from "../ui/badge";
 
 // Types
 interface Url {
@@ -72,8 +76,12 @@ interface Url {
   originalUrl: string;
   shortCode: string;
   name: string | null;
-  createdAt: Date;
   clicks: number;
+  threat: ThreatTypeEnum;
+  flagged: boolean;
+  flagCategory: FlagCategoryTypeEnum;
+  createdAt: Date;
+  disabled: boolean;
 }
 
 interface UserUrlsTableProps {
@@ -161,7 +169,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
   };
 
   const showQrCode = (shortCode: string) => {
-    const shortUrl = `${BASE_URL}/r/${shortCode}`;
+    const shortUrl = getShrinkifyUrl(shortCode);
     setQrCodeUrl(shortUrl);
     setQrCodeShortCode(shortCode);
     setIsQrCodeModalOpen(true);
@@ -272,7 +280,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
       cell: ({ row }) => (
         <div className="flex items-center max-w-xs">
           <div className="truncate" title={row.original.originalUrl}>
-            {row.original.originalUrl}
+            {stripHttp(row.original.originalUrl)}
           </div>
           <TooltipProvider>
             <Tooltip>
@@ -308,12 +316,16 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
         <DataTableColumnHeader column={column} title="Shrinkify Code" />
       ),
       cell: ({ row }) => {
-        const shortUrl = `${row.original.shortCode}`;
+        const shortUrl = getShrinkifyUrl(row.original.shortCode);
         return (
           <div className="flex items-center">
-            <div className="truncate" title={shortUrl}>
-              {shortUrl}
-            </div>
+            <Badge
+              variant="secondary"
+              className="truncate rounded-sm"
+              title={row.original.shortCode}
+            >
+              {row.original.shortCode}
+            </Badge>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -342,6 +354,40 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
           </div>
         );
       },
+    },
+    {
+      accessorKey: "flagged",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Flagged" />
+      ),
+      cell: ({ row }) => (
+        <div className="">
+          {row.original.flagged && row.original.threat ? (
+            <ShieldAlert className="size-5 text-red-600 dark:text-red-500 mt-0.5 flex-shrink-0" />
+          ) : row.original.flagged ? (
+            <AlertTriangle className="size-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+          ) : (
+            <span className="italic text-muted-foreground">None</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "disabled",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Disabled" />
+      ),
+      cell: ({ row }) => (
+        <>
+          {row.original.disabled ? (
+            <Badge variant="outline" className="rounded-sm">
+              {String(row.original.disabled).toUpperCase()}
+            </Badge>
+          ) : (
+            <span className="italic text-muted-foreground">None</span>
+          )}
+        </>
+      ),
     },
     {
       accessorKey: "clicks",
@@ -434,7 +480,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
               const data = table.getFilteredRowModel().rows.map((row) => ({
                 index: row.index + 1,
                 originalUrl: row.original.originalUrl,
-                shortUrl: `${BASE_URL}/r/${row.original.shortCode}`,
+                shortUrl: getShrinkifyUrl(row.original.shortCode),
                 clicks: row.original.clicks,
                 createdAt: new Date(
                   row.original.createdAt

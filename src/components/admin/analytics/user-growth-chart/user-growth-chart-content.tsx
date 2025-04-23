@@ -44,7 +44,6 @@ const UserGrowthChartContent = ({ className, chartData, ...props }: Props) => {
             tickLine={false}
             axisLine={false}
             tickMargin={8}
-            // tickFormatter={(value) => value.slice(0, 3)}
           />
           <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
           <defs>

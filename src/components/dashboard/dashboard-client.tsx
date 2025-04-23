@@ -124,7 +124,7 @@ export default function DashboardClient({ userUrls }: { userUrls: Url[] }) {
         </CardHeader>
         <CardContent className="px-4 md:px-6">
           <>
-            <div className="flex flex-col xl:flex-row gap-10">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
               <NewShrinkifyURLCard className="bg-secondary/40" />
               {barChartData.length > 0 ? (
                 <>
@@ -147,7 +147,7 @@ export default function DashboardClient({ userUrls }: { userUrls: Url[] }) {
                   />
                 </>
               ) : (
-                <div className="flex-1 flex flex-col items-center justify-center space-y-2 rounded-xl text-center py-8 bg-muted">
+                <div className="col-span-1 xl:col-span-2 flex flex-col items-center justify-center space-y-2 rounded-xl text-center py-8 bg-muted">
                   <p className="text-lg font-semibold">
                     No url data available yet.
                   </p>

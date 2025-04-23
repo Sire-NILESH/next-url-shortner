@@ -1,8 +1,13 @@
+import { BASE_URL } from "@/site-config/base-url";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function getShrinkifyUrl(shortCode: string) {
+  return `${BASE_URL}/r/${shortCode}`;
 }
 
 export function isValidUrl(url: string): boolean {
@@ -30,3 +35,7 @@ export function ensureHttps(url: string): string {
 
 export const capitalizeFirstLetter = (str: string): string =>
   str.charAt(0).toUpperCase() + str.slice(1);
+
+export function stripHttp(url: string): string {
+  return url.replace(/^https?:\/\//, "");
+}

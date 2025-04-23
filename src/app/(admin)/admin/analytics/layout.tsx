@@ -7,7 +7,7 @@ type Props = {
   children: ReactNode;
   sectionCards: ReactNode;
   urlCreationChart: ReactNode;
-  clicksStackedBarChart: ReactNode;
+  clicksInfoChart: ReactNode;
   userByProviderChart: ReactNode;
   userGrowthChart: ReactNode;
 };
@@ -20,7 +20,7 @@ const AdminAnalyticsParallelRoutesLayout = ({
   children,
   sectionCards,
   urlCreationChart,
-  clicksStackedBarChart,
+  clicksInfoChart,
   userGrowthChart,
   userByProviderChart,
 }: Props) => {
@@ -38,9 +38,7 @@ const AdminAnalyticsParallelRoutesLayout = ({
                   <div className="min-h-98">{urlCreationChart}</div>
 
                   <div className="@6xl/main:grid-cols-3 @3xl/main:grid-cols-2 grid grid-cols-1 gap-4">
-                    <div className="flex-1 min-h-108">
-                      {clicksStackedBarChart}
-                    </div>
+                    <div className="flex-1 min-h-108">{clicksInfoChart}</div>
                     <div className="flex-1 min-h-108">
                       {userByProviderChart}
                     </div>

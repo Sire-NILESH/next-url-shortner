@@ -34,7 +34,7 @@ const chartConfig = {
 const UrlVsFlaggedContent = ({ className, chartData, ...props }: Props) => {
   return (
     <div className={cn("", className)} {...props}>
-      <ChartContainer config={chartConfig} className="aspect-auto h-64 w-full">
+      <ChartContainer config={chartConfig} className="h-64 w-full">
         <AreaChart data={chartData}>
           <defs>
             <linearGradient id="fillUrls" x1="0" y1="0" x2="0" y2="1">

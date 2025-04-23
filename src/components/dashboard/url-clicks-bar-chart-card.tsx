@@ -34,7 +34,7 @@ export const UrlClicksBarChartCard = ({
   ...props
 }: UrlClicksBarChartCardProps) => {
   return (
-    <Card className={cn("flex flex-1 flex-col", className)} {...props}>
+    <Card className={cn("", className)} {...props}>
       <CardHeader className="flex flex-row gap-3 items-center pb-2">
         <ChartNoAxesColumn className="size-10 md:size-12 items-center rounded-lg p-2 text-purple-500 bg-purple-400/10" />
         <div className="space-y-1">
@@ -42,8 +42,11 @@ export const UrlClicksBarChartCard = ({
           <CardDescription>Top 5 URLs with most clicks</CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer config={barChartConfig}>
+      <CardContent className="pb-0">
+        <ChartContainer
+          className="h-64 mx-auto aspect-auto"
+          config={barChartConfig}
+        >
           <BarChart accessibilityLayer data={barChartData}>
             <CartesianGrid vertical={false} />
             <XAxis

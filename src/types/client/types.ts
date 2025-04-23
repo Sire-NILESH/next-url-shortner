@@ -34,3 +34,9 @@ export type UserGrowthResType = {
   period: string;
   users: number;
 }[];
+
+export type ClicksInfoChartResType = {
+  period: string;
+  clicks: number;
+  flaggedClicks: number;
+}[];

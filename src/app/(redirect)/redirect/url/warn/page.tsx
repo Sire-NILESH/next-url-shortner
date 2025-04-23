@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { WarnRedirectSearchParams } from "@/types/server/types";
-import { AlertTriangle, ExternalLink } from "lucide-react";
+import { AlertTriangle, ExternalLink, ShieldAlert } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -46,12 +46,12 @@ export default async function RedirectUrlWarningPage({ searchParams }: Props) {
               threat ? "bg-red-400/20" : "bg-yellow-400/40"
             )}
           >
-            <AlertTriangle
-              className={cn(
-                "size-8 text-destructive",
-                threat ? "text-red-500" : "text-yellow-500"
-              )}
-            />
+            
+            {threat ? (
+              <ShieldAlert className="size-10 sm:size-7 text-red-600 dark:text-red-500 mt-0.5 flex-shrink-0" />
+            ) : (
+              <AlertTriangle className="size-10 sm:size-7 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+            )}
           </div>
 
           {threat ? <Badge variant="default">{threat}</Badge> : null}

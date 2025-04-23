@@ -40,7 +40,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { formatNumber } from "@/lib/formatNum";
-import { cn } from "@/lib/utils";
+import { cn, getShrinkifyUrl } from "@/lib/utils";
 import {
   GetAllUrlsOptions,
   UrlWithUser,
@@ -332,7 +332,7 @@ export function AdminUrlsTable({
   const copyToClipboard = async (id: number, shortCode: string) => {
     try {
       setCopyingId(id);
-      const shrinkifyUrl = `${BASE_URL}/r/${shortCode}`;
+      const shrinkifyUrl = getShrinkifyUrl(shortCode);
       await navigator.clipboard.writeText(shrinkifyUrl);
       toast.success("Shrinkify URL copied to clipboard.");
     } catch (error) {
@@ -606,7 +606,7 @@ export function AdminUrlsTable({
                         <DropdownMenuItem>
                           <ExternalLink />
                           <a
-                            href={`${BASE_URL}/r/${url.shortCode}`}
+                            href={getShrinkifyUrl(url.shortCode)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-full"
