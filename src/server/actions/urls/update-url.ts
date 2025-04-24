@@ -1,20 +1,11 @@
 "use server";
 
+import { getShrinkifyUrl } from "@/lib/utils";
+import { updateShrinkifyUrlSchema } from "@/lib/validations/URLSchema";
 import { db, eq } from "@/server/db";
 import { urls } from "@/server/db/schema";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
-import { revalidatePath } from "next/cache";
-import { z } from "zod";
-
-const updateUrlSchema = z.object({
-  id: z.coerce.number(),
-  customCode: z
-    .string()
-    .max(255, "Custom code must be less than 255 characters")
-    .regex(/^[a-zA-Z0-9_-]+$/, "Custom code must be alphanumeric or hyphen"),
-  name: z.string().max(255, "Name must be less than 255 characters").optional(),
-});
 
 export async function updateUrl(
   formData: FormData
@@ -27,7 +18,7 @@ export async function updateUrl(
     const { data: session } = authResponse;
     const userId = session?.user?.id;
 
-    const validatedFields = updateUrlSchema.safeParse({
+    const validatedFields = updateShrinkifyUrlSchema.safeParse({
       id: formData.get("id"),
       customCode: formData.get("customCode"),
       name: formData.get("name"),
@@ -78,10 +69,7 @@ export async function updateUrl(
       })
       .where(eq(urls.id, id));
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const shortUrl = `${baseUrl}/r/${customCode}`;
-
-    revalidatePath("/dashboard");
+    const shortUrl = getShrinkifyUrl(customCode);
 
     return {
       success: true,

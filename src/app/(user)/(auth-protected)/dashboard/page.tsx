@@ -3,6 +3,7 @@ import DashboardIntroCard from "@/components/dashboard/dashboard-intro-card";
 import { getUserUrls } from "@/server/actions/urls/get-user-urls";
 import { auth } from "@/server/auth";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Dashboard | Shrinkify",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
   const session = await auth();
+  if (!session?.user) redirect("/login");
 
   // Get user's URLs
   const response = await getUserUrls(session?.user.id as string);

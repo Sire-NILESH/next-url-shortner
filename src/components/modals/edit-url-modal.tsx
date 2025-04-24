@@ -1,9 +1,16 @@
+import {
+  UpdateShrinkifyUrlFormData,
+  updateShrinkifyUrlFormSchema,
+} from "@/lib/validations/URLSchema";
+import { updateUrl } from "@/server/actions/urls/update-url";
+import { BASE_URL } from "@/site-config/base-url";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
+import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -20,21 +27,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Loader2 } from "lucide-react";
-import { updateUrl } from "@/server/actions/urls/update-url";
-import { BASE_URL } from "@/site-config/base-url";
-
-const editUrlSchema = z.object({
-  customCode: z
-    .string()
-    .min(3, "Custom code must be at least 3 characters")
-    .max(255, "Custom code must be less than 255 characters")
-    .regex(/^[a-zA-Z0-9_-]+$/, "Custom code must be alphanumeric or hyphen"),
-  name: z.string().max(255, "Name must be less than 255 characters").optional(),
-});
-
-type EditUrlFormData = z.infer<typeof editUrlSchema>;
 
 interface EditUrlModalProps {
   isOpen: boolean;
@@ -42,7 +34,7 @@ interface EditUrlModalProps {
   urlId: number;
   urlName: string | null;
   currentShortCode: string;
-  onSuccess: (newShortCode: string) => void;
+  onSuccess: (newShortCode: string, name?: string) => void;
 }
 
 export function EditUrlModal({
@@ -53,8 +45,8 @@ export function EditUrlModal({
   currentShortCode,
   onSuccess,
 }: EditUrlModalProps) {
-  const form = useForm<EditUrlFormData>({
-    resolver: zodResolver(editUrlSchema),
+  const form = useForm<UpdateShrinkifyUrlFormData>({
+    resolver: zodResolver(updateShrinkifyUrlFormSchema),
     defaultValues: {
       customCode: currentShortCode,
       name: urlName ? urlName : undefined, // Optional: set to actual name if available
@@ -69,7 +61,7 @@ export function EditUrlModal({
   }, [currentShortCode, form, urlName]);
 
   const mutation = useMutation({
-    mutationFn: async (data: EditUrlFormData) => {
+    mutationFn: async (data: UpdateShrinkifyUrlFormData) => {
       const formData = new FormData();
       formData.append("id", urlId.toString());
       formData.append("customCode", data.customCode);
@@ -81,7 +73,7 @@ export function EditUrlModal({
         toast.success("URL updated successfully", {
           description: "The URL has been updated successfully",
         });
-        onSuccess(variables.customCode);
+        onSuccess(variables.customCode, variables.name);
         onOpenChange(false);
       } else {
         toast.error("Failed to update URL", {

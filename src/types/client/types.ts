@@ -1,3 +1,5 @@
+import { FlagCategoryTypeEnum, ThreatTypeEnum } from "../server/types";
+
 export type Url = {
   id: number;
   originalUrl: string;
@@ -40,3 +42,16 @@ export type ClicksInfoChartResType = {
   clicks: number;
   flaggedClicks: number;
 }[];
+
+export type UserUrl = {
+  id: number;
+  originalUrl: string;
+  shortCode: string;
+  name: string | null;
+  threat: ThreatTypeEnum;
+  flagged: boolean;
+  flagCategory: FlagCategoryTypeEnum;
+  createdAt: Date;
+  clicks: number;
+  disabled: boolean;
+};

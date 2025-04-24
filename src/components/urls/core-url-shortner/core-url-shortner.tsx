@@ -1,7 +1,10 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import { UrlFormData, urlSchema } from "@/lib/URLSchema";
+import {
+  CreateShrinkifyUrlFormData,
+  createShrinkifyUrlFormSchema,
+} from "@/lib/validations/URLSchema";
 import { cn } from "@/lib/utils";
 import { createShrinkifyUrl } from "@/server/actions/urls/create-shrinkify-url";
 import { BASE_URL } from "@/site-config/base-url";
@@ -32,8 +35,8 @@ export function CoreUrlShortner({ className, ...props }: Props) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const form = useForm<UrlFormData>({
-    resolver: zodResolver(urlSchema),
+  const form = useForm<CreateShrinkifyUrlFormData>({
+    resolver: zodResolver(createShrinkifyUrlFormSchema),
     defaultValues: {
       url: "",
       customCode: "",
@@ -41,7 +44,7 @@ export function CoreUrlShortner({ className, ...props }: Props) {
   });
 
   const mutation = useMutation({
-    mutationFn: async (data: UrlFormData) => {
+    mutationFn: async (data: CreateShrinkifyUrlFormData) => {
       const formData = new FormData();
       formData.append("url", data.url);
 
@@ -107,7 +110,7 @@ export function CoreUrlShortner({ className, ...props }: Props) {
     session?.user,
   ]);
 
-  const onSubmit = (data: UrlFormData) => mutation.mutate(data);
+  const onSubmit = (data: CreateShrinkifyUrlFormData) => mutation.mutate(data);
 
   return (
     <>

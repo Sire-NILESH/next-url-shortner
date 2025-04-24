@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  QueryClient,
-  QueryClientProvider,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import {
   AlertTriangle,
@@ -48,10 +43,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import useMyUrls from "@/hooks/useMyUrls";
 import { formatNumber } from "@/lib/formatNum";
 import { getShrinkifyUrl, stripHttp } from "@/lib/utils";
 import { deleteUrl } from "@/server/actions/urls/delete-url";
-import { FlagCategoryTypeEnum, ThreatTypeEnum } from "@/types/server/types";
+import { UserUrl } from "@/types/client/types";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -70,26 +66,9 @@ import { EditUrlModal } from "../modals/edit-url-modal";
 import { QRCodeModal } from "../modals/qr-code-modal";
 import { Badge } from "../ui/badge";
 
-// Types
-interface Url {
-  id: number;
-  originalUrl: string;
-  shortCode: string;
-  name: string | null;
-  clicks: number;
-  threat: ThreatTypeEnum;
-  flagged: boolean;
-  flagCategory: FlagCategoryTypeEnum;
-  createdAt: Date;
-  disabled: boolean;
-}
-
 interface UserUrlsTableProps {
-  urls: Url[];
+  urls: UserUrl[];
 }
-
-// Create a client
-const queryClient = new QueryClient();
 
 const csvConfig = mkConfig({
   fieldSeparator: ",",
@@ -97,13 +76,8 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 });
 
-// Wrapper component with QueryClientProvider
 export default function UserUrlsTable({ urls }: UserUrlsTableProps) {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <UserUrlsDataTable urls={urls} />
-    </QueryClientProvider>
-  );
+  return <UserUrlsDataTable urls={urls} />;
 }
 
 function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
@@ -120,25 +94,21 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
   } | null>(null);
   const [globalFilter, setGlobalFilter] = useState("");
 
-  // Initialize the query client with the initial data
   const queryClient = useQueryClient();
 
-  // Set the initial data if it hasn't been set yet
-  if (!queryClient.getQueryData(["urls"])) {
-    queryClient.setQueryData(["urls"], initialUrls);
-  }
-
-  // Get the data from the query client
-  const urls = queryClient.getQueryData<Url[]>(["urls"]) || initialUrls;
-  const isLoading = false; // Since we're using initialUrls directly, there's no loading state
+  const { data: urls = initialUrls, isLoading } = useMyUrls({
+    initialData: initialUrls,
+  });
 
   // Delete URL mutation
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteUrl(id),
     onSuccess: (response, id) => {
       if (response.success) {
-        queryClient.setQueryData(["urls"], (oldData: Url[] | undefined) =>
-          oldData ? oldData.filter((url) => url.id !== id) : []
+        queryClient.setQueryData(
+          ["my-urls"],
+          (oldData: UserUrl[] | undefined) =>
+            oldData ? oldData.filter((url) => url.id !== id) : []
         );
         toast.success("URL deleted successfully", {
           description: "The URL has been deleted successfully",
@@ -180,14 +150,16 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
     setIsEditModalOpen(true);
   };
 
-  const handleEditSuccess = (newShortCode: string) => {
+  const handleEditSuccess = (newShortCode: string, name?: string) => {
     if (!urlToEdit) return;
 
     // Update the data in the cache
-    queryClient.setQueryData(["urls"], (oldData: Url[] | undefined) =>
+    queryClient.setQueryData(["my-urls"], (oldData: UserUrl[] | undefined) =>
       oldData
         ? oldData.map((url) =>
-            url.id === urlToEdit.id ? { ...url, shortCode: newShortCode } : url
+            url.id === urlToEdit.id
+              ? { ...url, shortCode: newShortCode, name: name || url.name }
+              : url
           )
         : []
     );
@@ -199,7 +171,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
     download(csvConfig)(csv);
   };
 
-  function RowActions({ url }: { url: Url }) {
+  function RowActions({ url }: { url: UserUrl }) {
     const isDeleting =
       deleteMutation.isPending && deleteMutation.variables === url.id;
 
@@ -248,7 +220,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
   }
 
   // Table columns definition
-  const columns: ColumnDef<Url>[] = [
+  const columns: ColumnDef<UserUrl>[] = [
     {
       id: "index",
       header: "#",

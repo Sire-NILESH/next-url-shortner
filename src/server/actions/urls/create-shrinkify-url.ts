@@ -12,7 +12,7 @@ import {
 } from "@/types/server/types";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { checkUrlSafety } from "../../services/url/check-url-safety-service";
+import { checkUrlSafety } from "../../services/url/check-url-safety.service";
 
 const shrinkifyUrlSchema = z.object({
   url: z.string().refine(isValidUrl, {

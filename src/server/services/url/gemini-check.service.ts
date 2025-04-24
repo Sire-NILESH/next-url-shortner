@@ -1,9 +1,9 @@
 import "server-only";
 
-import { UrlSafetyCheck } from "@/server/services/url/check-url-safety-service";
+import { UrlSafetyCheck } from "@/server/services/url/check-url-safety.service";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { flagCategoryEnum } from "@/server/db/schema";
-import { ThreatMatch } from "./google-safe-browsing-check-service";
+import { ThreatMatch } from "./google-safe-browsing-check.service";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY!);
 

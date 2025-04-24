@@ -9,7 +9,9 @@ type ResponseType = ApiResponse<UrlVsFlaggedRouteResType>;
 
 export async function GET(req: NextRequest): Promise<Response> {
   try {
-    const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
+    const authResponse = await authorizeRequest({
+      allowedRoles: ["admin"],
+    });
 
     if (!authResponse.success)
       return Response.json(authResponse satisfies ResponseType);

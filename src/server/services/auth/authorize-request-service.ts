@@ -9,6 +9,7 @@ type AuthorizeRequestOptions = {
   requireUserId?: string;
   allowedRoles?: UserRoleTypeEnum[];
   allowOverrideRole?: UserRoleTypeEnum;
+  redirectToLogin?: boolean;
 };
 
 export async function authorizeRequest({

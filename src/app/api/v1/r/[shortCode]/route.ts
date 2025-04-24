@@ -1,6 +1,6 @@
 import { recordClickEvent } from "@/server/actions/clicks/record-click-event";
 import { NextRequest, NextResponse, userAgent } from "next/server";
-import { checkUrlAccess } from "@/server/services/url/check-url-access-service";
+import { checkUrlAccess } from "@/server/services/url/check-url-access.service";
 import { WarnRedirectSearchParams } from "@/types/server/types";
 
 type Params = Promise<{ shortCode: string }>;
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest, props: { params: Params }) {
 
     return NextResponse.redirect(notFound, 302);
   } catch (error) {
-    console.error("GET /r/[shortCode] error:", error);
+    console.error(`Error in : ${req.nextUrl.pathname}`, error);
     return NextResponse.redirect(notFound, 302);
   }
 }
