@@ -57,6 +57,7 @@ export function UrlSearch({ initialSearch }: UrlSearchProps) {
         />
         {search && (
           <Button
+            type="button"
             variant={"outline"}
             onClick={clearSearch}
             className="absolute right-2.5 top-1/2 -translate-y-1/2 h-auto rounded-full size-5 p-0"

@@ -8,23 +8,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChartConfig } from "@/components/ui/chart";
-import { UserUrl } from "@/types/client/types";
+import useMyUrls from "@/hooks/useMyUrls";
 import { EqualApproximately, Link, MousePointerClick } from "lucide-react";
 import { useMemo } from "react";
 import { NewShrinkifyURLCard } from "./new-shrinkify-url-card";
 import StatCard from "./stat-card";
 import { UrlClicksBarChartCard } from "./url-clicks-bar-chart-card";
 import { UrlClicksDistributionCard } from "./url-clicks-distribution-card";
-import useMyUrls from "@/hooks/useMyUrls";
 
-export default function DashboardClient({
-  userUrls: initialData,
-}: {
-  userUrls: UserUrl[];
-}) {
-  const { data: userUrls } = useMyUrls({
-    initialData,
-  });
+export default function DashboardClient() {
+  const { data: userUrls } = useMyUrls();
 
   // calculate total clicks
   const totalClicks = useMemo(

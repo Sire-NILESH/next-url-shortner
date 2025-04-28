@@ -1,6 +1,6 @@
 "use server";
 
-import { ensureHttps, isValidUrl } from "@/lib/utils";
+import { ensureHttps, getShrinkifyUrl, isValidUrl } from "@/lib/utils";
 import { db } from "@/server/db";
 import { urls } from "@/server/db/schema";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
@@ -79,7 +79,7 @@ export async function createShrinkifyUrl(formData: FormData): Promise<
       const ai = safetyCheck.data;
 
       flagged = ai.flagged;
-      flagReason = ai.reason;
+      flagReason = ai.flagged ? ai.reason : null;
       flagCategory = ai.category;
 
       // Set to malicious only if confidence is high
@@ -145,10 +145,10 @@ export async function createShrinkifyUrl(formData: FormData): Promise<
       flagReason,
     });
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const shortUrl = `${baseUrl}/r/${shortCode}`;
+    const shortUrl = getShrinkifyUrl(shortCode);
 
-    // revalidatePath("/");
+    // revalidatePath("/dashboard");
+    // revalidatePath("/my-urls");
 
     return {
       success: true,

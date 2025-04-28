@@ -10,7 +10,17 @@ import {
   UrlStatusTypeEnum,
   UserRoleTypeEnum,
 } from "@/types/server/types";
-import { and, asc, desc, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  ilike,
+  isNull,
+  isNotNull,
+  or,
+  sql,
+} from "drizzle-orm";
 
 export type UrlWithUser = {
   id: number;
@@ -43,7 +53,7 @@ export type GetAllUrlsOptions = {
     | "status";
   sortOrder?: "asc" | "desc";
   search?: string;
-  filter?: "all" | "flagged" | "security" | "inappropriate" | "other";
+  filter?: "all" | "flagged" | "security" | "caution" | "safe";
 };
 
 export async function getAllUrls(
@@ -65,7 +75,6 @@ export async function getAllUrls(
 
     const offset = (page - 1) * limit;
 
-    // Base conditions
     const conditions = [];
 
     // Search condition
@@ -86,37 +95,15 @@ export async function getAllUrls(
       if (filter === "flagged") {
         conditions.push(eq(urls.flagged, true));
       } else if (filter === "security") {
-        conditions.push(
-          or(
-            ilike(urls.flagReason, "%security%"),
-            ilike(urls.flagReason, "%phishing%"),
-            ilike(urls.flagReason, "%malware%")
-          )
-        );
-      } else if (filter === "inappropriate") {
-        conditions.push(
-          or(
-            ilike(urls.flagReason, "%inappropriate%"),
-            ilike(urls.flagReason, "%adult%"),
-            ilike(urls.flagReason, "%offensive%")
-          )
-        );
-      } else if (filter === "other") {
-        conditions.push(
-          and(
-            isNotNull(urls.flagReason),
-            sql`NOT (${urls.flagReason} ILIKE '%security%')`,
-            sql`NOT (${urls.flagReason} ILIKE '%phishing%')`,
-            sql`NOT (${urls.flagReason} ILIKE '%malware%')`,
-            sql`NOT (${urls.flagReason} ILIKE '%inappropriate%')`,
-            sql`NOT (${urls.flagReason} ILIKE '%adult%')`,
-            sql`NOT (${urls.flagReason} ILIKE '%offensive%')`
-          )
-        );
+        conditions.push(isNotNull(urls.threat));
+      } else if (filter === "caution") {
+        conditions.push(and(eq(urls.flagged, true), isNull(urls.threat)));
+      } else if (filter === "safe") {
+        conditions.push(and(isNull(urls.threat), eq(urls.flagged, false)));
       }
     }
 
-    // Count query for pagination
+    // Count query
     const countQuery = db
       .select({ count: sql<number>`count(*)` })
       .from(urls)
@@ -153,7 +140,7 @@ export async function getAllUrls(
       .limit(limit)
       .offset(offset);
 
-    // Apply sorting
+    // Sorting
     if (sortBy === "userName") {
       query.orderBy(sortOrder === "asc" ? asc(users.name) : desc(users.name));
     } else {

@@ -1,6 +1,5 @@
 import AdminPageHeader from "@/components/admin/admin-page-header";
 import { AdminUrlsTable } from "@/components/admin/urls/admin-urls-table";
-import { UrlFilter } from "@/components/admin/urls/url-filter";
 import { UrlSearch } from "@/components/admin/urls/url-search";
 import {
   Card,
@@ -9,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getAllUrls } from "@/server/actions/admin/urls/get-all-urls";
 import { auth } from "@/server/auth";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -46,46 +44,8 @@ export default async function AdminUrlsPage({
   }
 
   const params = await searchParams;
-  const page = params.page ? parseInt(params.page) : 1;
+
   const search = params.search || "";
-  const sortBy = (params.sortBy || "createdAt") as
-    | "originalUrl"
-    | "shortCode"
-    | "createdAt"
-    | "clicks"
-    | "userName";
-  const sortOrder = (params.sortOrder || "desc") as "asc" | "desc";
-  const filter = (params.filter || "all") as
-    | "all"
-    | "flagged"
-    | "security"
-    | "inappropriate"
-    | "other";
-
-  const getHighlightStyle = () => {
-    switch (filter) {
-      case "security":
-        return "security";
-      case "inappropriate":
-        return "inappropriate";
-      case "other":
-        return "other";
-      default:
-        return "none";
-    }
-  };
-
-  const response = await getAllUrls({
-    page,
-    limit: 10,
-    search,
-    sortBy,
-    sortOrder,
-    filter,
-  });
-
-  const urls = response.success && response.data ? response.data.urls : [];
-  const total = response.success && response.data ? response.data.total : 0;
 
   return (
     <>
@@ -105,18 +65,7 @@ export default async function AdminUrlsPage({
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <UrlFilter initialFilter={filter} />
-              <AdminUrlsTable
-                urls={urls}
-                total={total}
-                currentPage={page}
-                currentSearch={search}
-                currentSortBy={sortBy}
-                currentSortOrder={sortOrder}
-                highlightStyle={getHighlightStyle()}
-              />
-            </div>
+            <AdminUrlsTable />
           </CardContent>
         </Card>
       </div>

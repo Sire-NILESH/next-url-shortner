@@ -66,21 +66,13 @@ import { EditUrlModal } from "../modals/edit-url-modal";
 import { QRCodeModal } from "../modals/qr-code-modal";
 import { Badge } from "../ui/badge";
 
-interface UserUrlsTableProps {
-  urls: UserUrl[];
-}
-
 const csvConfig = mkConfig({
   fieldSeparator: ",",
   decimalSeparator: ".",
   useKeysAsHeaders: true,
 });
 
-export default function UserUrlsTable({ urls }: UserUrlsTableProps) {
-  return <UserUrlsDataTable urls={urls} />;
-}
-
-function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
+export default function UserUrlsTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
@@ -96,9 +88,7 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
 
   const queryClient = useQueryClient();
 
-  const { data: urls = initialUrls, isLoading } = useMyUrls({
-    initialData: initialUrls,
-  });
+  const { data: urls, isLoading } = useMyUrls();
 
   // Delete URL mutation
   const deleteMutation = useMutation({
@@ -517,23 +507,31 @@ function UserUrlsDataTable({ urls: initialUrls }: UserUrlsTableProps) {
             </TableBody>
           </Table>
         </div>
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+        <div className="flex items-center justify-between flex-wrap-reverse">
+          <p className="text-muted-foreground text-xs">
+            {`Showing ${table.getRowModel().rows.length} of ${
+              table.getFilteredRowModel().rows.length
+            } URLs`}
+          </p>
+
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </SkeletonWrapper>
 

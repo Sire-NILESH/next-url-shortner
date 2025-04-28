@@ -1,16 +1,19 @@
 "use client";
 
-import RefreshButton from "@/components/refresh-button";
+// import RefreshButton from "@/components/refresh-button";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Flag, FlagIcon, ShieldAlert } from "lucide-react";
+import { GetAllUrlsOptions } from "@/server/actions/admin/urls/get-all-urls";
+import { AlertTriangle, BadgeCheck, Flag, ShieldAlert } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
+import RefreshButton from "./refresh-button";
 
 interface UrlFilterProps {
-  initialFilter: string;
+  initialFilter: GetAllUrlsOptions["filter"];
+  refreshHandler: () => void;
 }
 
-export function UrlFilter({ initialFilter }: UrlFilterProps) {
+export function UrlFilter({ initialFilter, refreshHandler }: UrlFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -41,12 +44,33 @@ export function UrlFilter({ initialFilter }: UrlFilterProps) {
       </Button>
 
       <Button
+        variant={initialFilter === "safe" ? "secondary" : "outline"}
+        size={"sm"}
+        onClick={() => handleFilterChange("safe")}
+        className="gap-2 text-green-600 dark:text-green-400"
+      >
+        <BadgeCheck className="size-4" />
+        Safe
+      </Button>
+
+      <Button
         variant={initialFilter === "flagged" ? "secondary" : "outline"}
         size={"sm"}
         onClick={() => handleFilterChange("flagged")}
+        className="gap-2 text-yellow-600 dark:text-yellow-400"
       >
-        <FlagIcon className="size-4" />
+        <Flag className="size-4" />
         All Flagged
+      </Button>
+
+      <Button
+        variant={initialFilter === "caution" ? "secondary" : "outline"}
+        size={"sm"}
+        onClick={() => handleFilterChange("caution")}
+        className="gap-2 text-orange-600 dark:text-orange-400"
+      >
+        <AlertTriangle className="size-4" />
+        Caution
       </Button>
 
       <Button
@@ -59,27 +83,9 @@ export function UrlFilter({ initialFilter }: UrlFilterProps) {
         Security Risks
       </Button>
 
-      <Button
-        variant={initialFilter === "inappropriate" ? "secondary" : "outline"}
-        size={"sm"}
-        onClick={() => handleFilterChange("inappropriate")}
-        className="gap-2 text-orange-600 dark:text-orange-400"
-      >
-        <AlertTriangle className="size-4" />
-        Innappropriate Content
-      </Button>
+      {/* <RefreshButton size={"sm"} /> */}
 
-      <Button
-        variant={initialFilter === "other" ? "secondary" : "outline"}
-        size={"sm"}
-        onClick={() => handleFilterChange("other")}
-        className="gap-2 text-yellow-600 dark:text-yellow-400"
-      >
-        <Flag className="size-4" />
-        Other Flags
-      </Button>
-
-      <RefreshButton size={"sm"} />
+      <RefreshButton onClickHandler={refreshHandler} />
     </div>
   );
 }

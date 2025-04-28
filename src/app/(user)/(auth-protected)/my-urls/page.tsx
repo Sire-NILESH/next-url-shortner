@@ -7,8 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import UserUrlsTable from "@/components/urls/user-urls-table";
-import { getUserUrls } from "@/server/actions/urls/get-user-urls";
-import { auth } from "@/server/auth";
+import { authorizePageService } from "@/server/services/auth/authorize-page-sevice";
 import { Link as LinkIcon } from "lucide-react";
 import { Metadata } from "next";
 
@@ -18,11 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MyUrlsPage() {
-  const session = await auth();
-
-  // Get user's URLs
-  const response = await getUserUrls(session?.user.id as string);
-  const userUrls = response.success && response.data ? response.data : [];
+  await authorizePageService();
 
   return (
     <div>
@@ -43,7 +38,7 @@ export default async function MyUrlsPage() {
             </div>
           </CardHeader>
           <CardContent className="px-4 md:px-6">
-            <UserUrlsTable urls={userUrls} />
+            <UserUrlsTable />
           </CardContent>
         </Card>
       </div>

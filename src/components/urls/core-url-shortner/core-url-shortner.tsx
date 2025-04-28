@@ -9,9 +9,9 @@ import { cn } from "@/lib/utils";
 import { createShrinkifyUrl } from "@/server/actions/urls/create-shrinkify-url";
 import { BASE_URL } from "@/site-config/base-url";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { ComponentProps, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -32,7 +32,6 @@ type Props = ComponentProps<"div">;
 export function CoreUrlShortner({ className, ...props }: Props) {
   const [showDashboardSuggestion, setShowDashboardSuggestion] = useState(false);
   const { data: session } = useSession();
-  const router = useRouter();
   const pathname = usePathname();
 
   const form = useForm<CreateShrinkifyUrlFormData>({
@@ -42,6 +41,8 @@ export function CoreUrlShortner({ className, ...props }: Props) {
       customCode: "",
     },
   });
+
+  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async (data: CreateShrinkifyUrlFormData) => {
@@ -55,7 +56,7 @@ export function CoreUrlShortner({ className, ...props }: Props) {
       const response = await createShrinkifyUrl(formData);
 
       if (!response.success) {
-        // 🔁 Perform redirect on client side if redicrect url is present
+        // Perform redirect on client side if redicrect url is present
         if (response.redirect) {
           window.location.href = response.redirect;
         }
@@ -75,9 +76,7 @@ export function CoreUrlShortner({ className, ...props }: Props) {
           });
         }
 
-        if (session?.user && pathname.includes("/dashboard")) {
-          router.refresh();
-        }
+        queryClient.invalidateQueries({ queryKey: ["my-urls"] });
       }
     },
     onError: (error) => {
