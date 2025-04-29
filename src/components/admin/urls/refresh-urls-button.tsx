@@ -5,7 +5,7 @@ type Props = {
   onClickHandler: () => void;
 };
 
-export default function RefreshButton({ onClickHandler }: Props) {
+export default function RefreshUrlsButton({ onClickHandler }: Props) {
   return (
     <ThrottleButton
       size="sm"

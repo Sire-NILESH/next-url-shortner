@@ -728,10 +728,7 @@ export function AdminUrlsTable({
                               disabled={isLoading}
                             >
                               <Copy className="mr-2 size-4" />
-                              Copy <span className="brandText">
-                                Shrinkify
-                              </span>{" "}
-                              URL
+                              Copy Shrinkify URL
                             </DropdownMenuItem>
                             <DropdownMenuItem disabled={isLoading}>
                               <ExternalLink className="mr-2 size-4" />
@@ -741,8 +738,7 @@ export function AdminUrlsTable({
                                 rel="noopener noreferrer"
                                 className="w-full"
                               >
-                                Visit{" "}
-                                <span className="brandText">Shrinkify</span> URL
+                                Visit Shrinkify URL
                               </a>
                             </DropdownMenuItem>
                             <DropdownMenuItem disabled={isLoading}>

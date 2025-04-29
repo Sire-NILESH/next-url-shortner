@@ -6,7 +6,7 @@ import { GetAllUrlsOptions } from "@/server/actions/admin/urls/get-all-urls";
 import { AlertTriangle, BadgeCheck, Flag, ShieldAlert } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
-import RefreshButton from "./refresh-button";
+import RefreshUrlsButton from "./refresh-urls-button";
 
 interface UrlFilterProps {
   initialFilter: GetAllUrlsOptions["filter"];
@@ -83,9 +83,7 @@ export function UrlFilter({ initialFilter, refreshHandler }: UrlFilterProps) {
         Security Risks
       </Button>
 
-      {/* <RefreshButton size={"sm"} /> */}
-
-      <RefreshButton onClickHandler={refreshHandler} />
+      <RefreshUrlsButton onClickHandler={refreshHandler} />
     </div>
   );
 }

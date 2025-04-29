@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getAllUsers } from "@/server/actions/admin/users/get-all-users";
 
 import AdminPageHeader from "@/components/admin/admin-page-header";
 import { auth } from "@/server/auth";
@@ -48,24 +47,7 @@ export default async function UserManagementPage({
 
   // Parse search params
   const params = await searchParams;
-  const page = params.page ? parseInt(params.page) : 1;
   const search = params.search || "";
-  const sortBy = (params.sortBy || "createdAt") as
-    | "name"
-    | "email"
-    | "role"
-    | "createdAt";
-  const sortOrder = (params.sortOrder || "desc") as "asc" | "desc";
-
-  const response = await getAllUsers({
-    page,
-    search,
-    sortBy,
-    sortOrder,
-  });
-
-  const users = response.success && response.data ? response.data.users : [];
-  const total = response.success && response.data ? response.data.total : 0;
 
   return (
     <>
@@ -86,14 +68,7 @@ export default async function UserManagementPage({
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <UsersTable
-                users={users}
-                total={total}
-                currentPage={page}
-                currentSearch={search}
-                currentSortBy={sortBy}
-                currentSortOrder={sortOrder}
-              />
+              <UsersTable />
             </div>
           </CardContent>
         </Card>

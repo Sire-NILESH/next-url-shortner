@@ -1,3 +1,5 @@
+import "server-only";
+
 import { redirect } from "next/navigation";
 import { auth } from "@/server/auth";
 import { UserRoleTypeEnum } from "@/types/server/types";

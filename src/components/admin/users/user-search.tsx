@@ -1,6 +1,5 @@
 "use client";
 
-import RefreshButton from "@/components/refresh-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
@@ -66,7 +65,6 @@ export function UserSearch({ initialSearch }: UserSearchProps) {
           <Search />
         </Button>
       </form>
-      <RefreshButton />
     </div>
   );
 }
