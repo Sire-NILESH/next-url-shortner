@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import UserUrlsTable from "@/components/urls/user-urls-table";
+import UserUrlTable from "@/components/urls/user-urls-table/user-url-table";
 import { authorizePageService } from "@/server/services/auth/authorize-page-sevice";
 import { Link as LinkIcon } from "lucide-react";
 import { Metadata } from "next";
@@ -38,7 +38,7 @@ export default async function MyUrlsPage() {
             </div>
           </CardHeader>
           <CardContent className="px-4 md:px-6">
-            <UserUrlsTable />
+            <UserUrlTable />
           </CardContent>
         </Card>
       </div>

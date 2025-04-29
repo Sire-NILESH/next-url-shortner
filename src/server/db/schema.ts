@@ -12,9 +12,6 @@ import {
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
-// Define user roles enum
-export const userRoleEnum = pgEnum("user_role", ["user", "admin"]);
-
 // Url threat types from Google Safe Browsing API
 export const threatTypeEnum = pgEnum("threat_type", [
   "MALWARE",
@@ -37,6 +34,9 @@ export const urlStatusEnum = pgEnum("status", [
   "suspended",
   "inactive",
 ]);
+
+// Define user roles enum
+export const userRoleEnum = pgEnum("user_role", ["user", "admin"]);
 
 export const userStatusEnum = pgEnum("status", [
   "active",

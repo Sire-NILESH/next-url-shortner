@@ -59,6 +59,12 @@ import { toast } from "sonner";
 import UsersTableSkeleton from "./users-table-skeleton";
 import UsersTableErrorFallback from "./users-table-error-fallback";
 import RefreshUsersButton from "./refresh-users-button";
+import { UserFilter } from "./user-filter";
+import {
+  UserProviderTypeEnum,
+  UserRoleTypeEnum,
+  UserStatusTypeEnum,
+} from "@/types/server/types";
 
 type SortBy = GetAllUsersOptions["sortBy"];
 type SortOrder = "asc" | "desc";
@@ -76,6 +82,9 @@ interface AdminUsersTableProps {
   initialSearch?: string;
   initialSortBy?: SortBy;
   initialSortOrder?: string;
+  initialRoles?: UserRoleTypeEnum[];
+  initialStatuses?: UserStatusTypeEnum[];
+  initialProviders?: UserProviderTypeEnum[];
 }
 
 export function UsersTable({
@@ -83,6 +92,9 @@ export function UsersTable({
   initialSearch = "",
   initialSortBy = "createdAt",
   initialSortOrder = "desc",
+  initialRoles = undefined,
+  initialStatuses = undefined,
+  initialProviders = undefined,
 }: AdminUsersTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -97,6 +109,15 @@ export function UsersTable({
   const currentSearch = searchParams.get("search") || initialSearch;
   const currentSortBy = (searchParams.get("sortBy") as SortBy) || initialSortBy;
   const currentSortOrder = searchParams.get("sortOrder") || initialSortOrder;
+  const currentRoles = searchParams.get("roles")
+    ? [searchParams.get("roles")]
+    : initialRoles;
+  const currentStatuses = searchParams.get("statuses")
+    ? [searchParams.get("statuses")]
+    : initialStatuses;
+  const currentProviders = searchParams.get("providers")
+    ? [searchParams.get("providers")]
+    : initialProviders;
 
   const limit = 10;
 
@@ -104,10 +125,15 @@ export function UsersTable({
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: [
       "admin-users",
-      currentPage,
-      currentSearch,
-      currentSortBy,
-      currentSortOrder,
+      {
+        currentPage,
+        currentSearch,
+        currentSortBy,
+        currentSortOrder,
+        currentRoles,
+        currentStatuses,
+        currentProviders,
+      },
     ],
     queryFn: async () => {
       const response = await getAllUsers({
@@ -115,6 +141,9 @@ export function UsersTable({
         search: currentSearch,
         sortBy: currentSortBy,
         sortOrder: currentSortOrder as SortOrder,
+        roles: currentRoles as UserRoleTypeEnum[],
+        statuses: currentStatuses as UserStatusTypeEnum[],
+        providers: currentProviders as UserProviderTypeEnum[],
         limit,
       });
       return response;
@@ -357,7 +386,10 @@ export function UsersTable({
 
   return (
     <div className="space-y-4">
-      <RefreshUsersButton onClickHandler={refreshQueryHandler} />
+      <div className="flex flex-wrap gap-2">
+        <UserFilter />
+        <RefreshUsersButton onClickHandler={refreshQueryHandler} />
+      </div>
 
       {isLoading && !initialLoadComplete ? (
         <UsersTableSkeleton />

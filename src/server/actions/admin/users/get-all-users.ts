@@ -3,7 +3,12 @@
 import { db } from "@/server/db";
 import { accounts, urls, users } from "@/server/db/schema";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
-import { ApiResponse } from "@/types/server/types";
+import {
+  ApiResponse,
+  UserProviderTypeEnum,
+  UserRoleTypeEnum,
+  UserStatusTypeEnum,
+} from "@/types/server/types";
 import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 
 export type UserWithoutPassword = {
@@ -33,6 +38,9 @@ export type GetAllUsersOptions = {
     | "providerType";
   sortOrder?: "asc" | "desc";
   search?: string;
+  roles?: UserRoleTypeEnum[] | null;
+  statuses?: UserStatusTypeEnum[] | null;
+  providers?: UserProviderTypeEnum[] | null;
 };
 
 export async function getAllUsers(
@@ -40,7 +48,6 @@ export async function getAllUsers(
 ): Promise<ApiResponse<{ users: UserWithoutPassword[]; total: number }>> {
   try {
     const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
-
     if (!authResponse.success) return authResponse;
 
     const {
@@ -49,11 +56,14 @@ export async function getAllUsers(
       sortBy = "createdAt",
       sortOrder = "desc",
       search = "",
+      roles = [],
+      statuses = [],
+      providers = [],
     } = options;
 
-    const offset = (page - 1) * limit;
+    console.log({ options });
 
-    // Base conditions
+    const offset = (page - 1) * limit;
     const conditions = [];
 
     // Search condition
@@ -67,22 +77,46 @@ export async function getAllUsers(
       );
     }
 
-    // Count query with DISTINCT to handle joins correctly
-    const countQuery = db
-      .select({ count: sql<number>`count(distinct ${users.id})` })
-      .from(users)
-      .leftJoin(urls, eq(users.id, urls.userId))
-      .where(conditions.length ? and(...conditions) : undefined);
+    // Roles filter
+    if (roles && roles.length > 0) {
+      conditions.push(or(...roles.map((role) => eq(users.role, role))));
+    }
 
-    // Sorting field selection
+    // Statuses filter
+    if (statuses && statuses.length > 0) {
+      conditions.push(
+        or(...statuses.map((status) => eq(users.status, status)))
+      );
+    }
+
+    // Providers filter
+    let providerCondition;
+    if (providers && providers.length > 0) {
+      providerCondition = or(...providers.map((p) => eq(accounts.provider, p)));
+    }
+
+    // Sorting field
     const sortingField =
       sortBy === "urlCount"
         ? sql<number>`COUNT(${urls.id})`
         : sortBy === "flaggedUrlCount"
         ? sql<number>`SUM(CASE WHEN ${urls.flagged} = true THEN 1 ELSE 0 END)`
         : sortBy === "providerType"
-        ? sql<string>`COALESCE(MIN(${accounts.provider}), 'email')`
+        ? sql<string>`COALESCE(MIN(${accounts.provider}), 'credentials')`
         : users[sortBy as keyof typeof users.$inferSelect];
+
+    // Count query
+    const countQuery = db
+      .select({ count: sql<number>`COUNT(DISTINCT ${users.id})` })
+      .from(users)
+      .leftJoin(urls, eq(users.id, urls.userId))
+      .leftJoin(accounts, eq(users.id, accounts.userId))
+      .where(
+        and(
+          ...(conditions.length ? [and(...conditions)] : []),
+          ...(providerCondition ? [providerCondition] : [])
+        )
+      );
 
     // Main query
     const query = db
@@ -95,19 +129,22 @@ export async function getAllUsers(
         createdAt: users.createdAt,
         image: users.image,
         urlCount: sql<number>`COUNT(${urls.id})`.as("urlCount"),
-        flaggedUrlCount:
-          sql<number>`SUM(CASE WHEN ${urls.flagged} = true THEN 1 ELSE 0 END)`.as(
-            "flaggedUrlCount"
-          ),
-        providerType:
-          sql<string>`COALESCE(MIN(${accounts.provider}), 'credentials')`.as(
-            "providerType"
-          ),
+        flaggedUrlCount: sql<number>`
+          SUM(CASE WHEN ${urls.flagged} = true THEN 1 ELSE 0 END)
+        `.as("flaggedUrlCount"),
+        providerType: sql<string>`
+          COALESCE(MIN(${accounts.provider}), 'credentials')
+        `.as("providerType"),
       })
       .from(users)
       .leftJoin(urls, eq(users.id, urls.userId))
       .leftJoin(accounts, eq(users.id, accounts.userId))
-      .where(conditions.length ? and(...conditions) : undefined)
+      .where(
+        and(
+          ...(conditions.length ? [and(...conditions)] : []),
+          ...(providerCondition ? [providerCondition] : [])
+        )
+      )
       .groupBy(users.id)
       .orderBy(sortOrder === "asc" ? asc(sortingField) : desc(sortingField))
       .limit(limit)

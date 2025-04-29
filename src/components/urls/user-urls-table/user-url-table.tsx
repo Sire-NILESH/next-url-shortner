@@ -60,11 +60,11 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { download, generateCsv, mkConfig } from "export-to-csv";
-import { DataTableColumnHeader } from "../data-table/column-header";
-import { DataTableViewOptions } from "../data-table/column-toggle";
-import { EditUrlModal } from "../modals/edit-url-modal";
-import { QRCodeModal } from "../modals/qr-code-modal";
-import { Badge } from "../ui/badge";
+import { DataTableColumnHeader } from "../../data-table/column-header";
+import { DataTableViewOptions } from "../../data-table/column-toggle";
+import { EditUrlModal } from "../../modals/edit-url-modal";
+import { QRCodeModal } from "../../modals/qr-code-modal";
+import { Badge } from "../../ui/badge";
 
 const csvConfig = mkConfig({
   fieldSeparator: ",",
@@ -72,7 +72,7 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 });
 
-export default function UserUrlsTable() {
+export default function UserUrlTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");

@@ -41,6 +41,8 @@ export type UserStatusTypeEnum = (typeof userStatusEnum.enumValues)[number];
 
 export type UserRoleTypeEnum = (typeof userRoleEnum.enumValues)[number];
 
+export type UserProviderTypeEnum = "google" | "credentials";
+
 export type UrlStatusTypeEnum = (typeof urlStatusEnum.enumValues)[number];
 
 export type WarnRedirectSearchParams = {
