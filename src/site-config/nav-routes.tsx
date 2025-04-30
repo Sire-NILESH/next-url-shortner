@@ -1,5 +1,4 @@
 import {
-  AlertTriangleIcon,
   ChartSpline,
   DatabaseIcon,
   House,
@@ -83,12 +82,6 @@ export const adminDashboardNavItems: AdminDashboardNavItem[] = [
     label: "URLs",
     path: "/admin/urls",
     icon: <Link2Icon />,
-    exact: true,
-  },
-  {
-    label: "Flagged URLs",
-    path: "/admin/urls/flagged",
-    icon: <AlertTriangleIcon />,
     exact: true,
   },
   {

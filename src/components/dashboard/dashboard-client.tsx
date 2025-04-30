@@ -150,12 +150,12 @@ export default function DashboardClient() {
                 </>
               ) : (
                 <div className="col-span-1 xl:col-span-2 flex flex-col items-center justify-center space-y-2 rounded-xl text-center py-8 bg-muted">
-                  <p className="text-lg font-semibold">
-                    No url data available yet.
+                  <p className="text-2xl !font-bold boldText">
+                    No url data available yet
                   </p>
 
                   <p className="text-base text-muted-foreground">
-                    Create some shrinkify URLs to see the stats.
+                    Create some shrinkify URLs to see the stats
                   </p>
                 </div>
               )}

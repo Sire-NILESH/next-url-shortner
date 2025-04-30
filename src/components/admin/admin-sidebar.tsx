@@ -21,15 +21,9 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import SkeletonWrapper from "../skeleton-wrapper";
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-};
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AdminSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
   const session = useSession();
   return (
     <Sidebar collapsible="icon" {...props}>

@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  AlertTriangle,
   ArrowRight,
   ChartSpline,
   Database,
@@ -26,7 +25,7 @@ export const metadata: Metadata = {
 type AdminModuleId =
   | "admin-analytics"
   | "admin-urls"
-  | "admin-flagged-urls"
+  // | "admin-flagged-urls"
   | "admin-users"
   | "admin-db-mamangement";
 
@@ -58,15 +57,6 @@ export const adminModules: AdminModule[] = [
     path: "/admin/urls",
     color: "text-blue-500",
     bgColor: "bg-blue-100 dark:bg-blue-900/20",
-  },
-  {
-    id: "admin-flagged-urls",
-    title: "Flagged URLs",
-    description: "Review and moderate flagged URLs",
-    icon: <AlertTriangle className="size-5" />,
-    path: "/admin/urls/flagged",
-    color: "text-yellow-500",
-    bgColor: "bg-yellow-100 dark:bg-yellow-900/20",
   },
   {
     id: "admin-users",

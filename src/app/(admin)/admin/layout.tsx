@@ -1,5 +1,5 @@
 import AdminLayoutBreadCrumb from "@/components/admin/admin-layout-breadcrum";
-import { AppSidebar } from "@/components/admin/admin-sidebar";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import FooterCompact from "@/components/footer/footer-compact";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -26,7 +26,7 @@ export default async function AdminLayout({ children }: Props) {
 
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AdminSidebar />
       <SidebarInset className="overflow-x-hidden">
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">

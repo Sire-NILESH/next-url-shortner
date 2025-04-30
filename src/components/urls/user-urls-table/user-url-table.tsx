@@ -412,10 +412,13 @@ export default function UserUrlTable() {
 
   if (urls.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">
-          You haven&apos;t created any short URLs yet. Click the button below to
-          create your first short URL.
+      <div className="flex flex-col items-center justify-center h-184 space-y-2 rounded-xl text-center py-8 bg-muted">
+        <p className="text-2xl !font-bold boldText">
+          No url data available yet
+        </p>
+
+        <p className="text-base text-muted-foreground">
+          Create some shrinkify URLs to see the table
         </p>
       </div>
     );

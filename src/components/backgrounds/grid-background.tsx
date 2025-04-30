@@ -7,7 +7,7 @@ export function GridBackgroundLayout({ children, className, ...props }: Props) {
   return (
     <div
       className={cn(
-        "h-full min-h-screen min-w-screen flex items-center justify-center relative",
+        "h-full min-h-screen min-w-screen flex justify-center relative",
         className
       )}
       {...props}
