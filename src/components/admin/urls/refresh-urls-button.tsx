@@ -12,7 +12,7 @@ export default function RefreshUrlsButton({ onClickHandler }: Props) {
       onThrottledClick={onClickHandler}
       idleIcon={<RefreshCw className="size-4" />}
       loadingIcon={<RefreshCw className="size-4 animate-spin" />}
-      // idleText="Refresh"
+      idleText="Refresh"
       loadingText="Refreshing..."
       showLoadingText
       delayInMS={5000}

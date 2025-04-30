@@ -65,6 +65,7 @@ import {
   UserRoleTypeEnum,
   UserStatusTypeEnum,
 } from "@/types/server/types";
+import { collectSearchParam } from "@/lib/utils";
 
 type SortBy = GetAllUsersOptions["sortBy"];
 type SortOrder = "asc" | "desc";
@@ -105,19 +106,16 @@ export function UsersTable({
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   // Parse URL params or use initial values
-  const currentPage = Number(searchParams.get("page") || initialPage);
-  const currentSearch = searchParams.get("search") || initialSearch;
-  const currentSortBy = (searchParams.get("sortBy") as SortBy) || initialSortBy;
-  const currentSortOrder = searchParams.get("sortOrder") || initialSortOrder;
-  const currentRoles = searchParams.get("roles")
-    ? [searchParams.get("roles")]
-    : initialRoles;
-  const currentStatuses = searchParams.get("statuses")
-    ? [searchParams.get("statuses")]
-    : initialStatuses;
-  const currentProviders = searchParams.get("providers")
-    ? [searchParams.get("providers")]
-    : initialProviders;
+  const currentPage = Number(searchParams.get("page") ?? initialPage);
+  const currentSearch = searchParams.get("search") ?? initialSearch;
+  const currentSortBy = (searchParams.get("sortBy") as SortBy) ?? initialSortBy;
+  const currentSortOrder = searchParams.get("sortOrder") ?? initialSortOrder;
+  const currentRoles =
+    collectSearchParam("roles", searchParams) ?? initialRoles;
+  const currentStatuses =
+    collectSearchParam("statuses", searchParams) ?? initialStatuses;
+  const currentProviders =
+    collectSearchParam("providers", searchParams) ?? initialProviders;
 
   const limit = 10;
 

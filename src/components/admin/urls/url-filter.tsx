@@ -7,6 +7,7 @@ import { AlertTriangle, BadgeCheck, Flag, ShieldAlert } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import RefreshUrlsButton from "./refresh-urls-button";
+import { UrlFacetedFilter } from "./url-faceted-filter";
 
 interface UrlFilterProps {
   initialFilter: GetAllUrlsOptions["filter"];
@@ -82,6 +83,8 @@ export function UrlFilter({ initialFilter, refreshHandler }: UrlFilterProps) {
         <ShieldAlert className="size-4" />
         Security Risks
       </Button>
+
+      <UrlFacetedFilter />
 
       <RefreshUrlsButton onClickHandler={refreshHandler} />
     </div>

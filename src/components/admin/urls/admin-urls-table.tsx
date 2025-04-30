@@ -40,7 +40,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { formatNumber } from "@/lib/formatNum";
-import { cn, getShrinkifyUrl } from "@/lib/utils";
+import { cn, collectSearchParam, getShrinkifyUrl } from "@/lib/utils";
 import {
   getAllUrls,
   GetAllUrlsOptions,
@@ -74,6 +74,11 @@ import { toast } from "sonner";
 import AdminUrlsTableSkeleton from "./admin-urls-table-skeleton";
 import { UrlFilter } from "./url-filter";
 import AdminUrlsTableErrorFallback from "./admin-urls-table-error-fallback";
+import {
+  FlagCategoryTypeEnum,
+  ThreatTypeEnum,
+  UrlStatusTypeEnum,
+} from "@/types/server/types";
 
 type SortBy = GetAllUrlsOptions["sortBy"];
 type SortOrder = "asc" | "desc";
@@ -93,6 +98,9 @@ interface UrlsTableProps {
   initialSortBy?: SortBy;
   initialSortOrder?: string;
   initialFilter?: FilterType;
+  initialThreats?: ThreatTypeEnum[];
+  initialStatuses?: UrlStatusTypeEnum[];
+  initialCategories?: FlagCategoryTypeEnum[];
 }
 
 const getUrlCategory = (url: UrlWithUser) => {
@@ -139,6 +147,9 @@ export function AdminUrlsTable({
   initialSortBy = "createdAt",
   initialSortOrder = "desc",
   initialFilter = "all",
+  initialThreats = undefined,
+  initialStatuses = undefined,
+  initialCategories = undefined,
 }: UrlsTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -150,12 +161,18 @@ export function AdminUrlsTable({
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   // Parse URL params or use initial values
-  const currentPage = Number(searchParams.get("page") || initialPage);
-  const currentSearch = searchParams.get("search") || initialSearch;
-  const currentSortBy = (searchParams.get("sortBy") as SortBy) || initialSortBy;
-  const currentSortOrder = searchParams.get("sortOrder") || initialSortOrder;
+  const currentPage = Number(searchParams.get("page") ?? initialPage);
+  const currentSearch = searchParams.get("search") ?? initialSearch;
+  const currentSortBy = (searchParams.get("sortBy") as SortBy) ?? initialSortBy;
+  const currentSortOrder = searchParams.get("sortOrder") ?? initialSortOrder;
   const currentFilter =
-    (searchParams.get("filter") as FilterType) || initialFilter;
+    (searchParams.get("filter") as FilterType) ?? initialFilter;
+  const currentThreats =
+    collectSearchParam("threats", searchParams) ?? initialThreats;
+  const currentStatuses =
+    collectSearchParam("statuses", searchParams) ?? initialStatuses;
+  const currentCategories =
+    collectSearchParam("categories", searchParams) ?? initialCategories;
 
   const limit = 10;
 
@@ -163,11 +180,16 @@ export function AdminUrlsTable({
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: [
       "admin-urls",
-      currentPage,
-      currentSearch,
-      currentSortBy,
-      currentSortOrder,
-      currentFilter,
+      {
+        currentPage,
+        currentSearch,
+        currentSortBy,
+        currentSortOrder,
+        currentFilter,
+        currentThreats,
+        currentStatuses,
+        currentCategories,
+      },
     ],
     queryFn: async () => {
       const response = await getAllUrls({
@@ -176,6 +198,9 @@ export function AdminUrlsTable({
         sortBy: currentSortBy,
         sortOrder: currentSortOrder as SortOrder,
         filter: currentFilter,
+        threats: currentThreats as ThreatTypeEnum[],
+        statuses: currentStatuses as UrlStatusTypeEnum[],
+        categories: currentCategories as FlagCategoryTypeEnum[],
         limit,
       });
       return response;

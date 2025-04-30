@@ -54,6 +54,9 @@ export type GetAllUrlsOptions = {
   sortOrder?: "asc" | "desc";
   search?: string;
   filter?: "all" | "flagged" | "security" | "caution" | "safe";
+  threats?: ThreatTypeEnum[] | null;
+  statuses?: UrlStatusTypeEnum[] | null;
+  categories?: FlagCategoryTypeEnum[] | null;
 };
 
 export async function getAllUrls(
@@ -71,6 +74,9 @@ export async function getAllUrls(
       sortOrder = "desc",
       search = "",
       filter = "all",
+      threats = [],
+      statuses = [],
+      categories = [],
     } = options;
 
     const offset = (page - 1) * limit;
@@ -101,6 +107,37 @@ export async function getAllUrls(
       } else if (filter === "safe") {
         conditions.push(and(isNull(urls.threat), eq(urls.flagged, false)));
       }
+    }
+
+    // Threats filter
+    if (threats && threats.length > 0) {
+      conditions.push(
+        or(
+          ...threats.map((threat) => {
+            if (threat) {
+              return eq(urls.threat, threat);
+            }
+          })
+        )
+      );
+    }
+
+    // Statuses filter
+    if (statuses && statuses.length > 0) {
+      conditions.push(or(...statuses.map((status) => eq(urls.status, status))));
+    }
+
+    // Categories filter
+    if (categories && categories.length > 0) {
+      conditions.push(
+        or(
+          ...categories.map((category) => {
+            if (category) {
+              return eq(urls.flagCategory, category);
+            }
+          })
+        )
+      );
     }
 
     // Count query

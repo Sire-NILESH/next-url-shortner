@@ -9,7 +9,7 @@ import {
   UserRoleTypeEnum,
   UserStatusTypeEnum,
 } from "@/types/server/types";
-import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 
 export type UserWithoutPassword = {
   id: string;
@@ -61,8 +61,6 @@ export async function getAllUsers(
       providers = [],
     } = options;
 
-    console.log({ options });
-
     const offset = (page - 1) * limit;
     const conditions = [];
 
@@ -92,7 +90,12 @@ export async function getAllUsers(
     // Providers filter
     let providerCondition;
     if (providers && providers.length > 0) {
-      providerCondition = or(...providers.map((p) => eq(accounts.provider, p)));
+      providerCondition = or(
+        ...providers.map((p) => {
+          if (p === "credentials") return isNull(accounts.provider);
+          return eq(accounts.provider, p);
+        })
+      );
     }
 
     // Sorting field

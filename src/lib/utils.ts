@@ -1,5 +1,6 @@
 import { BASE_URL } from "@/site-config/base-url";
 import { clsx, type ClassValue } from "clsx";
+import { ReadonlyURLSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -38,4 +39,11 @@ export const capitalizeFirstLetter = (str: string): string =>
 
 export function stripHttp(url: string): string {
   return url.replace(/^https?:\/\//, "");
+}
+
+export function collectSearchParam(
+  field: string,
+  searchParams: ReadonlyURLSearchParams
+) {
+  return searchParams.get(field) ? searchParams.get(field)?.split(",") : [];
 }
