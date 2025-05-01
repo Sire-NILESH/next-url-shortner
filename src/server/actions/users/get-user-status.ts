@@ -1,8 +1,8 @@
 "use server";
 
-import { auth } from "@/server/auth";
 import { db, eq } from "@/server/db";
 import { users } from "@/server/db/schema";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse, UserStatusTypeEnum } from "@/types/server/types";
 import { redirect } from "next/navigation";
 
@@ -10,9 +10,11 @@ export async function getUserStatus(): Promise<
   ApiResponse<UserStatusTypeEnum>
 > {
   try {
-    const session = await auth();
+    const authResponse = await authorizeRequest();
 
-    if (!session || !session.user) redirect("/login");
+    if (!authResponse.success) return redirect("/login");
+
+    const { data: session } = authResponse;
 
     const userId = session.user.id;
 

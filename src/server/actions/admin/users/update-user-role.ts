@@ -3,12 +3,18 @@
 import { db, eq } from "@/server/db";
 import { userRoleEnum, users } from "@/server/db/schema";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
-import { ApiResponse, UserRoleTypeEnum } from "@/types/server/types";
-// import { revalidatePath } from "next/cache";
+import { ApiResponse } from "@/types/server/types";
+import { z } from "zod";
+
+const updateUserRoleSchema = z.object({
+  userId: z.string().min(1),
+  role: z.enum(userRoleEnum.enumValues),
+});
+
+export type updateUserRoleParams = z.infer<typeof updateUserRoleSchema>;
 
 export async function updateUserRole(
-  userId: string,
-  role: UserRoleTypeEnum
+  params: updateUserRoleParams
 ): Promise<ApiResponse<null>> {
   try {
     const authResponse = await authorizeRequest({
@@ -18,6 +24,14 @@ export async function updateUserRole(
     if (!authResponse.success) return authResponse;
 
     const { data: session } = authResponse;
+
+    const parsed = updateUserRoleSchema.safeParse(params);
+
+    if (!parsed.success) {
+      return { success: false, error: "Invalid params" };
+    }
+
+    const { role, userId } = parsed.data;
 
     // Prevent changing own role
     if (session.user.id === userId) {
@@ -52,8 +66,6 @@ export async function updateUserRole(
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId));
-
-    // revalidatePath("/admin/users");
 
     return {
       success: true,

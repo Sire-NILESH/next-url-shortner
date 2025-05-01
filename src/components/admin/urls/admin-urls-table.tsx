@@ -198,9 +198,9 @@ export function AdminUrlsTable({
         sortBy: currentSortBy,
         sortOrder: currentSortOrder as SortOrder,
         filter: currentFilter,
-        threats: currentThreats as ThreatTypeEnum[],
-        statuses: currentStatuses as UrlStatusTypeEnum[],
-        categories: currentCategories as FlagCategoryTypeEnum[],
+        threats: currentThreats as GetAllUrlsOptions["threats"],
+        statuses: currentStatuses as GetAllUrlsOptions["statuses"],
+        categories: currentCategories as GetAllUrlsOptions["categories"],
         limit,
       });
       return response;
@@ -284,7 +284,7 @@ export function AdminUrlsTable({
       urlId: number;
       action: "approve" | "delete";
     }) => {
-      return await manageFlaggedUrl(urlId, action);
+      return await manageFlaggedUrl({ urlId, action });
     },
     onSuccess: (data, { action }) => {
       toast.success(
@@ -318,7 +318,7 @@ export function AdminUrlsTable({
       urlId: number;
       newUrlStatus: URLStatus;
     }) => {
-      return await updateUrlStatus(urlId, newUrlStatus);
+      return await updateUrlStatus({ urlId, status: newUrlStatus });
     },
     onSuccess: (data, { newUrlStatus }) => {
       if (data.success) {

@@ -1,17 +1,21 @@
 "use server";
 
 import timeRanges from "@/lib/timeRanges";
+import { TimeRangeSchema } from "@/lib/validations/TimeRangeSchema";
 import { db } from "@/server/db";
 import { users } from "@/server/db/schema";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 import { sql } from "drizzle-orm";
+import { z } from "zod";
 
-type TimeRange = keyof typeof timeRanges | "all time";
+const getTotalUsersStatOptionsSchema = z.object({
+  timeRange: TimeRangeSchema.nullable().optional(),
+});
 
-interface GetTotalUsersStatOptions {
-  timeRange?: TimeRange;
-}
+export type GetTotalUsersStatOptions = z.infer<
+  typeof getTotalUsersStatOptionsSchema
+>;
 
 export const getTotalUsersStat = async (
   options: GetTotalUsersStatOptions = { timeRange: "all time" }
@@ -24,15 +28,24 @@ export const getTotalUsersStat = async (
     const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
 
     if (!authResponse.success) return authResponse;
+
+    const parsed = getTotalUsersStatOptionsSchema.safeParse(options);
+
+    if (!parsed.success) {
+      return { success: false, error: "Invalid params" };
+    }
+
+    const optionsParsed = parsed.data;
+
     let timeRangeWhereCondition;
     if (
-      options.timeRange &&
-      options.timeRange !== "all time" &&
-      options.timeRange in timeRanges
+      optionsParsed.timeRange &&
+      optionsParsed.timeRange !== "all time" &&
+      optionsParsed.timeRange in timeRanges
     ) {
       timeRangeWhereCondition = sql`${
         users.createdAt
-      } >= NOW() - INTERVAL '${sql.raw(timeRanges[options.timeRange])}'`;
+      } >= NOW() - INTERVAL '${sql.raw(timeRanges[optionsParsed.timeRange])}'`;
     }
 
     const query = db

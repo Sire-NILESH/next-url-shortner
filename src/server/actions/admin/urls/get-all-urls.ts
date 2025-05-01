@@ -21,6 +21,12 @@ import {
   or,
   sql,
 } from "drizzle-orm";
+import { z } from "zod";
+import {
+  threatTypeEnum,
+  urlStatusEnum,
+  flagCategoryEnum,
+} from "@/server/db/schema";
 
 export type UrlWithUser = {
   id: number;
@@ -39,25 +45,33 @@ export type UrlWithUser = {
   status: UrlStatusTypeEnum;
 };
 
-export type GetAllUrlsOptions = {
-  page?: number;
-  limit?: number;
-  sortBy?:
-    | "originalUrl"
-    | "shortCode"
-    | "createdAt"
-    | "clicks"
-    | "userName"
-    | "threat"
-    | "flagCategory"
-    | "status";
-  sortOrder?: "asc" | "desc";
-  search?: string;
-  filter?: "all" | "flagged" | "security" | "caution" | "safe";
-  threats?: ThreatTypeEnum[] | null;
-  statuses?: UrlStatusTypeEnum[] | null;
-  categories?: FlagCategoryTypeEnum[] | null;
-};
+const getAllUrlsOptionsSchema = z.object({
+  page: z.number().int().positive().optional(),
+  limit: z.number().int().positive().optional(),
+  sortBy: z
+    .enum([
+      "originalUrl",
+      "shortCode",
+      "createdAt",
+      "clicks",
+      "userName",
+      "threat",
+      "flagCategory",
+      "status",
+    ])
+    .optional(),
+  sortOrder: z.enum(["asc", "desc"]).optional(),
+  search: z.string().optional(),
+  filter: z.enum(["all", "flagged", "security", "caution", "safe"]).optional(),
+  threats: z.array(z.enum(threatTypeEnum.enumValues)).nullable().optional(),
+  statuses: z.array(z.enum(urlStatusEnum.enumValues)).nullable().optional(),
+  categories: z
+    .array(z.enum(flagCategoryEnum.enumValues))
+    .nullable()
+    .optional(),
+});
+
+export type GetAllUrlsOptions = z.infer<typeof getAllUrlsOptionsSchema>;
 
 export async function getAllUrls(
   options: GetAllUrlsOptions = {}
@@ -66,6 +80,12 @@ export async function getAllUrls(
     const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
 
     if (!authResponse.success) return authResponse;
+
+    const parsed = getAllUrlsOptionsSchema.safeParse(options);
+
+    if (!parsed.success) {
+      return { success: false, error: "Invalid query parameters" };
+    }
 
     const {
       page = 1,
@@ -77,7 +97,7 @@ export async function getAllUrls(
       threats = [],
       statuses = [],
       categories = [],
-    } = options;
+    } = parsed.data;
 
     const offset = (page - 1) * limit;
 

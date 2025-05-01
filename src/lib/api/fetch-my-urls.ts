@@ -14,7 +14,7 @@ export const fetchMyUrls = async () => {
       description: data.error,
     });
 
-    throw new Error(data.error);
+    return [];
   }
 
   return data.data ? data.data : [];

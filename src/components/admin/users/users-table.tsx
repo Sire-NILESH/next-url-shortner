@@ -231,7 +231,7 @@ export function UsersTable({
     }) => {
       const newRole = currentRole === "admin" ? "user" : "admin";
 
-      return await updateUserRole(userId, newRole);
+      return await updateUserRole({ userId, role: newRole });
     },
     onSuccess: (data, { currentRole }) => {
       if (data.success) {
@@ -268,7 +268,7 @@ export function UsersTable({
       userId: string;
       newUserStatus: UserStatus;
     }) => {
-      return await updateUserStatus(userId, newUserStatus);
+      return await updateUserStatus({ userId, status: newUserStatus });
     },
     onSuccess: (data, { newUserStatus }) => {
       if (data.success) {

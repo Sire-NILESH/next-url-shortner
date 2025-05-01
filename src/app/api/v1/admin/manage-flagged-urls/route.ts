@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const response = await manageFlaggedUrl(urlId, action);
+    const response = await manageFlaggedUrl({ urlId, action });
     return NextResponse.json(response);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {

@@ -1,4 +1,4 @@
-"use server";
+import "server-only";
 
 import { userAgent } from "next/server";
 import { db, eq } from "@/server/db";
@@ -6,7 +6,7 @@ import { urls, clickEvents } from "@/server/db/schema";
 import { ApiResponse, Url } from "@/types/server/types";
 import { sql } from "drizzle-orm";
 
-export async function recordClickEvent(
+export async function recordClickEventService(
   url: typeof urls.$inferSelect,
   userAgentParsed?: ReturnType<typeof userAgent>
 ): Promise<ApiResponse<Url>> {

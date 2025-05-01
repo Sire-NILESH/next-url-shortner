@@ -1,5 +1,5 @@
 // src/app/api/analytics/users/by-provider/route.ts
-import { TimeRangeValidator } from "@/lib/timeRanges";
+import { TimeRangeSchema } from "@/lib/validations/TimeRangeSchema";
 import { getUsersByProviderChartData } from "@/server/services/admin/user/get-user-by-provider-chart-data.service";
 
 import { UsersByProviderResType } from "@/types/client/types";
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest): Promise<Response> {
   try {
     const timeRangeSearchParam = req.nextUrl.searchParams.get("timeRange");
 
-    const parsedTimeRange = TimeRangeValidator.safeParse(timeRangeSearchParam);
+    const parsedTimeRange = TimeRangeSchema.safeParse(timeRangeSearchParam);
 
     if (!parsedTimeRange.success) {
       return Response.json({

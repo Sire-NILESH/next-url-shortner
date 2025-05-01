@@ -5,17 +5,30 @@ import { urls } from "@/server/db/schema";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
-type Action = "approve" | "delete";
+const manageFlaggedUrlSchema = z.object({
+  urlId: z.number().int().positive(),
+  action: z.enum(["approve", "delete"]),
+});
+
+export type ManageFlaggedUrlInput = z.infer<typeof manageFlaggedUrlSchema>;
 
 export async function manageFlaggedUrl(
-  urlId: number,
-  action: Action
+  params: ManageFlaggedUrlInput
 ): Promise<ApiResponse<null>> {
   try {
     const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
 
     if (!authResponse.success) return authResponse;
+
+    const parsed = manageFlaggedUrlSchema.safeParse(params);
+
+    if (!parsed.success) {
+      return { success: false, error: "Invalid params" };
+    }
+
+    const { urlId, action } = parsed.data;
 
     const urlToManage = await db.query.urls.findFirst({
       where: (urls, { eq }) => eq(urls.id, urlId),

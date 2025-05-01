@@ -1,9 +1,4 @@
 import { format, sub } from "date-fns";
-import { z } from "zod";
-
-export const TimeRangeValidator = z
-  .enum(["24H", "7D", "30D", "3M", "6M", "1Y", "all time"])
-  .nullable();
 
 const timeRanges = {
   "24H": "1 day",

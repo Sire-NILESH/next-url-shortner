@@ -3,12 +3,18 @@
 import { db, eq } from "@/server/db";
 import { users, userStatusEnum } from "@/server/db/schema";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
-import { ApiResponse, UserStatusTypeEnum } from "@/types/server/types";
-// import { revalidatePath } from "next/cache";
+import { ApiResponse } from "@/types/server/types";
+import { z } from "zod";
+
+const updateUserStatusSchema = z.object({
+  userId: z.string().min(1),
+  status: z.enum(userStatusEnum.enumValues),
+});
+
+export type UpdateUserStatusParams = z.infer<typeof updateUserStatusSchema>;
 
 export async function updateUserStatus(
-  userId: string,
-  status: UserStatusTypeEnum
+  params: UpdateUserStatusParams
 ): Promise<ApiResponse<null>> {
   try {
     const authResponse = await authorizeRequest({
@@ -18,6 +24,14 @@ export async function updateUserStatus(
     if (!authResponse.success) return authResponse;
 
     const { data: session } = authResponse;
+
+    const parsed = updateUserStatusSchema.safeParse(params);
+
+    if (!parsed.success) {
+      return { success: false, error: "Invalid params" };
+    }
+
+    const { status, userId } = parsed.data;
 
     // Prevent changing own status
     if (session.user.id === userId) {
@@ -52,8 +66,6 @@ export async function updateUserStatus(
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId));
-
-    //  revalidatePath("/admin/users");
 
     return {
       success: true,

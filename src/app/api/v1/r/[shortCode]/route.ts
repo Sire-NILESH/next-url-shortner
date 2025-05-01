@@ -1,7 +1,7 @@
-import { recordClickEvent } from "@/server/actions/clicks/record-click-event";
-import { NextRequest, NextResponse, userAgent } from "next/server";
+import { recordClickEventService } from "@/server/services/clicks/record-click-event.service";
 import { checkUrlAccess } from "@/server/services/url/check-url-access.service";
 import { WarnRedirectSearchParams } from "@/types/server/types";
+import { NextRequest, NextResponse, userAgent } from "next/server";
 
 type Params = Promise<{ shortCode: string }>;
 
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest, props: { params: Params }) {
     }
 
     const url = accessResult.url;
-    const response = await recordClickEvent(url, userAgentParsed);
+    const response = await recordClickEventService(url, userAgentParsed);
 
     if (response.success && response.data) {
       if (url.flagged) {

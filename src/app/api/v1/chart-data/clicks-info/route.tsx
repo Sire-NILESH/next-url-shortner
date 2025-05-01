@@ -1,4 +1,4 @@
-import { TimeRangeValidator } from "@/lib/timeRanges";
+import { TimeRangeSchema } from "@/lib/validations/TimeRangeSchema";
 import { getClicksVsFlaggedChartData } from "@/server/services/admin/clicks/get-clicks-vs-flagged-chart-data.service";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ClicksInfoChartResType } from "@/types/client/types";
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest): Promise<Response> {
 
     const timeRangeSearchParam = req.nextUrl.searchParams.get("timeRange");
 
-    const parsedTimeRange = TimeRangeValidator.safeParse(timeRangeSearchParam);
+    const parsedTimeRange = TimeRangeSchema.safeParse(timeRangeSearchParam);
 
     if (!parsedTimeRange.success)
       return Response.json({

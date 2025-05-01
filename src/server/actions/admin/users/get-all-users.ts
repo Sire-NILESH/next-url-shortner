@@ -1,15 +1,17 @@
 "use server";
 
 import { db } from "@/server/db";
-import { accounts, urls, users } from "@/server/db/schema";
-import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import {
-  ApiResponse,
-  UserProviderTypeEnum,
-  UserRoleTypeEnum,
-  UserStatusTypeEnum,
-} from "@/types/server/types";
+  accounts,
+  urls,
+  userRoleEnum,
+  users,
+  userStatusEnum,
+} from "@/server/db/schema";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
+import { ApiResponse } from "@/types/server/types";
 import { and, asc, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
+import { z } from "zod";
 
 export type UserWithoutPassword = {
   id: string;
@@ -24,31 +26,46 @@ export type UserWithoutPassword = {
   providerType: string | null;
 };
 
-export type GetAllUsersOptions = {
-  page?: number;
-  limit?: number;
-  sortBy?:
-    | "name"
-    | "email"
-    | "role"
-    | "status"
-    | "createdAt"
-    | "urlCount"
-    | "flaggedUrlCount"
-    | "providerType";
-  sortOrder?: "asc" | "desc";
-  search?: string;
-  roles?: UserRoleTypeEnum[] | null;
-  statuses?: UserStatusTypeEnum[] | null;
-  providers?: UserProviderTypeEnum[] | null;
-};
+const getAllUsersOptionsSchema = z.object({
+  page: z.number().int().positive().optional(),
+  limit: z.number().int().positive().optional(),
+  sortBy: z
+    .enum([
+      "name",
+      "email",
+      "role",
+      "status",
+      "createdAt",
+      "urlCount",
+      "flaggedUrlCount",
+      "providerType",
+    ])
+    .optional(),
+  sortOrder: z.enum(["asc", "desc"]).optional(),
+  search: z.string().optional(),
+  roles: z.array(z.enum(userRoleEnum.enumValues)).nullable().optional(),
+  statuses: z.array(z.enum(userStatusEnum.enumValues)).nullable().optional(),
+  providers: z
+    .array(z.enum(["google", "credentials"]))
+    .nullable()
+    .optional(),
+});
+
+export type GetAllUsersOptions = z.infer<typeof getAllUsersOptionsSchema>;
 
 export async function getAllUsers(
   options: GetAllUsersOptions = {}
 ): Promise<ApiResponse<{ users: UserWithoutPassword[]; total: number }>> {
   try {
     const authResponse = await authorizeRequest({ allowedRoles: ["admin"] });
+
     if (!authResponse.success) return authResponse;
+
+    const parsed = getAllUsersOptionsSchema.safeParse(options);
+
+    if (!parsed.success) {
+      return { success: false, error: "Invalid query parameters" };
+    }
 
     const {
       page = 1,
@@ -59,7 +76,7 @@ export async function getAllUsers(
       roles = [],
       statuses = [],
       providers = [],
-    } = options;
+    } = parsed.data;
 
     const offset = (page - 1) * limit;
     const conditions = [];
