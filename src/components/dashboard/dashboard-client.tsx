@@ -13,8 +13,8 @@ import { EqualApproximately, Link, MousePointerClick } from "lucide-react";
 import { useMemo } from "react";
 import { NewShrinkifyURLCard } from "./new-shrinkify-url-card";
 import StatCard from "./stat-card";
-import { UrlClicksBarChartCard } from "./url-clicks-bar-chart-card";
 import { UrlClicksDistributionCard } from "./url-clicks-distribution-card";
+import { UrlsHistoryChart } from "./url-history-chart";
 
 export default function DashboardClient() {
   const { data: userUrls } = useMyUrls();
@@ -40,15 +40,6 @@ export default function DashboardClient() {
     [userUrls]
   );
 
-  // prepare data for the bar chart with numeric values
-  const barChartData = useMemo(() => {
-    return topUrls.map((url) => ({
-      url: url.shortCode,
-      clicks: url.clicks,
-      originalUrl: url.originalUrl,
-    }));
-  }, [topUrls]);
-
   // prepare data for the pie chart with numerc values
   const pieChartData = useMemo(() => {
     return topUrls.map((url, index) => ({
@@ -57,21 +48,6 @@ export default function DashboardClient() {
       fill: `hsl(var(--chart-${index + 1}))`,
     }));
   }, [topUrls]);
-
-  // bar chart config
-  const barChartConfig = {
-    clicks: {
-      label: "Clicks",
-      color: "var(--chart-1)",
-    },
-    ...topUrls.reduce((acc, url, index) => {
-      acc[url.shortCode] = {
-        label: url.name ?? url.shortCode,
-        color: `var(--chart-${index + 1})`,
-      };
-      return acc;
-    }, {} as ChartConfig),
-  };
 
   // pie chart config
   const pieChartConfig = {
@@ -86,6 +62,7 @@ export default function DashboardClient() {
       return acc;
     }, {} as ChartConfig),
   };
+
   return (
     <>
       <div className="grid gap-8 xl:grid-cols-3 mb-8">
@@ -128,23 +105,18 @@ export default function DashboardClient() {
           <>
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
               <NewShrinkifyURLCard className="bg-secondary/40" />
-              {barChartData.length > 0 ? (
+              {userUrls.length > 0 ? (
                 <>
-                  <UrlClicksBarChartCard
+                  <UrlsHistoryChart
+                    userUrls={userUrls}
                     className="bg-secondary/40"
-                    avgClicks={avgClicks}
-                    barChartConfig={barChartConfig}
-                    barChartData={barChartData}
-                    topUrlsLen={topUrls.length}
                   />
 
                   <UrlClicksDistributionCard
                     className="bg-secondary/40"
-                    avgClicks={avgClicks}
                     pieChartConfig={pieChartConfig}
                     pieChartData={pieChartData}
                     topUrlsLen={topUrls.length}
-                    userUrlsLen={userUrls.length}
                     totalClicks={totalClicks}
                   />
                 </>

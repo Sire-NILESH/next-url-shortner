@@ -36,7 +36,7 @@ const DashboardIntroCard = async ({
       <CardHeader className="hidden md:block">
         <div className="flex items-center gap-3">
           <div className="space-y-0.5 text-right">
-            <p className="text-sm font-medium">{userName}</p>
+            <p className="text-base font-medium">{userName}</p>
             <p className="text-muted-foreground text-xs">{userEmail}</p>
           </div>
           <UserAvatar
@@ -49,7 +49,9 @@ const DashboardIntroCard = async ({
 
       <CardContent className="flex-1 space-y-2">
         <div className="flex gap-4 lg:gap-6 items-center">
-          <h1 className="text-3xl boldText !font-semibold">{pageTitle}</h1>
+          <h1 className="text-2xl md:text-3xl boldText !font-semibold">
+            {pageTitle}
+          </h1>
 
           {session && session.user.role === "admin" ? (
             <>

@@ -49,7 +49,7 @@ export type CreateShrinkifyUrlFormData = z.infer<
 export const updateShrinkifyUrlSchema = z.object({
   id: z.coerce.number(),
   customCode: shortCodeSchema,
-  name: urlNameSchema.optional(),
+  name: urlNameSchema.optional().nullable(),
 });
 
 export type UpdateShrinkifyUrlData = z.infer<typeof updateShrinkifyUrlSchema>;
@@ -59,5 +59,6 @@ export const updateShrinkifyUrlFormSchema = z.object({
   name: urlNameSchema.optional(),
 });
 
-export type UpdateShrinkifyUrlFormData = z.infer<typeof updateShrinkifyUrlFormSchema>;
-
+export type UpdateShrinkifyUrlFormData = z.infer<
+  typeof updateShrinkifyUrlFormSchema
+>;

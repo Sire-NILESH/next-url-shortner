@@ -6,10 +6,10 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { ChartPie, TrendingUp, TrendingDown } from "lucide-react";
+import { ChartPie } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ComponentProps } from "react";
-import { PieChart, Pie, Label } from "recharts";
+import { PieChart, Pie, Label, Sector } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
@@ -17,14 +17,14 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { UrlClicksPieChartDataType } from "@/types/client/types";
+import { formatNumber } from "@/lib/formatNum";
+import { PieSectorDataItem } from "recharts/types/polar/Pie";
 
 interface UrlClicksDistributionCardProps extends ComponentProps<"div"> {
   pieChartConfig: ChartConfig;
   pieChartData: UrlClicksPieChartDataType[];
   totalClicks: number;
-  avgClicks: number;
   topUrlsLen: number;
-  userUrlsLen: number;
 }
 
 export const UrlClicksDistributionCard = ({
@@ -32,9 +32,7 @@ export const UrlClicksDistributionCard = ({
   pieChartConfig,
   pieChartData,
   totalClicks,
-  avgClicks,
   topUrlsLen,
-  userUrlsLen,
   ...props
 }: UrlClicksDistributionCardProps) => {
   return (
@@ -63,7 +61,15 @@ export const UrlClicksDistributionCard = ({
               dataKey="clicks"
               nameKey="url"
               innerRadius={60}
-              strokeWidth={5}
+              label
+              labelLine={false}
+              activeIndex={0}
+              activeShape={({
+                outerRadius = 0,
+                ...props
+              }: PieSectorDataItem) => (
+                <Sector {...props} outerRadius={outerRadius + 10} />
+              )}
             >
               <Label
                 content={({ viewBox }) => {
@@ -80,7 +86,7 @@ export const UrlClicksDistributionCard = ({
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalClicks.toLocaleString()}
+                          {formatNumber(totalClicks)}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
@@ -100,21 +106,10 @@ export const UrlClicksDistributionCard = ({
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          {userUrlsLen > 0 &&
-            (avgClicks > 5 ? (
-              <>
-                Trending up by {((avgClicks / 5) * 100).toFixed(1)}% this month
-                <TrendingUp className="size-4 text-green-500" />
-              </>
-            ) : (
-              <>
-                Could improve with only {Math.ceil(5 - avgClicks)} more clicks
-                <TrendingDown className="size-4 text-amber-500" />
-              </>
-            ))}
+          {`${pieChartData[0].url} is your best performing url`}
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing click count for your top {topUrlsLen} URLs
+          Showing click counts for your top {topUrlsLen} URLs till today
         </div>
       </CardFooter>
     </Card>

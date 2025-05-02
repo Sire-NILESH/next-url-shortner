@@ -15,6 +15,11 @@ export type UrlClicksBarChartDataType = {
   originalUrl: string;
 };
 
+export type UrlsHistoryChartDataType = {
+  period: string;
+  urls: number;
+};
+
 export type UrlClicksPieChartDataType = {
   url: string;
   clicks: number;
