@@ -25,7 +25,6 @@ export async function updateUrl(
     });
 
     if (!validatedFields.success) {
-      console.log({ error: validatedFields.error });
       return {
         success: false,
         error:

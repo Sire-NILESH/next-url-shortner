@@ -65,6 +65,7 @@ import { DataTableViewOptions } from "../../data-table/column-toggle";
 import { EditUrlModal } from "../../modals/edit-url-modal";
 import { QRCodeModal } from "../../modals/qr-code-modal";
 import { Badge } from "../../ui/badge";
+import UserUrlsErrorFallback from "./user-urls-error-fallback";
 
 const csvConfig = mkConfig({
   fieldSeparator: ",",
@@ -88,11 +89,11 @@ export default function UserUrlTable() {
 
   const queryClient = useQueryClient();
 
-  const { data: urls, isLoading } = useMyUrls();
+  const { data: urls, isLoading, error } = useMyUrls();
 
   // Delete URL mutation
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteUrl(id),
+    mutationFn: (id: number) => deleteUrl({ urlId: id }),
     onSuccess: (response, id) => {
       if (response.success) {
         queryClient.setQueryData(
@@ -385,7 +386,7 @@ export default function UserUrlTable() {
 
   // Set up the table
   const table = useReactTable({
-    data: urls,
+    data: urls ? urls : [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
@@ -410,7 +411,11 @@ export default function UserUrlTable() {
     },
   });
 
-  if (urls.length === 0) {
+  if (error && !isLoading) {
+    return <UserUrlsErrorFallback error={error} />;
+  }
+
+  if (urls && urls.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-184 space-y-2 rounded-xl text-center py-8 bg-muted">
         <p className="text-2xl !font-bold boldText">
@@ -436,10 +441,12 @@ export default function UserUrlTable() {
             className="pl-8"
           />
         </div>
+
         <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
             size="sm"
+            disabled={isLoading || !!error}
             className="ml-auto h-8 lg:flex"
             onClick={() => {
               const data = table.getFilteredRowModel().rows.map((row) => ({
@@ -461,7 +468,7 @@ export default function UserUrlTable() {
         </div>
       </div>
 
-      <SkeletonWrapper isLoading={isLoading}>
+      <SkeletonWrapper isLoading={isLoading} className="min-h-142">
         <div className="rounded-md border flex-1 overflow-hidden">
           <Table className="font-mono">
             <TableHeader>
