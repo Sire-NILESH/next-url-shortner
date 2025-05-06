@@ -1,3 +1,5 @@
+"use no memo";
+
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -61,12 +63,16 @@ export function DataTableColumnHeader<TData, TValue>({
             Desc
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator />
+          {column.getCanHide() && (
+            <>
+              <DropdownMenuSeparator />
 
-          <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-            <EyeNoneIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            Hide
-          </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
+                <EyeNoneIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+                Hide
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import UserUrlTable from "@/components/urls/user-urls-table/user-url-table";
+import UserUrlTable from "@/components/urls/user-url-table/user-url-table";
 import { authorizePageService } from "@/server/services/auth/authorize-page-sevice";
 import { Link as LinkIcon } from "lucide-react";
 import { Metadata } from "next";
