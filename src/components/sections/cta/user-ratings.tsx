@@ -16,7 +16,7 @@ export function UserRatings({ className, ...props }: UserRatingsProps) {
     <div
       className={cn(
         "flex items-center rounded-full",
-        "sm:px-4 sm:py-3 sm:border sm:border-border sm:bg-background",
+        // "sm:px-4 sm:py-3 sm:border sm:border-border sm:bg-background",
         className
       )}
       {...props}

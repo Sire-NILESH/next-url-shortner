@@ -44,6 +44,7 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.0",
     "export-to-csv": "^1.4.0",
+    "framer-motion": "^12.9.7",
     "lucide-react": "^0.477.0",
     "mini-svg-data-uri": "^1.4.4",
     "next": "15.2.0",

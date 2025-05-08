@@ -37,6 +37,6 @@ export const faqData = [
   {
     question: "Can I see who clicked on my links?",
     answer:
-      "While we provide anonymized analytics such as location, device type, and referral sources, we do not track personally identifiable information to maintain user privacy.",
+      "While we provide anonymized analytics, we do not track personally identifiable information to maintain user privacy.",
   },
 ];

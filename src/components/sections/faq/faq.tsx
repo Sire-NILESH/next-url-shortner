@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PhoneCall } from "lucide-react";
 import { faqData } from "./faq-data";
+import { SectionContent, SectionDescription, SectionTitle } from "../Section";
 
 function FAQ() {
   return (
@@ -25,14 +26,15 @@ function FAQ() {
                 </Badge>
               </div>
               <div className="flex gap-4 flex-col">
-                <h4 className="text-3xl sm:text-5xl max-w-xl text-left boldText">
+                <SectionTitle className="text-3xl sm:text-5xl max-w-xl text-left">
                   {"Got questions? We've got answers for You!"}
-                </h4>
-                <p className="-mt-3 sm:mt-0 text-base md:text-lg max-w-xl lg:max-w-lg leading-relaxed tracking-tight text-muted-foreground text-left">
+                </SectionTitle>
+
+                <SectionDescription className="-mt-3 sm:mt-0 md:text-lg max-w-xl lg:max-w-lg text-left">
                   Find answers to common questions about shrinkify, how it
                   works, tracking features, customization options, and more. Get
                   the details you need to make the most of our service today!
-                </p>
+                </SectionDescription>
               </div>
               <div className="mt-3 sm:mt-0">
                 <Button className="gap-4" variant="outline">
@@ -41,16 +43,21 @@ function FAQ() {
               </div>
             </div>
           </div>
-          <Accordion type="single" collapsible className="w-full">
-            {faqData.map((faqItem, index) => (
-              <AccordionItem key={index} value={"index-" + index}>
-                <AccordionTrigger className="text-left">
-                  {faqItem.question}
-                </AccordionTrigger>
-                <AccordionContent>{faqItem.answer}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+
+          <SectionContent>
+            <Accordion type="single" collapsible className="w-full">
+              {faqData.map((faqItem, index) => (
+                <AccordionItem key={index} value={"index-" + index}>
+                  <AccordionTrigger className="text-left">
+                    {faqItem.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground">
+                    {faqItem.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </SectionContent>
         </div>
       </div>
     </div>

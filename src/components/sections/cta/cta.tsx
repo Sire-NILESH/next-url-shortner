@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { UserRatings } from "./user-ratings";
+import { SectionContent, SectionDescription, SectionTitle } from "../Section";
 
 interface CTAProps {
   badge?: {
@@ -40,27 +41,31 @@ export function CTA({
         )}
 
         {/* Title */}
-        <h2 className="max-w-2xl text-3xl boldText sm:text-5xl">{title}</h2>
+        <SectionTitle className="max-w-2xl text-3xl sm:text-5xl">
+          {title}
+        </SectionTitle>
 
         {/* Description */}
         {description && (
-          <p className="-mt-4 sm:mt-0 text-base md:text-lg max-w-[750px] leading-relaxed tracking-tight text-muted-foreground pb-4">
+          <SectionDescription className="pb-4">
             {description}
-          </p>
+          </SectionDescription>
         )}
 
-        {/* Action Button */}
-        <div className="flex gap-3">
-          <Button size="lg" asChild>
-            <Link href={action.href}>{action.text}</Link>
-          </Button>
-          <Button variant={"outline"} size="lg" asChild>
-            <Link href={"/"}>{"Learn more"}</Link>
-          </Button>
-        </div>
+        <SectionContent className="sm:mx-auto flex flex-col sm:items-center space-y-20">
+          {/* User Ratings */}
+          <UserRatings className="w-fit" />
 
-        {/* User Ratings */}
-        <UserRatings className="mt-12 w-fit" />
+          {/* Action Button */}
+          <div className="flex gap-3">
+            <Button size="lg" asChild>
+              <Link href={action.href}>{action.text}</Link>
+            </Button>
+            <Button variant={"outline"} size="lg" asChild>
+              <Link href={"/"}>{"Learn more"}</Link>
+            </Button>
+          </div>
+        </SectionContent>
       </div>
     </div>
   );

@@ -10,21 +10,16 @@ export interface TestimonialAuthor {
 export interface TestimonialCardProps {
   author: TestimonialAuthor;
   text: string;
-  href?: string;
   className?: string;
 }
 
 export function TestimonialCard({
   author,
   text,
-  href,
   className,
 }: TestimonialCardProps) {
-  const Card = href ? "a" : "div";
-
   return (
-    <Card
-      {...(href ? { href } : {})}
+    <div
       className={cn(
         "flex flex-col rounded-lg border border-b-border/30",
         "bg-gradient-to-b from-muted to-muted/60",
@@ -45,6 +40,6 @@ export function TestimonialCard({
         </div>
       </div>
       <p className="sm:text-md mt-4 text-sm text-muted-foreground">{text}</p>
-    </Card>
+    </div>
   );
 }

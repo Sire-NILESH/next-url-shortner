@@ -25,7 +25,7 @@ const AuthUser = ({ className, ...props }: Props) => {
       ) : (
         <Link
           href={"/login"}
-          className={buttonVariants({ variant: "default" })}
+          className={buttonVariants({ variant: "default", size: "sm" })}
         >
           Login
         </Link>

@@ -74,8 +74,9 @@ export function SiteFooter() {
           <div>
             <h3 className="mb-4 text-lg font-semibold">Contact Us</h3>
             <address className="space-y-2 text-sm not-italic">
-              <p>123 Innovation Street</p>
-              <p>Tech City, TC 12345</p>
+              <p>Spire 1, Habitation Unit A-7</p>
+              <p>Iacon Central</p>
+              <p>Cybertron</p>
               <p>Phone: (123) 456-7890</p>
               <p>Email: community@example.com</p>
             </address>
