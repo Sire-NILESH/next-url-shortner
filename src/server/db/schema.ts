@@ -30,7 +30,7 @@ export const flagCategoryEnum = pgEnum("flag_category", [
   "unknown",
 ]);
 
-export const urlStatusEnum = pgEnum("status", [
+export const urlStatusEnum = pgEnum("url_status", [
   "active",
   "suspended",
   "inactive",
@@ -39,7 +39,7 @@ export const urlStatusEnum = pgEnum("status", [
 // Define user roles enum
 export const userRoleEnum = pgEnum("user_role", ["user", "admin"]);
 
-export const userStatusEnum = pgEnum("status", [
+export const userStatusEnum = pgEnum("user_status", [
   "active",
   "suspended",
   "inactive",
