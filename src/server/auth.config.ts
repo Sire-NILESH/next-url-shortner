@@ -1,4 +1,6 @@
-import bcrypt from "bcryptjs";
+import InvalidLoginError from "@/lib/auth/errors/invalidLoginError";
+import { comparePasswords } from "@/lib/auth/utils/password-helpers";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
 import { DefaultSession, NextAuthConfig } from "next-auth";
 import "next-auth/jwt";
@@ -8,8 +10,6 @@ import Google from "next-auth/providers/google";
 import { z } from "zod";
 import { db } from "./db";
 import { accounts, sessions, users, verificationTokens } from "./db/schema";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import InvalidLoginError from "@/lib/auth/errors/invalidLoginError";
 
 // extend the types to include role and status
 declare module "next-auth" {
@@ -148,7 +148,7 @@ export const authConfig: NextAuthConfig = {
         if (user.status === "inactive")
           throw new InvalidLoginError("ACCOUNT_INACTIVE");
 
-        const passwordsMatch = await bcrypt.compare(
+        const passwordsMatch = await comparePasswords(
           password,
           user.password || ""
         );

@@ -3,7 +3,7 @@
 import { UserStatusTypeEnum } from "@/types/server/types";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import useLogout from "./useLogout";
+import useLogout from "./hooks/useLogout";
 
 type AutoLogoutByStatusProps = {
   userStatus: UserStatusTypeEnum;

@@ -1,7 +1,6 @@
 "use client";
 "use no memo";
 
-import { ConfirmationModal } from "@/components/modals/confirmation-modal";
 import { EditUrlModal } from "@/components/modals/edit-url-modal";
 import { QRCodeModal } from "@/components/modals/qr-code-modal";
 import SkeletonWrapper from "@/components/skeleton-wrapper";
@@ -29,6 +28,7 @@ import TablePagination from "./table-pagination";
 import TableToolbar from "./table-toolbar";
 import UrlDataTable from "./url-data-table";
 import UserUrlsErrorFallback from "./user-urls-error-fallback";
+import { ConfirmModal } from "@/components/modals/confirm-modal/confirm-modal";
 
 const csvConfig = mkConfig({
   fieldSeparator: ",",
@@ -194,7 +194,7 @@ export default function UserUrlTable({ className, ...props }: Props) {
         />
       )}
       {/* Delete Confirmation Modal */}
-      <ConfirmationModal
+      <ConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteConfirmed}
@@ -205,7 +205,7 @@ export default function UserUrlTable({ className, ...props }: Props) {
       />
 
       {/* Export Confirmation Modal */}
-      <ConfirmationModal
+      <ConfirmModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         onConfirm={handleExportConfirmed}

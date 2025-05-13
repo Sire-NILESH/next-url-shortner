@@ -1,6 +1,6 @@
 "use client";
 
-import { loginSchema } from "./schema";
+import { loginSchema } from "../schema";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { signIn } from "next-auth/react";

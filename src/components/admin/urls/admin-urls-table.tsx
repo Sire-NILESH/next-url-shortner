@@ -693,7 +693,7 @@ export function AdminUrlsTable({
                       </TableCell>
                       <TableCell>
                         {url.userId ? (
-                          <div className="max-w-50">
+                          <div className="max-w-50 truncate">
                             <div className="flex items-center gap-2">
                               {url.userRole === "admin" ? (
                                 <ShieldIcon className="text-foreground size-3.5" />
@@ -702,17 +702,19 @@ export function AdminUrlsTable({
                               )}
                               <span
                                 title={url.userName || "Unknown User"}
-                                className="line-clamp-1"
+                                className="truncate"
                               >
                                 {url.userName || "Unknown User"}
                               </span>
                             </div>
-                            <span
-                              title={url.userEmail || "Unknown email"}
-                              className="text-muted-foreground line-clamp-1"
-                            >
-                              {url.userEmail || "Unknown email"}
-                            </span>
+                            <div>
+                              <span
+                                title={url.userEmail || "Unknown email"}
+                                className="truncate text-muted-foreground"
+                              >
+                                {url.userEmail || "Unknown email"}
+                              </span>
+                            </div>
                           </div>
                         ) : (
                           <div className="flex items-center gap-2 text-muted-foreground">

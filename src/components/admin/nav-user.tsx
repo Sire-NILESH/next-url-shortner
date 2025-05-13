@@ -17,7 +17,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Session } from "next-auth";
-import useLogout from "../auth/useLogout";
+import useLogout from "../auth/hooks/useLogout";
 import { UserAvatar } from "../auth/user-avatar-dropdown";
 
 export function NavUser({ session }: { session: Session | null }) {

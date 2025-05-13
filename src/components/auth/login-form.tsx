@@ -20,8 +20,8 @@ import {
 import { Input } from "../ui/input";
 import GoogleLoginIcon from "./google-login-icon";
 import { loginSchema } from "./schema";
-import useGoogleAuthLogin from "./useGoogleAuthLogin";
-import useLogin from "./useLogin";
+import useGoogleAuthLogin from "./hooks/useGoogleAuthLogin";
+import useLogin from "./hooks/useLogin";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 

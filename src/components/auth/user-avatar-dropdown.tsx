@@ -7,11 +7,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Session } from "next-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import useLogout from "./useLogout";
+import useLogout from "./hooks/useLogout";
 
 export function UserAvatarDropdown({ session }: { session: Session | null }) {
   const { logoutStatus, logoutUser } = useLogout();
@@ -40,6 +41,7 @@ export function UserAvatarDropdown({ session }: { session: Session | null }) {
           <User />
           {session?.user.name ? session?.user.name : "unknown user"}
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           disabled={logoutStatus === "pending"}
           onClick={() => logoutUser()}

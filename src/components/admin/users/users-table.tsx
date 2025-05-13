@@ -530,14 +530,19 @@ export function UsersTable({
                             </AvatarFallback>
                           </Avatar>
                           <div className="font-medium">
-                            <p title={user.name || "Unknown User"}>
+                            <p
+                              className="truncate"
+                              title={user.name || "Unknown User"}
+                            >
                               {user.name || "Unknown User"}
                             </p>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <p title={user.email}>{user.email}</p>
+                        <p className="truncate" title={user.email}>
+                          {user.email}
+                        </p>
                       </TableCell>
                       <TableCell>{user.id}</TableCell>
                       <TableCell>

@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
-interface ConfirmationModalProps {
+interface ConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -22,7 +22,7 @@ interface ConfirmationModalProps {
   isLoading?: boolean;
 }
 
-export function ConfirmationModal({
+export function ConfirmModal({
   isOpen,
   onClose,
   onConfirm,
@@ -31,7 +31,7 @@ export function ConfirmationModal({
   confirmText = "Confirm",
   cancelText = "Cancel",
   isLoading = false,
-}: ConfirmationModalProps) {
+}: ConfirmModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
