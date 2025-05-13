@@ -13,7 +13,7 @@ const DashboardNav = ({ className, ...props }: Props) => {
   return (
     <nav
       className={cn(
-        "flex items-center justify-end space-x-4 list-none text-base font-semibold",
+        "flex items-center justify-end space-x-4 list-none text-base",
         className
       )}
       {...props}

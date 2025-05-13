@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import PasswordInput from "../password-input";
 import { Button } from "../ui/button";
 import {
   Form,
@@ -82,10 +83,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="********"
-                  type="password"
-                  autoComplete="current-password"
+                <PasswordInput
                   disabled={registerMutation.isPending}
                   {...field}
                 />
@@ -101,10 +99,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Confirm Password</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="********"
-                  type="password"
-                  autoComplete="new-password"
+                <PasswordInput
                   disabled={registerMutation.isPending}
                   {...field}
                 />

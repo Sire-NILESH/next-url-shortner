@@ -4,6 +4,7 @@ import {
   SectionTitle,
   SectionDescription,
   SectionProps,
+  SectionContent,
 } from "@/components/sections/Section";
 import { FeaturesList } from "@/components/sections/features/features-list";
 import { cn } from "@/lib/utils";
@@ -33,7 +34,9 @@ const FeatuesSection = ({ className, ...props }: Props) => {
         . And the catch? there is none!
       </SectionDescription>
 
-      <FeaturesList className="w-full" />
+      <SectionContent>
+        <FeaturesList className="w-full" />
+      </SectionContent>
     </Section>
   );
 };

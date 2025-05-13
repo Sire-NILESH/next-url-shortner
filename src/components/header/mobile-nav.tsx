@@ -27,6 +27,7 @@ export function MobileNav() {
       <SheetTrigger asChild>
         <Button
           variant="outline"
+          size="sm"
           className="px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
         >
           <Menu className="size-5" />
@@ -34,11 +35,11 @@ export function MobileNav() {
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="left" className="pt-14 space-y-12">
+      <SheetContent side="left" className="pt-14 space-y-6">
         <SheetTitle>
           <div className="pl-4">
-            <Brand className="text-4xl pb-2 max-w-fit" />
-            <p className="text-muted-foreground">
+            <Brand className="text-2xl sm:text-4xl pb-2 max-w-fit" />
+            <p className="text-sm sm:text-base text-muted-foreground">
               {"Simply shrinkify your URLs with ease"}
             </p>
             <p className="sr-only">Navigation menu</p>
@@ -51,7 +52,7 @@ export function MobileNav() {
               <Link key={pathObj.id} href={pathObj.path}>
                 <li
                   className={cn(
-                    "flex items-center gap-2 hover:text-foreground text-muted-foreground hover:bg-secondary p-2 rounded-lg",
+                    "flex items-center gap-2 hover:text-foreground text-sm sm:text-base text-muted-foreground hover:bg-secondary p-2 rounded-lg",
                     pathname === pathObj.path &&
                       "text-primary-foreground bg-primary font-medium"
                   )}

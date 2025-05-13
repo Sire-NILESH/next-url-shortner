@@ -1,9 +1,16 @@
+import {
+  UpdateShrinkifyUrlFormData,
+  updateShrinkifyUrlFormSchema,
+} from "@/lib/validations/URLSchema";
+import { updateUrl } from "@/server/actions/urls/update-url";
+import { BASE_URL } from "@/site-config/base-url";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
+import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -20,53 +27,45 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Loader2 } from "lucide-react";
-import { updateUrl } from "@/server/actions/urls/update-url";
-
-const editUrlSchema = z.object({
-  customCode: z
-    .string()
-    .min(3, "Custom code must be at least 3 characters")
-    .max(255, "Custom code must be less than 255 characters")
-    .regex(/^[a-zA-Z0-9_-]+$/, "Custom code must be alphanumeric or hyphen"),
-});
-
-type EditUrlFormData = z.infer<typeof editUrlSchema>;
 
 interface EditUrlModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   urlId: number;
+  urlName: string | null;
   currentShortCode: string;
-  onSuccess: (newShortCode: string) => void;
+  onSuccess: (newShortCode: string, name?: string) => void;
 }
 
 export function EditUrlModal({
   isOpen,
   onOpenChange,
   urlId,
+  urlName,
   currentShortCode,
   onSuccess,
 }: EditUrlModalProps) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
-
-  const form = useForm<EditUrlFormData>({
-    resolver: zodResolver(editUrlSchema),
+  const form = useForm<UpdateShrinkifyUrlFormData>({
+    resolver: zodResolver(updateShrinkifyUrlFormSchema),
     defaultValues: {
       customCode: currentShortCode,
+      name: urlName ? urlName : undefined, // Optional: set to actual name if available
     },
   });
 
   useEffect(() => {
-    form.reset({ customCode: currentShortCode });
-  }, [currentShortCode, form]);
+    form.reset({
+      customCode: currentShortCode,
+      name: urlName ? urlName : undefined, // Optional: reset to actual name if available
+    });
+  }, [currentShortCode, form, urlName]);
 
   const mutation = useMutation({
-    mutationFn: async (data: EditUrlFormData) => {
+    mutationFn: async (data: UpdateShrinkifyUrlFormData) => {
       const formData = new FormData();
       formData.append("id", urlId.toString());
       formData.append("customCode", data.customCode);
+      if (data.name) formData.append("name", data.name);
       return updateUrl(formData);
     },
     onSuccess: (response, variables) => {
@@ -74,11 +73,14 @@ export function EditUrlModal({
         toast.success("URL updated successfully", {
           description: "The URL has been updated successfully",
         });
-        onSuccess(variables.customCode);
+        onSuccess(variables.customCode, variables.name);
         onOpenChange(false);
       } else {
         toast.error("Failed to update URL", {
-          description: response.error || "An error occurred",
+          description:
+            !response.success && response.error
+              ? response.error
+              : "An error occurred",
         });
       }
     },
@@ -115,7 +117,7 @@ export function EditUrlModal({
                   <FormControl>
                     <div className="flex flex-col sm:flex-row items-center gap-3">
                       <span className="sm:text-sm text-muted-foreground sm:mr-2">
-                        {baseUrl}/r/
+                        {BASE_URL}/r/
                       </span>
                       <Input
                         placeholder="Custom code"
@@ -124,6 +126,24 @@ export function EditUrlModal({
                         className="flex-1 p-2"
                       />
                     </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      placeholder="Name (optional)"
+                      {...field}
+                      disabled={mutation.isPending}
+                      className="p-2"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

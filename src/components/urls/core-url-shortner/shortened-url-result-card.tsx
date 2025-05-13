@@ -2,15 +2,17 @@ import React, { ComponentProps, useState } from "react";
 import { Card, CardContent } from "../../ui/card";
 import { Input } from "../../ui/input";
 import { Button } from "../../ui/button";
-import { Copy, QrCode } from "lucide-react";
+import { Copy, PartyPopper, QrCode } from "lucide-react";
 import FlaggedURLInfo from "./flagged-url-info";
 import { cn } from "@/lib/utils";
 import { QRCodeModal } from "../../modals/qr-code-modal";
 import { toast } from "sonner";
+import { ThreatTypeEnum } from "@/types/server/types";
 
 type Props = ComponentProps<"div"> & {
   shortUrl: string;
   shortCode: string | null;
+  threat: ThreatTypeEnum;
   flaggedInfo: null | {
     flagged: boolean;
     reason: string | null;
@@ -22,6 +24,7 @@ const ShortenedURLResultCard = ({
   className,
   shortUrl,
   shortCode,
+  threat,
   flaggedInfo,
   ...props
 }: Props) => {
@@ -46,9 +49,12 @@ const ShortenedURLResultCard = ({
   return (
     <Card className={cn("rounded-xl", className)} {...props}>
       <CardContent className="space-y-6">
-        <p className="tracking-wide text-sm font-semibold text-muted-foreground">
-          {"✨ We Shrinkified your URL ✨"}
-        </p>
+        <div className="flex gap-2 items-center justify-center">
+          <PartyPopper className="size-4 text-yellow-600" />
+          <p className="tracking-wide text-sm font-semibold text-muted-foreground">
+            {"We Shrinkified your URL"}
+          </p>
+        </div>
 
         <div className="flex items-center gap-2">
           <Input
@@ -60,6 +66,7 @@ const ShortenedURLResultCard = ({
           <Button
             type="button"
             variant={"outline"}
+            disabled={!!threat}
             className="flex-shrink-0"
             onClick={copyToClipboard}
           >
@@ -68,6 +75,7 @@ const ShortenedURLResultCard = ({
           </Button>
           <Button
             type="button"
+            disabled={!!threat}
             variant={"outline"}
             className="flex-shrink-0"
             onClick={showQrCode}
@@ -77,7 +85,7 @@ const ShortenedURLResultCard = ({
         </div>
 
         {flaggedInfo && flaggedInfo.flagged && (
-          <FlaggedURLInfo flaggedInfo={flaggedInfo} />
+          <FlaggedURLInfo threat={threat} flaggedInfo={flaggedInfo} />
         )}
 
         {shortUrl && shortCode && (

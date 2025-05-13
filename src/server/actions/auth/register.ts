@@ -1,10 +1,10 @@
 "use server";
 
-import { ApiResponse } from "@/lib/types";
+import generateId from "@/lib/auth/utils/generate-id";
+import { hashPassword } from "@/lib/auth/utils/password-helpers";
 import { db } from "@/server/db";
 import { users } from "@/server/db/schema";
-import bcrypt from "bcryptjs";
-import { nanoid } from "nanoid";
+import { ApiResponse } from "@/types/server/types";
 import { z } from "zod";
 
 const registerSchema = z.object({
@@ -47,8 +47,8 @@ export async function registerUser(
       };
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const userId = nanoid();
+    const hashedPassword = await hashPassword(password);
+    const userId = generateId();
 
     await db.insert(users).values({
       id: userId,
@@ -56,6 +56,7 @@ export async function registerUser(
       email: email.toLowerCase(),
       password: hashedPassword,
       role: "user",
+      status: "active",
       createdAt: new Date(),
       updatedAt: new Date(),
     });

@@ -26,8 +26,10 @@ export default function RegisterPage() {
         </div>
 
         <Card className="py-10">
-          <CardHeader className="space-y-1">
-            <CardTitle>Sign up</CardTitle>
+          <CardHeader className="mb-2">
+            <CardTitle className="text-xl text-card-foreground/80">
+              Register
+            </CardTitle>
             <CardDescription>
               Fill your details below to create an account.
             </CardDescription>

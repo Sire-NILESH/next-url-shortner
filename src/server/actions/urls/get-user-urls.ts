@@ -1,45 +1,37 @@
 "use server";
 
-import { ApiResponse } from "@/lib/types";
-import { auth } from "@/server/auth";
-import { db } from "@/server/db";
+import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
+import { getUserUrlsByUserId } from "@/server/services/url/get-user-urls-by-userid.service";
+import { UserUrl } from "@/types/client/types";
+import { ApiResponse } from "@/types/server/types";
+import { z } from "zod";
 
-export async function getUserUrls(userId: string): Promise<
-  ApiResponse<
-    Array<{
-      id: number;
-      originalUrl: string;
-      shortCode: string;
-      createdAt: Date;
-      clicks: number;
-    }>
-  >
-> {
+const getUserUrlsSchema = z.object({
+  userId: z.string().min(1),
+});
+
+export type GetUserUrlsParams = z.infer<typeof getUserUrlsSchema>;
+
+export async function getUserUrls(
+  params: GetUserUrlsParams
+): Promise<ApiResponse<Array<UserUrl>>> {
   try {
-    const session = await auth();
-    if (!session?.user || session.user.id !== userId) {
-      return {
-        success: false,
-        error: "Unauthorized",
-      };
+    const parsed = getUserUrlsSchema.safeParse(params);
+
+    if (!parsed.success) {
+      return { success: false, error: "Invalid params" };
     }
 
-    // Get all URLs for the user
-    const userUrls = await db.query.urls.findMany({
-      where: (urls, { eq }) => eq(urls.userId, userId),
-      orderBy: (urls, { desc }) => [desc(urls.createdAt)],
-    });
+    const { userId } = parsed.data;
 
-    return {
-      success: true,
-      data: userUrls.map((url) => ({
-        id: url.id,
-        originalUrl: url.originalUrl,
-        shortCode: url.shortCode,
-        createdAt: url.createdAt,
-        clicks: url.clicks,
-      })),
-    };
+    const authResponse = await authorizeRequest({ requireUserId: userId });
+
+    if (!authResponse.success) return authResponse;
+
+    // Get all URLs for the user
+    const resultsResponse = await getUserUrlsByUserId(userId);
+
+    return resultsResponse;
   } catch (error) {
     console.error("Error getting user URLs", error);
     return {

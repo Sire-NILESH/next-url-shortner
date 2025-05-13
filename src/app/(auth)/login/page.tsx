@@ -26,8 +26,10 @@ export default function LoginPage() {
         </div>
 
         <Card className="py-10">
-          <CardHeader className="space-y-1">
-            <CardTitle>Log in</CardTitle>
+          <CardHeader className="mb-1">
+            <CardTitle className="text-xl text-card-foreground/80">
+              Login
+            </CardTitle>
             <CardDescription>
               Choose a log-in method below to continue.
             </CardDescription>

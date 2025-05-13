@@ -1,8 +1,7 @@
 import { GridBackgroundLayout } from "@/components/backgrounds/grid-background";
 import FooterCompact from "@/components/footer/footer-compact";
 import { DashboardHeader } from "@/components/header/dashboard-header";
-import { auth } from "@/server/auth";
-import { redirect } from "next/navigation";
+import { authorizePageService } from "@/server/services/auth/authorize-page-sevice";
 import { ReactNode } from "react";
 
 interface DashboardLayoutProps {
@@ -12,10 +11,7 @@ interface DashboardLayoutProps {
 export default async function DashboardLayout({
   children,
 }: DashboardLayoutProps) {
-  const session = await auth();
-  if (!session?.user) {
-    redirect("/login");
-  }
+  await authorizePageService();
 
   return (
     <>

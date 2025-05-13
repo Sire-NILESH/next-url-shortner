@@ -1,29 +1,26 @@
 "use client";
 
 import { AuthProvider } from "@/components/providers/auth-provider";
+import QueryProvider from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
-import { cn } from "@/lib/utils";
-import { ComponentProps, useState } from "react";
+import { PropsWithChildren } from "react";
 import "./globals.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-type Props = ComponentProps<"div">;
+type Props = PropsWithChildren;
 
-const Providers = ({ className, children, ...props }: Props) => {
-  // Create a client instance for each request to avoid sharing state between users
-  const [queryClient] = useState(() => new QueryClient());
+const Providers = ({ children }: Props) => {
   return (
-    <div className={cn("", className)} {...props}>
+    <>
       <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
+        <QueryProvider>
           <AuthProvider>
             <ToastProvider />
             {children}
           </AuthProvider>
-        </QueryClientProvider>
+        </QueryProvider>
       </ThemeProvider>
-    </div>
+    </>
   );
 };
 

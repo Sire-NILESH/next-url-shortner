@@ -29,6 +29,41 @@
       "when": 1742463820345,
       "tag": "0003_young_ghost_rider",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1744471272324,
+      "tag": "0004_lively_vivisector",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1744538777556,
+      "tag": "0005_busy_ogun",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1744738267981,
+      "tag": "0006_broken_the_hand",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1746699331272,
+      "tag": "0007_stormy_luke_cage",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1746718161260,
+      "tag": "0008_redundant_silvermane",
+      "breakpoints": true
     }
   ]
 }

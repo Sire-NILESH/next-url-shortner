@@ -1,4 +1,16 @@
-import { House, LayoutDashboard, Link, LogIn, UserPlus } from "lucide-react";
+import {
+  ChartSpline,
+  DatabaseIcon,
+  House,
+  LayoutDashboard,
+  LayoutDashboardIcon,
+  Link,
+  Link2Icon,
+  LinkIcon,
+  LogIn,
+  UserPlus,
+  UsersIcon,
+} from "lucide-react";
 
 export const navRoutes = {
   "/": {
@@ -32,12 +44,6 @@ export const mobileNavRoutes = {
 };
 
 export const dashboardNavRoutes = {
-  // "/stats": {
-  //   id: "stats",
-  //   path: "/stats",
-  //   label: "Stats",
-  //   icon: <BarChart3Icon className="size-4" />,
-  // },
   "/dashboard": {
     id: "dashboard",
     path: "/dashboard",
@@ -51,3 +57,58 @@ export const dashboardNavRoutes = {
     icon: <Link className="size-4" />,
   },
 };
+
+export type AdminDashboardNavItem = {
+  label: string;
+  path: string;
+  icon: React.ReactNode;
+  exact: boolean;
+};
+
+export const adminDashboardNavItems: AdminDashboardNavItem[] = [
+  {
+    label: "Overview",
+    path: "/admin",
+    icon: <LayoutDashboardIcon />,
+    exact: true,
+  },
+  {
+    label: "Analytics",
+    path: "/admin/analytics",
+    icon: <ChartSpline />,
+    exact: true,
+  },
+  {
+    label: "URLs",
+    path: "/admin/urls",
+    icon: <Link2Icon />,
+    exact: true,
+  },
+  {
+    label: "Users",
+    path: "/admin/users",
+    icon: <UsersIcon />,
+    exact: true,
+  },
+  {
+    label: "Database",
+    path: "/admin/database",
+    icon: <DatabaseIcon />,
+    exact: true,
+  },
+];
+
+export const adminDashboardPlatformNavItems: AdminDashboardNavItem[] = [
+  {
+    label: "Dashboard",
+    path: "/dashboard",
+    icon: <LayoutDashboardIcon />,
+    exact: true,
+  },
+  {
+    label: "My URLs",
+    path: "/my-urls",
+    icon: <LinkIcon />,
+    exact: true,
+  },
+];

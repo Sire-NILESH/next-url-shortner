@@ -10,24 +10,19 @@ export interface TestimonialAuthor {
 export interface TestimonialCardProps {
   author: TestimonialAuthor;
   text: string;
-  href?: string;
   className?: string;
 }
 
 export function TestimonialCard({
   author,
   text,
-  href,
   className,
 }: TestimonialCardProps) {
-  const Card = href ? "a" : "div";
-
   return (
-    <Card
-      {...(href ? { href } : {})}
+    <div
       className={cn(
         "flex flex-col rounded-lg border border-b-border/30",
-        "bg-gradient-to-b from-muted/70 to-muted/30",
+        "bg-gradient-to-b from-muted to-muted/60",
         "p-4 text-start sm:p-6",
         "hover:from-muted/60 hover:to-muted/20",
         "max-w-[320px] sm:max-w-[320px]",
@@ -37,7 +32,7 @@ export function TestimonialCard({
     >
       <div className="flex items-center gap-3">
         <Avatar className="h-12 w-12">
-          <AvatarImage src={author.avatar} alt={author.name} />
+          <AvatarImage loading="lazy" src={author.avatar} alt={author.name} />
         </Avatar>
         <div className="flex flex-col items-start">
           <h3 className="text-md font-semibold leading-none">{author.name}</h3>
@@ -45,6 +40,6 @@ export function TestimonialCard({
         </div>
       </div>
       <p className="sm:text-md mt-4 text-sm text-muted-foreground">{text}</p>
-    </Card>
+    </div>
   );
 }

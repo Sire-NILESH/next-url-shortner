@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import PasswordInput from "../password-input";
 import { Button } from "../ui/button";
 import {
   Form,
@@ -19,8 +20,8 @@ import {
 import { Input } from "../ui/input";
 import GoogleLoginIcon from "./google-login-icon";
 import { loginSchema } from "./schema";
-import useGoogleAuthLogin from "./useGoogleAuthLogin";
-import useLogin from "./useLogin";
+import useGoogleAuthLogin from "./hooks/useGoogleAuthLogin";
+import useLogin from "./hooks/useLogin";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -122,10 +123,7 @@ export function LoginForm() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="********"
-                    type="password"
-                    autoComplete="current-password"
+                  <PasswordInput
                     disabled={loginMutation.isPending}
                     {...field}
                   />
