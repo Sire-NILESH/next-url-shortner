@@ -11,10 +11,12 @@ import React, { ComponentProps } from "react";
 type Props = ComponentProps<"div"> & {
   value?: string | undefined;
   onValueChange?(value: string): void;
+  selectTriggerClassName?: string;
 };
 
 const TimeRangeSelect = ({
   className,
+  selectTriggerClassName,
   value,
   onValueChange,
   ...props
@@ -23,7 +25,10 @@ const TimeRangeSelect = ({
     <div className={cn("", className)} {...props}>
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger
-          className="@[767px]/card:hidden flex w-30"
+          className={cn(
+            "@[767px]/card:hidden flex w-30",
+            selectTriggerClassName
+          )}
           aria-label="Select a value"
         >
           <SelectValue placeholder="Past 6M" />

@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   await authorizePageService();
 
   return (
-    <div>
+    <div className="h-full px-4">
       <DashboardIntroCard
         pageTitle={"My Dashboard"}
         pageSubtitle="this is your shrinkify urls dashboard"

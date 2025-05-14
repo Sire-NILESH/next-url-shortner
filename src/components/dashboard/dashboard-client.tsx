@@ -118,28 +118,28 @@ export default function DashboardClient() {
         </SkeletonWrapper>
       </div>
 
-      <Card>
-        <CardHeader className="px-4 md:px-6">
+      <Card className="bg-transparent border-transparent shadow-none sm:bg-card sm:border-border sm:shadow-sm">
+        <CardHeader className="px-2 sm:px-6">
           <CardTitle>URL Performance</CardTitle>
           <CardDescription>
             Take a glance at how your urls are performing
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="px-4 md:px-6">
+        <CardContent className="px-0 md:px-6">
           <>
             <SkeletonWrapper isLoading={isLoading} className="rounded-xl">
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
-                <NewShrinkifyURLCard className="bg-secondary/40" />
+                <NewShrinkifyURLCard className="bg-card sm:bg-secondary/40" />
                 {userUrls && userUrls.length > 0 ? (
                   <>
                     <UrlsHistoryChart
                       userUrls={userUrls}
-                      className="bg-secondary/40"
+                      className="bg-card sm:bg-secondary/40"
                     />
 
                     <UrlClicksDistributionCard
-                      className="bg-secondary/40"
+                      className="bg-card sm:bg-secondary/40"
                       pieChartConfig={pieChartConfig}
                       pieChartData={pieChartData}
                       topUrlsLen={topUrls.length}

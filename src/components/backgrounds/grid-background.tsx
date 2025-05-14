@@ -17,7 +17,7 @@ export function GridBackgroundLayout({ children, className, ...props }: Props) {
         <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-black bg-gray-100 [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]" />
       </div>
 
-      <div className="container mx-2">{children}</div>
+      <div className="container">{children}</div>
     </div>
   );
 }

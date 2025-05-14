@@ -45,8 +45,7 @@ export async function checkUrlAccess(
   const [creator] = await db
     .select({ status: users.status })
     .from(users)
-    .where(eq(users.id, url.userId))
-    .limit(1);
+    .where(eq(users.id, url.userId));
 
   if (!creator) return { allowed: false, reason: "not_found" };
 

@@ -18,7 +18,7 @@ export default async function DashboardLayout({
       <DashboardHeader />
       <div className="flex flex-col min-h-screen">
         <GridBackgroundLayout>
-          <div className="container px-2 md:p-0 my-32">{children}</div>
+          <div className="container sm:px-4 md:p-0 my-32">{children}</div>
         </GridBackgroundLayout>
       </div>
       <FooterCompact />
