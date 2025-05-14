@@ -157,7 +157,7 @@ export default function UserUrlTable({ className, ...props }: Props) {
   return (
     <div
       className={cn(
-        "w-full min-h-full border rounded-lg p-4 space-y-6 md:space-y-0 bg-secondary/40",
+        "w-full min-h-full border shadow-sm rounded-lg p-4 space-y-6 md:space-y-0 bg-card sm:bg-secondary/40",
         className
       )}
       {...props}

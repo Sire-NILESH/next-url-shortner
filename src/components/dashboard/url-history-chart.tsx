@@ -68,7 +68,7 @@ export const UrlsHistoryChart = ({
             data={chartData}
             layout="vertical"
             margin={{
-              left: -20,
+              left: -10,
             }}
           >
             <XAxis type="number" dataKey="urls" hide />
