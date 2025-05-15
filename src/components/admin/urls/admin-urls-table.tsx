@@ -707,10 +707,10 @@ export function AdminUrlsTable({
                                 {url.userName || "Unknown User"}
                               </span>
                             </div>
-                            <div>
+                            <div className="truncate">
                               <span
                                 title={url.userEmail || "Unknown email"}
-                                className="truncate text-muted-foreground"
+                                className="text-muted-foreground"
                               >
                                 {url.userEmail || "Unknown email"}
                               </span>
