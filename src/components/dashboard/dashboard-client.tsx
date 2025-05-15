@@ -126,7 +126,7 @@ export default function DashboardClient() {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="px-0 md:px-6">
+        <CardContent className="px-0 sm:px-6">
           <>
             <SkeletonWrapper isLoading={isLoading} className="rounded-xl">
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">

@@ -13,7 +13,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { prepareUrlHistoryChartData } from "@/lib/prepare-url-history-chart-data";
-import timeRanges, { getTimeRangeLabel, TimeRange } from "@/lib/timeRanges";
+import { getTimeRangeLabel, TimeRange } from "@/lib/timeRanges";
 import { cn } from "@/lib/utils";
 import { UserUrl } from "@/types/client/types";
 import { History } from "lucide-react";
@@ -44,12 +44,17 @@ export const UrlsHistoryChart = ({
   }, [userUrls, timeRange]);
 
   return (
-    <Card className={cn("", className)} {...props}>
+    <Card className={cn("@container", className)} {...props}>
       <CardHeader className="relative flex flex-row gap-3 items-center pb-2">
         <History className="size-10 md:size-12 items-center rounded-lg p-2 text-purple-500 bg-purple-400/10" />
         <div className="space-y-1">
           <CardTitle>URL History</CardTitle>
-          <CardDescription>{getTimeRangeLabel(timeRange)}</CardDescription>
+          <CardDescription className="hidden @md:block">
+            {"Your urls generated over time"}
+          </CardDescription>
+          <CardDescription className="block @md:hidden">
+            {"Your urls over time"}
+          </CardDescription>
         </div>
 
         <TimeRangeSelect
@@ -94,17 +99,13 @@ export const UrlsHistoryChart = ({
         </ChartContainer>
       </CardContent>
       <CardFooter>
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              {`${totalUrls} URLs generated over this period`}
-            </div>
-            <div className="flex items-center gap-2 leading-none text-muted-foreground">
-              {timeRange === "all time"
-                ? "Total shrinkifiy URLs till today"
-                : `Showing total shrinkify URLs for the last ${timeRanges[timeRange]}`}
-            </div>
-          </div>
+        <div className="mx-auto text-center text-sm space-y-2">
+          <p className="leading-none">
+            {`${totalUrls} URLs generated over this period`}
+          </p>
+          <p className="leading-none text-muted-foreground">
+            {getTimeRangeLabel(timeRange)}
+          </p>
         </div>
       </CardFooter>
     </Card>

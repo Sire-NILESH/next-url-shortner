@@ -104,12 +104,14 @@ export const UrlClicksDistributionCard = ({
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          {`${pieChartData[0].url} is your best performing url`}
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing click counts for your top {topUrlsLen} URLs till today
+      <CardFooter>
+        <div className="mx-auto text-center text-sm space-y-2">
+          <p className="leading-none">
+            {`${pieChartData[0].url} is your best performing url`}
+          </p>
+          <p className="leading-none text-muted-foreground">
+            Showing click counts for your top {topUrlsLen} URLs till today
+          </p>
         </div>
       </CardFooter>
     </Card>
