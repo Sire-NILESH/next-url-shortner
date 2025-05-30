@@ -9,9 +9,8 @@ import {
 } from "@/components/ui/card";
 
 import AdminPageHeader from "@/components/admin/admin-page-header";
-import { auth } from "@/server/auth";
+import { authorizePageService } from "@/server/services/auth/authorize-page-sevice";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { adminModules } from "../page";
 
 export const metadata: Metadata = {
@@ -33,17 +32,7 @@ export default async function UserManagementPage({
     sortOrder?: string;
   }>;
 }) {
-  const session = await auth();
-
-  // Redirect to login if not authenticated
-  if (!session?.user) {
-    redirect("/login");
-  }
-
-  // Redirect to dashboard if not an admin
-  if (session.user.role !== "admin") {
-    redirect("/dashboard");
-  }
+  await authorizePageService({ allowedRoles: ["admin"] });
 
   // Parse search params
   const params = await searchParams;

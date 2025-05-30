@@ -8,9 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { auth } from "@/server/auth";
+import { authorizePageService } from "@/server/services/auth/authorize-page-sevice";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { adminModules } from "../page";
 
 export const metadata: Metadata = {
@@ -33,15 +32,7 @@ export default async function AdminUrlsPage({
     filter?: string;
   }>;
 }) {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/login");
-  }
-
-  if (session?.user.role !== "admin") {
-    redirect("/dashboard");
-  }
+  await authorizePageService({ allowedRoles: ["admin"] });
 
   const params = await searchParams;
 

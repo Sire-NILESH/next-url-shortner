@@ -65,7 +65,7 @@ import {
   UserRoleTypeEnum,
   UserStatusTypeEnum,
 } from "@/types/server/types";
-import { collectSearchParam } from "@/lib/utils";
+import { cn, collectSearchParam } from "@/lib/utils";
 
 type SortBy = GetAllUsersOptions["sortBy"];
 type SortOrder = "asc" | "desc";
@@ -614,18 +614,19 @@ export function UsersTable({
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              className={
-                                user.role === "admin"
-                                  ? "text-destructive"
-                                  : "text-blue-600"
-                              }
+                              className={cn(
+                                "text-blue-600",
+                                user.role === "admin" ? "text-destructive" : ""
+                              )}
                               onClick={() =>
                                 handleRoleToggle({
                                   userId: user.id,
                                   currentRole: user.role,
                                 })
                               }
-                              disabled={isCurrentRowPerformingAction(user.id)}
+                              // currently, this feature is under review and hence is disabled.
+                              disabled={true}
+                              // disabled={isCurrentRowPerformingAction(user.id)}
                             >
                               {user.role === "user" ? (
                                 <ShieldIcon className="mr-2 size-3.5 text-blue-600" />

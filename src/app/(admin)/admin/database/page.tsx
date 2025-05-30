@@ -10,6 +10,8 @@ import {
 import { AlertTriangle, CloudUpload } from "lucide-react";
 import { Metadata } from "next";
 import { adminModules } from "../page";
+import SeedUnavailable from "@/components/admin/seed/seed-unavailable";
+import { authorizePageService } from "@/server/services/auth/authorize-page-sevice";
 
 export const metadata: Metadata = {
   title: "Database Management - Admin | Shrinkify",
@@ -20,7 +22,13 @@ const [adminUrlsPageModule] = adminModules.filter(
   (module) => module.id === "admin-db-mamangement"
 );
 
-export default function DatabasePage() {
+const isProductionMode = process.env.NODE_ENV === "production";
+
+console.log({ isProductionMode, env: process.env.NODE_ENV });
+
+export default async function DatabasePage() {
+  await authorizePageService({ allowedRoles: ["admin"] });
+
   return (
     <>
       <AdminPageHeader className="mb-6" module={adminUrlsPageModule} />
@@ -64,7 +72,7 @@ export default function DatabasePage() {
             </div>
 
             <div>
-              <SeedOptionsForm />
+              {isProductionMode ? <SeedUnavailable /> : <SeedOptionsForm />}
             </div>
           </CardContent>
         </Card>

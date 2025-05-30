@@ -1,7 +1,6 @@
 import { GridBackgroundLayout } from "@/components/backgrounds/grid-background";
 import FooterCompact from "@/components/footer/footer-compact";
 import { DashboardHeader } from "@/components/header/dashboard-header";
-import { authorizePageService } from "@/server/services/auth/authorize-page-sevice";
 import { ReactNode } from "react";
 
 interface DashboardLayoutProps {
@@ -11,8 +10,6 @@ interface DashboardLayoutProps {
 export default async function DashboardLayout({
   children,
 }: DashboardLayoutProps) {
-  await authorizePageService();
-
   return (
     <>
       <DashboardHeader />
