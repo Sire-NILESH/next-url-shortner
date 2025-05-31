@@ -41,7 +41,7 @@ export function getTimeRangeLabel(range: TimeRange): string {
       return `${format(from, "MMM yyyy")} - ${format(now, "MMM yyyy")}`;
     }
     case "1Y": {
-      const from = sub(now, { years: 1 });
+      const from = sub(now, { months: 11 });
       return `${format(from, "MMM yyyy")} - ${format(now, "MMM yyyy")}`;
     }
     case "all time": {

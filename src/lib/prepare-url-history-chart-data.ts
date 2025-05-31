@@ -1,5 +1,15 @@
+import {
+  sub,
+  add,
+  format,
+  isAfter,
+  startOfDay,
+  startOfHour,
+  startOfMonth,
+  startOfYear,
+} from "date-fns";
+
 import { UrlsHistoryChartDataType, UserUrl } from "@/types/client/types";
-import { sub, add, format, isAfter } from "date-fns";
 
 type TimeRange = "24H" | "7D" | "30D" | "3M" | "6M" | "1Y" | "all time";
 
@@ -15,27 +25,28 @@ export const prepareUrlHistoryChartData = (
   const now = new Date();
   let fromDate = new Date(2000, 0); // default all time
 
+  // Adjust fromDate to the start of the appropriate time unit
   switch (timeRange) {
     case "24H":
-      fromDate = sub(now, { hours: 23 });
+      fromDate = startOfHour(sub(now, { hours: 23 }));
       break;
     case "7D":
-      fromDate = sub(now, { days: 6 });
+      fromDate = startOfDay(sub(now, { days: 6 }));
       break;
     case "30D":
-      fromDate = sub(now, { days: 29 });
+      fromDate = startOfDay(sub(now, { days: 29 }));
       break;
     case "3M":
-      fromDate = sub(now, { months: 2 });
+      fromDate = startOfMonth(sub(now, { months: 2 })); // include 3 full months
       break;
     case "6M":
-      fromDate = sub(now, { months: 5 });
+      fromDate = startOfMonth(sub(now, { months: 5 })); // include 6 full months
       break;
     case "1Y":
-      fromDate = sub(now, { years: 1 });
+      fromDate = startOfMonth(sub(now, { months: 11 })); // include 12 full months
       break;
     case "all time":
-      fromDate = new Date(2023, 0); // or find from earliest `createdAt`
+      fromDate = startOfYear(new Date(2023, 0)); // or earliest createdAt date
       break;
   }
 
@@ -45,19 +56,17 @@ export const prepareUrlHistoryChartData = (
   // Determine format and step
   let formatStr = "MMM yyyy";
   let stepUnit: "hour" | "day" | "month" | "year" = "month";
-  let stepCount = 1;
+  const stepCount = 1;
   const timePoints: Map<string, number> = new Map();
 
   switch (timeRange) {
     case "24H":
       formatStr = "hh a";
       stepUnit = "hour";
-      stepCount = 1;
       break;
     case "7D":
       formatStr = "EEE"; // Sun, Mon, etc.
       stepUnit = "day";
-      stepCount = 1;
       break;
     case "30D":
       formatStr = "dd/MM";
@@ -72,7 +81,6 @@ export const prepareUrlHistoryChartData = (
     case "all time":
       formatStr = "yyyy";
       stepUnit = "year";
-      stepCount = 1;
       break;
   }
 
@@ -95,7 +103,7 @@ export const prepareUrlHistoryChartData = (
       case "month":
         cursor = add(cursor, { months: stepCount });
         break;
-      case "year": // <- ADD THIS
+      case "year":
         cursor = add(cursor, { years: stepCount });
         break;
     }

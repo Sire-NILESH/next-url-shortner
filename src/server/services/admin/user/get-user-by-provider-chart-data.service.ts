@@ -46,7 +46,7 @@ export const getUsersByProviderChartData = async (
         fromDate = sub(now, { months: 5 });
         break;
       case "1Y":
-        fromDate = sub(now, { years: 1 });
+        fromDate = sub(now, { months: 11 });
         break;
       case "all time":
         fromDate = new Date(2023, 0);

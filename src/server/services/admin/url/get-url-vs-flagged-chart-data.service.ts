@@ -58,7 +58,7 @@ export const getUrlVsFlaggedChartData = async (
         format = "Mon";
         break;
       case "1Y":
-        fromDate = sub(now, { years: 1 });
+        fromDate = sub(now, { months: 11 });
         interval = "1 month";
         format = "Mon YYYY";
         break;
