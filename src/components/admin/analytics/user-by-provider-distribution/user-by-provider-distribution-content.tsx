@@ -9,6 +9,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { formatNumber } from "@/lib/formatNum";
 
 type UserByProviderDistributionData = {
   providerType: string;
@@ -73,7 +74,9 @@ const UserByProviderDistributionContent = ({
             dataKey="users"
             nameKey="providerType"
             innerRadius={60}
-            strokeWidth={5}
+            strokeWidth={1}
+            label
+            labelLine={false}
           >
             <Label
               content={({ viewBox }) => {
@@ -93,7 +96,7 @@ const UserByProviderDistributionContent = ({
                         {chartData.length === 1 &&
                         chartData[0].providerType === "None"
                           ? "0"
-                          : totalUsers.toLocaleString()}
+                          : formatNumber(totalUsers)}
                       </tspan>
                       <tspan
                         x={viewBox.cx}

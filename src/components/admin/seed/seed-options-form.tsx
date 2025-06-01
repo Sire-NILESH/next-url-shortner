@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import {
   SeedOptions,
   seedOptionsSchema,
@@ -29,7 +30,7 @@ import { seedDatabase } from "@/server/actions/seed/seed";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { CloudUpload, Loader } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -53,6 +54,28 @@ export default function SeedOptionsForm() {
     resolver: zodResolver(formSchema),
   });
 
+  const userCount = useWatch({ control: form.control, name: "userCount" });
+  const maxUrlsPerUser = useWatch({
+    control: form.control,
+    name: "maxUrlsPerUser",
+  });
+  const maxClicksPerUrl = useWatch({
+    control: form.control,
+    name: "maxClicksPerUrl",
+  });
+  const flaggedUrlRate = useWatch({
+    control: form.control,
+    name: "flaggedUrlRate",
+  });
+  const period = useWatch({ control: form.control, name: "period" });
+
+  const { isConfirmModalOpen, toggleConfirmModal } = useConfirmaModal();
+
+  function onConfirmModalHandler() {
+    seedMutation(form.getValues());
+    toggleConfirmModal();
+  }
+
   const { mutate: seedMutation, isPending } = useMutation({
     mutationFn: seedDB,
     onSuccess: (response, variables) => {
@@ -75,13 +98,6 @@ export default function SeedOptionsForm() {
       });
     },
   });
-
-  const { isConfirmModalOpen, toggleConfirmModal } = useConfirmaModal();
-
-  function onConfirmModalHandler() {
-    seedMutation(form.getValues());
-    toggleConfirmModal();
-  }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -203,6 +219,48 @@ export default function SeedOptionsForm() {
               </FormItem>
             )}
           />
+
+          {/* Estimates */}
+          <div className="my-10 space-y-4">
+            <p className="text-sm italic">
+              This seed will roughly create these records in the DB
+            </p>
+
+            <ul className="w-full sm:max-w-xs text-sm space-y-1.5 text-muted-foreground">
+              <li className="grid grid-cols-2">
+                <em className="text-foreground">Users:</em>
+                <span>{userCount ? userCount : 0}</span>
+              </li>
+              <Separator />
+              <li className="grid grid-cols-2">
+                <em className="text-foreground">URLs: </em>
+                <span>
+                  {userCount && maxUrlsPerUser ? userCount * maxUrlsPerUser : 0}
+                </span>
+              </li>
+              <Separator />
+              <li className="grid grid-cols-2">
+                <em className="text-foreground">Flagged URLs: </em>
+                <span>
+                  {flaggedUrlRate ? Math.round(flaggedUrlRate * 100) : 0}%
+                </span>
+              </li>
+              <Separator />
+              <li className="grid grid-cols-2">
+                <em className="text-foreground">Clicks: </em>
+                <span>
+                  {userCount && maxUrlsPerUser && maxClicksPerUrl
+                    ? userCount * maxUrlsPerUser * maxClicksPerUrl
+                    : 0}
+                </span>
+              </li>
+              <Separator />
+              <li className="grid grid-cols-2">
+                <em className="text-foreground">Peroid: </em>
+                <span>{period ? period : "unknown"}</span>
+              </li>
+            </ul>
+          </div>
 
           <Button type="submit" className="w-full sm:max-w-fit">
             <div className="font-medium flex items-center gap-2">

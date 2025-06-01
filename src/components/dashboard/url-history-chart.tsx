@@ -18,7 +18,14 @@ import { cn } from "@/lib/utils";
 import { UserUrl } from "@/types/client/types";
 import { History } from "lucide-react";
 import { ComponentProps, useMemo, useState } from "react";
-import { Bar, BarChart, LabelList, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  LabelList,
+  XAxis,
+  YAxis,
+} from "recharts";
 import TimeRangeSelect from "../admin/analytics/time-range-select";
 
 interface UrlsHistoryChartProps extends ComponentProps<"div"> {
@@ -76,6 +83,7 @@ export const UrlsHistoryChart = ({
               left: -10,
             }}
           >
+            <CartesianGrid vertical={false} />
             <XAxis type="number" dataKey="urls" hide />
             <YAxis
               dataKey="period"
@@ -92,7 +100,7 @@ export const UrlsHistoryChart = ({
                 position="right"
                 offset={8}
                 className="fill-foreground"
-                fontSize={12}
+                fontSize={timeRange === "30D" || timeRange === "24H" ? 10 : 12}
               />
             </Bar>
           </BarChart>
