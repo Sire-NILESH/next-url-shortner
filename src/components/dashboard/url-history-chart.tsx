@@ -35,7 +35,7 @@ interface UrlsHistoryChartProps extends ComponentProps<"div"> {
 const urlHistoryChartConfig = {
   urls: {
     label: "URLs",
-    color: "hsl(var(--chart-1))",
+    color: "var(--chart-1)",
   },
 } satisfies ChartConfig;
 

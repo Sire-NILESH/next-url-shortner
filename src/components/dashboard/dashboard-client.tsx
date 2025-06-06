@@ -50,7 +50,7 @@ export default function DashboardClient() {
     return topUrls.map((url, index) => ({
       url: url.shortCode,
       clicks: url.clicks,
-      fill: `hsl(var(--chart-${index + 1}))`,
+      fill: `var(--chart-${index + 1})`,
     }));
   }, [topUrls]);
 

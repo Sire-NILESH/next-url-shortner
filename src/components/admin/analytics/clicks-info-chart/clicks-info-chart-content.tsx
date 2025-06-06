@@ -25,11 +25,11 @@ type Props = ComponentProps<"div"> & {
 const chartConfig = {
   clicks: {
     label: "Clicks",
-    color: "hsl(var(--chart-1))",
+    color: "var(--chart-1)",
   },
   flaggedClicks: {
     label: "Flagged",
-    color: "hsl(var(--chart-3))",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
 

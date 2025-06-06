@@ -48,7 +48,7 @@ const UserByProviderDistributionContent = ({
     return chartData.map((curr, index) => ({
       providerType: curr.providerType,
       users: curr.users,
-      fill: `hsl(var(--chart-${index + 1}))`,
+      fill: `var(--chart-${index + 1})`,
     }));
   }, [chartData]);
 

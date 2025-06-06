@@ -23,11 +23,11 @@ type Props = ComponentProps<"div"> & {
 const chartConfig = {
   urls: {
     label: "URLs",
-    color: "hsl(var(--chart-1))",
+    color: "var(--chart-1)",
   },
   flaggedUrls: {
     label: "Flagged",
-    color: "hsl(var(--chart-2))",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
 
