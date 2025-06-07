@@ -21,9 +21,13 @@ export function UrlFilter({ initialFilter, refreshHandler }: UrlFilterProps) {
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("page", "1");
+      let params = new URLSearchParams();
+      if (value !== "all") {
+        // if not "all" then also consider the previous search params and extend it. "all" is treated like a clear search params
+        params = new URLSearchParams(searchParams);
+      }
       params.set(name, value);
+      params.set("page", "1");
       return params.toString();
     },
     [searchParams]

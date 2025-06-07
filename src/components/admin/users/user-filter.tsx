@@ -1,8 +1,9 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { FacetedFilter } from "@/components/ui/faceted-filter";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 const roleOptions = [
   { label: "Admin", value: "admin" },
@@ -40,51 +41,75 @@ export function UserFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [roles, setRoles] = useState(() =>
-    parseParamSet(searchParams, "roles")
-  );
-  const [statuses, setStatuses] = useState(() =>
-    parseParamSet(searchParams, "statuses")
-  );
-  const [providers, setProviders] = useState(() =>
-    parseParamSet(searchParams, "providers")
-  );
+  const searchParamsSnapshot = useRef<string>("");
+
+  const externalRoles = parseParamSet(searchParams, "roles");
+  const externalStatuses = parseParamSet(searchParams, "statuses");
+  const externalProviders = parseParamSet(searchParams, "providers");
+  const hasParams =
+    !!externalRoles.size || !!externalStatuses.size || !!externalProviders.size;
+
+  const [roles, setRoles] = useState(externalRoles);
+  const [statuses, setStatuses] = useState(externalStatuses);
+  const [providers, setProviders] = useState(externalProviders);
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  const updateUrlParams = useCallback(
-    (
-      nextRoles: Set<string>,
-      nextStatuses: Set<string>,
-      nextProviders: Set<string>
-    ) => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
+  // Sync state with URL when URL changes outside the component
+  const currentParamsStr = searchParams.toString();
+  if (searchParamsSnapshot.current !== currentParamsStr) {
+    searchParamsSnapshot.current = currentParamsStr;
+    setRoles(externalRoles);
+    setStatuses(externalStatuses);
+    setProviders(externalProviders);
+  }
 
-      debounceRef.current = setTimeout(() => {
-        const query = buildQueryString(nextRoles, nextStatuses, nextProviders);
-        router.push(query);
-      }, 1000);
-    },
-    [router]
-  );
+  function updateUrlParams(
+    nextRoles: Set<string>,
+    nextStatuses: Set<string>,
+    nextProviders: Set<string>
+  ) {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
 
-  const handleFilterChange = (
+    debounceRef.current = setTimeout(() => {
+      const query = buildQueryString(nextRoles, nextStatuses, nextProviders);
+      router.push(query);
+    }, 1000);
+  }
+
+  function handleFilterChange(
     key: "roles" | "statuses" | "providers",
     values: Set<string>
-  ) => {
-    if (key === "roles") setRoles(values);
-    else if (key === "statuses") setStatuses(values);
-    else if (key === "providers") setProviders(values);
+  ) {
+    const nextRoles = key === "roles" ? values : roles;
+    const nextStatuses = key === "statuses" ? values : statuses;
+    const nextProviders = key === "providers" ? values : providers;
 
-    updateUrlParams(
-      key === "roles" ? values : roles,
-      key === "statuses" ? values : statuses,
-      key === "providers" ? values : providers
-    );
-  };
+    setRoles(nextRoles);
+    setStatuses(nextStatuses);
+    setProviders(nextProviders);
+
+    updateUrlParams(nextRoles, nextStatuses, nextProviders);
+  }
+
+  function resetFilters() {
+    setRoles(new Set());
+    setStatuses(new Set());
+    setProviders(new Set());
+    router.push(window.location.pathname);
+  }
 
   return (
     <div className="flex flex-wrap gap-2">
+      <Button
+        variant={hasParams ? "outline" : "default"}
+        size={"sm"}
+        onClick={resetFilters}
+        className="gap-2"
+      >
+        All Users
+      </Button>
+
       <FacetedFilter
         title="Role"
         options={roleOptions}

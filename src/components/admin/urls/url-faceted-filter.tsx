@@ -1,8 +1,8 @@
 "use client";
 
 import { FacetedFilter } from "@/components/ui/faceted-filter";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useRef, useState } from "react";
 
 const threatOptions = [
   { label: "Malware", value: "MALWARE" },
@@ -50,51 +50,54 @@ export function UrlFacetedFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [threats, setThreats] = useState(() =>
-    parseParamSet(searchParams, "threats")
-  );
-  const [statuses, setStatuses] = useState(() =>
-    parseParamSet(searchParams, "statuses")
-  );
-  const [categories, setCategories] = useState(() =>
-    parseParamSet(searchParams, "categories")
-  );
+  const searchParamsSnapshot = useRef<string>("");
+
+  const externalThreats = parseParamSet(searchParams, "threats");
+  const externalStatuses = parseParamSet(searchParams, "statuses");
+  const externalCategories = parseParamSet(searchParams, "categories");
+
+  // local state that updates instantly
+  const [threats, setThreats] = useState(externalThreats);
+  const [statuses, setStatuses] = useState(externalStatuses);
+  const [categories, setCategories] = useState(externalCategories);
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  const updateUrlParams = useCallback(
-    (
-      nextThreats: Set<string>,
-      nextStatuses: Set<string>,
-      nextCategories: Set<string>
-    ) => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
+  // Detect if URL changed from outside, and sync local state
+  const currentParamsStr = searchParams.toString();
+  if (searchParamsSnapshot.current !== currentParamsStr) {
+    searchParamsSnapshot.current = currentParamsStr;
+    setThreats(externalThreats);
+    setStatuses(externalStatuses);
+    setCategories(externalCategories);
+  }
 
-      debounceRef.current = setTimeout(() => {
-        const query = buildQueryString(
-          nextThreats,
-          nextStatuses,
-          nextCategories
-        );
-        router.push(query);
-      }, 1000);
-    },
-    [router]
-  );
+  const updateUrlParams = (
+    nextThreats: Set<string>,
+    nextStatuses: Set<string>,
+    nextCategories: Set<string>
+  ) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(() => {
+      const query = buildQueryString(nextThreats, nextStatuses, nextCategories);
+      router.push(query);
+    }, 1000);
+  };
 
   const handleFilterChange = (
     key: "threats" | "statuses" | "categories",
     values: Set<string>
   ) => {
-    if (key === "threats") setThreats(values);
-    else if (key === "statuses") setStatuses(values);
-    else if (key === "categories") setCategories(values);
+    const nextThreats = key === "threats" ? values : threats;
+    const nextStatuses = key === "statuses" ? values : statuses;
+    const nextCategories = key === "categories" ? values : categories;
 
-    updateUrlParams(
-      key === "threats" ? values : threats,
-      key === "statuses" ? values : statuses,
-      key === "categories" ? values : categories
-    );
+    setThreats(nextThreats);
+    setStatuses(nextStatuses);
+    setCategories(nextCategories);
+
+    updateUrlParams(nextThreats, nextStatuses, nextCategories);
   };
 
   return (
