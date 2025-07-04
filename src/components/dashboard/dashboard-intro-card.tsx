@@ -49,7 +49,7 @@ const DashboardIntroCard = async ({
 
       <CardContent className="flex-1 space-y-2">
         <div className="flex gap-4 lg:gap-6 items-center">
-          <h1 className="text-2xl md:text-3xl boldText !font-semibold">
+          <h1 className="text-xl md:text-3xl boldText !font-semibold">
             {pageTitle}
           </h1>
 
@@ -69,7 +69,7 @@ const DashboardIntroCard = async ({
             </>
           ) : null}
         </div>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-sm md:text-base">
           Hi <span className="font-semibold">{userName}</span>, {pageSubtitle}
         </p>
       </CardContent>
