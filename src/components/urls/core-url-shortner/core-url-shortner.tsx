@@ -170,7 +170,7 @@ export function CoreUrlShortner({ className, ...props }: Props) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="flex flex-col gap-4 md:gap-0 md:flex-row items-center w-full @sm:w-fit @sm:max-w-lg mx-auto">
+                    <div className="flex flex-col gap-4 @md:gap-0 @md:flex-row items-center w-full @sm:w-fit @sm:max-w-lg mx-auto">
                       <span className="text-sm text-muted-foreground mr-2">
                         {BASE_URL}
                         /r/
