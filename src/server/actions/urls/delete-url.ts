@@ -2,6 +2,8 @@
 
 import { db, eq } from "@/server/db";
 import { urls } from "@/server/db/schema";
+import { userUrlsCache } from "@/server/redis/cache/urls/user-urls-cache";
+import { applyRateLimit } from "@/server/redis/ratelimiter";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 import { z } from "zod";
@@ -21,6 +23,18 @@ export async function deleteUrl(
     if (!authResponse.success) return authResponse;
 
     const { data: session } = authResponse;
+
+    // Rate limit check
+    const limiterResult = await applyRateLimit({
+      limiterKey: "userUrlModificatonsRateLimit",
+    });
+
+    if (!limiterResult?.success) {
+      return {
+        success: false,
+        error: "Too many requests, please try again later.",
+      };
+    }
 
     const parsed = deleteUrlSchema.safeParse(params);
 
@@ -47,6 +61,9 @@ export async function deleteUrl(
     }
 
     await db.delete(urls).where(eq(urls.id, urlId));
+
+    // Delete existing user urls cache data in redis
+    await userUrlsCache.delete(session.user.id);
 
     return {
       success: true,

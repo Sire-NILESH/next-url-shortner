@@ -2,6 +2,7 @@
 
 import { db, eq } from "@/server/db";
 import { users, userStatusEnum } from "@/server/db/schema";
+import { userStatusCache } from "@/server/redis/cache/users/user-status-cache";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 import { z } from "zod";
@@ -66,6 +67,9 @@ export async function updateUserStatus(
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId));
+
+    // Delete existing user urls cache data in redis
+    await userStatusCache.delete(userId); //the user id from param and not session, else it will change the status of admin itself.
 
     return {
       success: true,

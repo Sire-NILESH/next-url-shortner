@@ -3,6 +3,7 @@
 import { ensureHttps, getShrinkifyUrl, isValidUrl } from "@/lib/utils";
 import { db } from "@/server/db";
 import { urls } from "@/server/db/schema";
+import { applyRateLimit } from "@/server/redis/ratelimiter";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ensureValidUserStatus } from "@/server/services/user/ensure-valid-user-status";
 import {
@@ -13,6 +14,7 @@ import {
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { checkUrlSafety } from "../../services/url/check-url-safety.service";
+import { userUrlsCache } from "@/server/redis/cache/urls/user-urls-cache";
 
 const shrinkifyUrlSchema = z.object({
   url: z.string().refine(isValidUrl, {
@@ -37,6 +39,7 @@ export async function createShrinkifyUrl(formData: FormData): Promise<
   }>
 > {
   try {
+    // 1 - Auth check
     const authResponse = await authorizeRequest();
 
     if (!authResponse.success) return authResponse;
@@ -44,10 +47,24 @@ export async function createShrinkifyUrl(formData: FormData): Promise<
     const { data: session } = authResponse;
     const userId = session.user.id;
 
+    // 2 - Rate limit check
+    const limiterResult = await applyRateLimit({
+      limiterKey: "urlShortenRateLimit",
+    });
+
+    if (!limiterResult?.success) {
+      return {
+        success: false,
+        error: "Too many requests, please try again later.",
+      };
+    }
+
+    // 3 - Check user status is active
     const validUserStatusResponse = await ensureValidUserStatus(userId);
 
     if (!validUserStatusResponse.success) return validUserStatusResponse;
 
+    // 4 - Params validation
     const url = formData.get("url") as string;
     const customCode = formData.get("customCode") as string;
 
@@ -66,8 +83,8 @@ export async function createShrinkifyUrl(formData: FormData): Promise<
       };
     }
 
+    // 5 - URL Safety checks with Google-Safe-Browsing API and Google Gemini
     const originalUrl = ensureHttps(validatedFields.data.url);
-
     const safetyCheck = await checkUrlSafety(originalUrl);
 
     let flagged = false;
@@ -114,7 +131,7 @@ export async function createShrinkifyUrl(formData: FormData): Promise<
         };
       }
     } else {
-      // Retry up to 3 times
+      // Retry up to 3 times, rare case
       let attempts = 0;
       while (attempts < 3) {
         const exists = await db.query.urls.findFirst({
@@ -147,8 +164,8 @@ export async function createShrinkifyUrl(formData: FormData): Promise<
 
     const shortUrl = getShrinkifyUrl(shortCode);
 
-    // revalidatePath("/dashboard");
-    // revalidatePath("/my-urls");
+    // Delete existing user urls cache data in redis
+    await userUrlsCache.delete(userId);
 
     return {
       success: true,
