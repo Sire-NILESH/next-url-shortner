@@ -1,6 +1,6 @@
-// export const FLAGGED_NO_THREAT_URL_AUTO_LIMIT = parseInt(
-//   process.env.FLAGGED_NO_THREAT_URL_AUTO_LIMIT || "20"
-// );
+export const FLAGGED_NO_THREAT_URL_AUTO_LIMIT = parseInt(
+  process.env.FLAGGED_NO_THREAT_URL_AUTO_LIMIT || "20"
+);
 
 export const SEED_LIMITS = {
   MAX_USERS: 25,
