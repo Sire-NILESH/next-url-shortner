@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { WarnRedirectSearchParams } from "@/types/server/types";
-import { AlertTriangle, ExternalLink, ShieldAlert } from "lucide-react";
+import { AlertTriangle, ChevronRight, ShieldAlert } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -46,7 +46,6 @@ export default async function RedirectUrlWarningPage({ searchParams }: Props) {
               threat ? "bg-red-400/20" : "bg-yellow-400/40"
             )}
           >
-            
             {threat ? (
               <ShieldAlert className="size-10 sm:size-7 text-red-600 dark:text-red-500 mt-0.5 flex-shrink-0" />
             ) : (
@@ -69,15 +68,15 @@ export default async function RedirectUrlWarningPage({ searchParams }: Props) {
             <div className="flex justify-center items-center">
               <Link
                 href={redirectUrl}
-                target="_blank"
+                // target="_blank"
                 rel="noopener noreferrer"
                 className={cn(
                   buttonVariants({ variant: "default" }),
-                  "w-full max-w-70"
+                  "w-full sm:max-w-40 group"
                 )}
               >
-                <ExternalLink className="size-4" />
-                Visit URL
+                Yes continue
+                <ChevronRight className="size-4 group-hover:translate-x-1 transition-transform duration-200" />
               </Link>
             </div>
           </div>

@@ -2,6 +2,7 @@
 
 import { db, eq } from "@/server/db";
 import { users } from "@/server/db/schema";
+import { userStatusCache } from "@/server/redis/cache/users/user-status-cache";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse, UserStatusTypeEnum } from "@/types/server/types";
 import { redirect } from "next/navigation";
@@ -18,9 +19,26 @@ export async function getUserStatus(): Promise<
 
     const userId = session.user.id;
 
+    // Check redis cache
+    const cacheData = await userStatusCache.get(userId);
+
+    if (cacheData) {
+      const response = {
+        success: true,
+        data: cacheData.userStatus,
+      };
+      return response;
+    }
+
     const [user] = await db.select().from(users).where(eq(users.id, userId));
 
     if (!user) redirect("/login");
+
+    // Create a redis cache entry
+    await userStatusCache.set(userId, {
+      userId,
+      userStatus: user.status,
+    });
 
     return {
       success: true,

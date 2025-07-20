@@ -1,19 +1,8 @@
-import "server-only";
-
 import { db } from "@/server/db";
-import { eq } from "drizzle-orm";
 import { urls, users } from "@/server/db/schema";
-import { FLAGGED_NO_THREAT_URL_AUTO_LIMIT } from "@/site-config/limits";
-import { Url } from "@/types/server/types";
-
-const FLAGGED_NO_THREAT_LIMIT = FLAGGED_NO_THREAT_URL_AUTO_LIMIT;
-
-type AccessCheckResult =
-  | { allowed: true; url: Url }
-  | {
-      allowed: false;
-      reason: "not_found" | "suspended" | "inactive" | "flagged_limit_reached";
-    };
+import { redirectUrlCache } from "@/server/redis/cache/urls/redirect-url-cache";
+import { UrlAccessCheckResult } from "@/types/server/types";
+import { eq } from "drizzle-orm";
 
 /**
  * Checks for url safety against url status, creator status, availability and auto bans flagged/threat urls on crossing pre-defined hard limits.
@@ -23,47 +12,54 @@ type AccessCheckResult =
  */
 export async function checkUrlAccess(
   shortCode: string
-): Promise<AccessCheckResult> {
-  const [url] = await db
-    .select()
+): Promise<UrlAccessCheckResult> {
+  // Try Redis first
+  const cacheData = await redirectUrlCache.get(shortCode);
+  if (cacheData) return cacheData.cacheUrl;
+
+  const [result] = await db
+    .select({
+      url: urls,
+      userStatus: users.status,
+    })
     .from(urls)
+    .leftJoin(users, eq(users.id, urls.userId))
     .where(eq(urls.shortCode, shortCode))
     .limit(1);
 
-  if (!url) return { allowed: false, reason: "not_found" };
+  let toCache: UrlAccessCheckResult;
 
-  // Check URL-specific block statuses first
-  if (url.status === "suspended")
-    return { allowed: false, reason: "suspended" };
+  if (!result || !result.url) {
+    toCache = { allowed: false, reason: "not_found" };
+  } else {
+    const { url, userStatus } = result;
 
-  if (url.status === "inactive") return { allowed: false, reason: "inactive" };
-
-  // URL must have a creator
-  if (!url.userId) return { allowed: false, reason: "not_found" };
-
-  // Fetch the creator
-  const [creator] = await db
-    .select({ status: users.status })
-    .from(users)
-    .where(eq(users.id, url.userId));
-
-  if (!creator) return { allowed: false, reason: "not_found" };
-
-  if (creator.status === "suspended")
-    return { allowed: false, reason: "suspended" };
-
-  if (creator.status === "inactive")
-    return { allowed: false, reason: "inactive" };
-
-  // Check flagged threshold
-  if (url.flagged && !url.threat && url.clicks >= FLAGGED_NO_THREAT_LIMIT) {
-    await db
-      .update(urls)
-      .set({ status: "suspended" })
-      .where(eq(urls.id, url.id));
-
-    return { allowed: false, reason: "flagged_limit_reached" };
+    if (!url.userId || !userStatus) {
+      toCache = { allowed: false, reason: "not_found" };
+    } else if (url.status === "suspended" || userStatus === "suspended") {
+      toCache = { allowed: false, reason: "suspended" };
+    } else if (url.status === "inactive" || userStatus === "inactive") {
+      toCache = { allowed: false, reason: "inactive" };
+    } else {
+      toCache = {
+        allowed: true,
+        url: {
+          id: url.id,
+          shortCode: url.shortCode,
+          originalUrl: url.originalUrl,
+          userId: url.userId,
+          status: url.status,
+          flagged: url.flagged,
+          threat: url.threat,
+          flagCategory: url.flagCategory,
+          flagReason: url.flagReason,
+          userStatus,
+        },
+      };
+    }
   }
 
-  return { allowed: true, url };
+  await redirectUrlCache.set(shortCode, { cacheUrl: toCache });
+
+  return toCache;
 }

@@ -25,7 +25,7 @@ export async function manageFlaggedUrl(
     const parsed = manageFlaggedUrlSchema.safeParse(params);
 
     if (!parsed.success) {
-      return { success: false, error: "Invalid params" };
+      return { success: false, error: "Invalid command" };
     }
 
     const { urlId, action } = parsed.data;

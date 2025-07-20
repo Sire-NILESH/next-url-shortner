@@ -2,6 +2,10 @@
 
 import { db, eq } from "@/server/db";
 import { users, userStatusEnum } from "@/server/db/schema";
+import { redirectUrlCache } from "@/server/redis/cache/urls/redirect-url-cache";
+import { userUrlsCache } from "@/server/redis/cache/urls/user-urls-cache";
+import { userStatusCache } from "@/server/redis/cache/users/user-status-cache";
+import { redis } from "@/server/redis/redis";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 import { z } from "zod";
@@ -48,24 +52,34 @@ export async function updateUserStatus(
       };
     }
 
-    const userToUpdate = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.id, userId),
-    });
+    const updateResult = await db
+      .update(users)
+      .set({
+        status,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning({ userId: users.id });
 
-    if (!userToUpdate) {
+    if (updateResult.length == 0) {
       return {
         success: false,
         error: "User not found",
       };
     }
 
-    await db
-      .update(users)
-      .set({
-        status,
-        updatedAt: new Date(),
-      })
-      .where(eq(users.id, userId));
+    await redis
+      .pipeline()
+      // Also delete this url shortcode from the redirect cache.
+      .del(userStatusCache.getFullKey(updateResult[0].userId))
+      // Delete existing user urls cache data in redis
+      .del(userUrlsCache.getFullKey(updateResult[0].userId))
+      .exec();
+
+    // Important: Delete all cached URL shortCodes of this user.
+    await redirectUrlCache.deleteAllCacheUrlShortCodesByUserId(
+      updateResult[0].userId
+    );
 
     return {
       success: true,

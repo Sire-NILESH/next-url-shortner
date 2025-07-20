@@ -5,7 +5,7 @@ import {
 import { updateUrl } from "@/server/actions/urls/update-url";
 import { BASE_URL } from "@/site-config/base-url";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -27,6 +27,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { UserUrl } from "@/types/client/types";
 
 interface EditUrlModalProps {
   isOpen: boolean;
@@ -34,7 +35,6 @@ interface EditUrlModalProps {
   urlId: number;
   urlName: string | null;
   currentShortCode: string;
-  onSuccess: (newShortCode: string, name?: string) => void;
 }
 
 export function EditUrlModal({
@@ -43,8 +43,9 @@ export function EditUrlModal({
   urlId,
   urlName,
   currentShortCode,
-  onSuccess,
 }: EditUrlModalProps) {
+  const queryClient = useQueryClient();
+
   const form = useForm<UpdateShrinkifyUrlFormData>({
     resolver: zodResolver(updateShrinkifyUrlFormSchema),
     defaultValues: {
@@ -73,7 +74,22 @@ export function EditUrlModal({
         toast.success("URL updated successfully", {
           description: "The URL has been updated successfully",
         });
-        onSuccess(variables.customCode, variables.name);
+
+        queryClient.setQueryData(
+          ["my-urls"],
+          (oldData: UserUrl[] | undefined) =>
+            oldData
+              ? oldData.map((url) =>
+                  url.id === urlId
+                    ? {
+                        ...url,
+                        shortCode: variables.customCode,
+                        name: variables.name || url.name,
+                      }
+                    : url
+                )
+              : []
+        );
         onOpenChange(false);
       } else {
         toast.error("Failed to update URL", {

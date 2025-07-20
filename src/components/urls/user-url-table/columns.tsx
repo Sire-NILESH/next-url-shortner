@@ -158,7 +158,7 @@ export const columns: ColumnDef<UserUrl>[] = [
     cell: ({ row }) => (
       <>
         {row.original.disabled ? (
-          <Badge variant="outline" className="rounded-sm">
+          <Badge variant="destructive" className="rounded-sm">
             {String(row.original.disabled).toUpperCase()}
           </Badge>
         ) : (

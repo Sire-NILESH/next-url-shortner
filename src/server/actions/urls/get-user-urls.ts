@@ -1,5 +1,6 @@
 "use server";
 
+import { userUrlsCache } from "@/server/redis/cache/urls/user-urls-cache";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { getUserUrlsByUserId } from "@/server/services/url/get-user-urls-by-userid.service";
 import { UserUrl } from "@/types/client/types";
@@ -28,10 +29,27 @@ export async function getUserUrls(
 
     if (!authResponse.success) return authResponse;
 
-    // Get all URLs for the user
-    const resultsResponse = await getUserUrlsByUserId(userId);
+    // Check redis cache
+    const cacheData = await userUrlsCache.get(userId);
 
-    return resultsResponse;
+    if (cacheData) {
+      const response = {
+        success: true,
+        data: cacheData.urls,
+      } satisfies ApiResponse<Array<UserUrl>>;
+      return response;
+    }
+
+    // Get all URLs for the user
+    const dbData = await getUserUrlsByUserId(userId);
+
+    // Create a redis cache entry
+    await userUrlsCache.set(userId, {
+      userId,
+      urls: dbData.success ? dbData.data : [],
+    });
+
+    return dbData;
   } catch (error) {
     console.error("Error getting user URLs", error);
     return {

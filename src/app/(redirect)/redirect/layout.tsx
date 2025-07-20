@@ -7,7 +7,7 @@ const layout = ({ children }: Props) => {
   return (
     <div className="dark min-h-screen bg-black text-white">
       {children}
-      <FooterCompact />
+      <FooterCompact disableActionBtns />
     </div>
   );
 };

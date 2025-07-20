@@ -4,6 +4,10 @@ import { getShrinkifyUrl } from "@/lib/utils";
 import { updateShrinkifyUrlSchema } from "@/lib/validations/URLSchema";
 import { db, eq } from "@/server/db";
 import { urls } from "@/server/db/schema";
+import { redirectUrlCache } from "@/server/redis/cache/urls/redirect-url-cache";
+import { userUrlsCache } from "@/server/redis/cache/urls/user-urls-cache";
+import { applyRateLimit } from "@/server/redis/ratelimiter";
+import { redis } from "@/server/redis/redis";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 
@@ -16,6 +20,19 @@ export async function updateUrl(
     if (!authResponse.success) return authResponse;
 
     const { data: session } = authResponse;
+
+    // Rate limit check
+    const limiterResult = await applyRateLimit({
+      limiterKey: "userUrlModificatonsRateLimit",
+    });
+
+    if (!limiterResult?.success) {
+      return {
+        success: false,
+        error: "Too many requests, please try again later.",
+      };
+    }
+
     const userId = session?.user?.id;
 
     const validatedFields = updateShrinkifyUrlSchema.safeParse({
@@ -70,6 +87,14 @@ export async function updateUrl(
       .where(eq(urls.id, id));
 
     const shortUrl = getShrinkifyUrl(customCode);
+
+    await redis
+      .pipeline()
+      // Delete existing user urls cache data in redis
+      .del(userUrlsCache.getFullKey(session.user.id))
+      // Also delete this url shortcode from the redirect cache.
+      .del(redirectUrlCache.getFullKey(existingUrl.shortCode))
+      .exec();
 
     return {
       success: true,

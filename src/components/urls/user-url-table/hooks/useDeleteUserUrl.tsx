@@ -3,7 +3,7 @@ import { deleteUrl } from "@/server/actions/urls/delete-url";
 import { toast } from "sonner";
 import { UserUrl } from "@/types/client/types";
 
-export function useUserUrlTableMutations() {
+export function useDeleteUserUrl() {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
@@ -32,26 +32,7 @@ export function useUserUrlTableMutations() {
     },
   });
 
-  const handleEditSuccess = (
-    urlToEdit: { id: number; shortCode: string; name: string | null } | null,
-    newShortCode: string,
-    name?: string
-  ) => {
-    if (!urlToEdit) return;
-
-    queryClient.setQueryData(["my-urls"], (oldData: UserUrl[] | undefined) =>
-      oldData
-        ? oldData.map((url) =>
-            url.id === urlToEdit.id
-              ? { ...url, shortCode: newShortCode, name: name || url.name }
-              : url
-          )
-        : []
-    );
-  };
-
   return {
     deleteMutation,
-    handleEditSuccess,
   };
 }

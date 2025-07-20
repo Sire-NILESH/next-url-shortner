@@ -10,6 +10,7 @@ import Google from "next-auth/providers/google";
 import { z } from "zod";
 import { db } from "./db";
 import { accounts, sessions, users, verificationTokens } from "./db/schema";
+import { applyRateLimit } from "./redis/ratelimiter";
 
 // extend the types to include role and status
 declare module "next-auth" {
@@ -129,6 +130,14 @@ export const authConfig: NextAuthConfig = {
         if (!parsed.success) {
           throw new InvalidLoginError("INVALID_INPUT");
         }
+
+        //  Rate limit check
+        const limiterResult = await applyRateLimit({
+          limiterKey: "authRateLimit",
+        });
+
+        if (!limiterResult?.success)
+          throw new InvalidLoginError("TOO_MANY_REQUESTS");
 
         const { email, password } = parsed.data;
         const [user] = await db

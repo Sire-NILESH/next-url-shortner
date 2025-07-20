@@ -12,6 +12,7 @@ export type AuthErrorKey =
   | "INVALID_INPUT"
   | "EMAIL_ALREADY_EXISTS"
   | "OAUTH_SIGNUP_NOT_ALLOWED"
+  | "TOO_MANY_REQUESTS"
   | "ERROR";
 
 // Final object with strong typing
@@ -41,6 +42,10 @@ export const AuthErrorCodes: Record<AuthErrorKey, AuthErrorCode> = {
   OAUTH_SIGNUP_NOT_ALLOWED: {
     code: "OAUTH_SIGNUP_NOT_ALLOWED",
     message: "You are not allowed to sign up using this method.",
+  },
+  TOO_MANY_REQUESTS: {
+    code: "TOO_MANY_REQUESTS",
+    message: "Too many requests, please try again later.",
   },
   ERROR: {
     code: "ERROR",
