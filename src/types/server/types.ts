@@ -51,3 +51,27 @@ export type WarnRedirectSearchParams = {
   reason?: string;
   threat?: string;
 };
+
+export type UserUrlShortCode = { urlId: number; shortCode: string };
+
+export type CacheUrl = Pick<
+  Url,
+  | "id"
+  | "shortCode"
+  | "originalUrl"
+  | "userId"
+  | "status"
+  | "flagged"
+  | "threat"
+  | "flagCategory"
+  | "flagReason"
+> & {
+  userStatus: UserStatusTypeEnum;
+};
+
+export type UrlAccessCheckResult =
+  | { allowed: true; url: CacheUrl }
+  | {
+      allowed: false;
+      reason: "not_found" | "suspended" | "inactive" | "flagged_limit_reached";
+    };

@@ -6,6 +6,6 @@ export const userUrlsCache = createRedisCache<{
   urls: UserUrl[];
 }>({
   prefix: "userUrls",
-  ttlInSeconds: 60,
+  ttlInSeconds: 120,
   allowCompression: true,
 });

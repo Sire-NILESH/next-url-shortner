@@ -6,11 +6,12 @@ import { headers } from "next/headers";
 
 // 1. Define all use cases (keys) here
 const limiterConfigs = {
-  urlShortenRateLimit: Ratelimit.fixedWindow(5, "1 m"),
-  clickTrackRateLimit: Ratelimit.fixedWindow(100, "1 m"),
+  urlShortenRateLimit: Ratelimit.fixedWindow(4, "1 m"),
+  clickTrackRateLimit: Ratelimit.fixedWindow(10, "1 m"),
   authRateLimit: Ratelimit.fixedWindow(5, "2 m"),
   userUrlModificatonsRateLimit: Ratelimit.fixedWindow(10, "1 m"),
-  generalRateLimit: Ratelimit.fixedWindow(10, "60 s"),
+  userUrlsRateLimit: Ratelimit.fixedWindow(10, "1 m"),
+  generalRateLimit: Ratelimit.fixedWindow(10, "1 m"),
 } as const;
 
 // 2. Type-safe limiter names

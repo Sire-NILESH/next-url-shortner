@@ -1,6 +1,7 @@
 "use client";
 "use no memo";
 
+import { ConfirmModal } from "@/components/modals/confirm-modal/confirm-modal";
 import { EditUrlModal } from "@/components/modals/edit-url-modal";
 import { QRCodeModal } from "@/components/modals/qr-code-modal";
 import SkeletonWrapper from "@/components/skeleton-wrapper";
@@ -18,17 +19,16 @@ import { ComponentProps } from "react";
 import { columns } from "./columns";
 import EmptyState from "./empty-state";
 import { useDeleteConfirmationModal } from "./hooks/useDeleteConfirmationModal";
+import { useDeleteUserUrl } from "./hooks/useDeleteUserUrl";
 import { useEditUrlModal } from "./hooks/useEditUrlModal";
 import { useExportConfirmationModal } from "./hooks/useExportConfirmationModal";
 import { useQrCodeModal } from "./hooks/useQrCodeModal";
-import { useUserUrlTableMutations } from "./hooks/useUserUrlTableMutations";
 import { useUserUrlTableState } from "./hooks/useUserUrlTableState";
 import { RowActions } from "./row-actions";
 import TablePagination from "./table-pagination";
 import TableToolbar from "./table-toolbar";
 import UrlDataTable from "./url-data-table";
 import UserUrlsErrorFallback from "./user-urls-error-fallback";
-import { ConfirmModal } from "@/components/modals/confirm-modal/confirm-modal";
 
 const csvConfig = mkConfig({
   fieldSeparator: ",",
@@ -40,8 +40,6 @@ type Props = ComponentProps<"div"> & {};
 
 export default function UserUrlTable({ className, ...props }: Props) {
   const { data: urls, isLoading, error } = useMyUrls();
-
-  const { deleteMutation, handleEditSuccess } = useUserUrlTableMutations();
 
   // State management hooks
   const {
@@ -73,6 +71,8 @@ export default function UserUrlTable({ className, ...props }: Props) {
 
   const { handleExportConfirmation, isExportModalOpen, setIsExportModalOpen } =
     useExportConfirmationModal();
+
+  const { deleteMutation } = useDeleteUserUrl();
 
   // Handle confirmed deletion
   const handleDeleteConfirmed = () => {
@@ -113,6 +113,9 @@ export default function UserUrlTable({ className, ...props }: Props) {
             onDelete={confirmDelete}
             handleEdit={handleEdit}
             showQrCode={showQrCode}
+            isDeleting={(urlId: number) =>
+              urlToDelete === urlId && deleteMutation.isPending
+            }
           />
         ),
       },
@@ -181,6 +184,7 @@ export default function UserUrlTable({ className, ...props }: Props) {
         url={qrCodeUrl}
         shortCode={qrCodeShortCode}
       />
+
       {urlToEdit && (
         <EditUrlModal
           isOpen={isEditModalOpen}
@@ -188,11 +192,9 @@ export default function UserUrlTable({ className, ...props }: Props) {
           urlId={urlToEdit.id}
           urlName={urlToEdit.name}
           currentShortCode={urlToEdit.shortCode}
-          onSuccess={(newShortCode, name) =>
-            handleEditSuccess(urlToEdit, newShortCode, name)
-          }
         />
       )}
+
       {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={isDeleteModalOpen}

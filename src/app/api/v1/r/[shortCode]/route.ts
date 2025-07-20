@@ -1,3 +1,5 @@
+import { shortCodeSchema } from "@/lib/validations/URLSchema";
+import { applyRateLimit } from "@/server/redis/ratelimiter";
 import { recordClickEventService } from "@/server/services/clicks/record-click-event.service";
 import { checkUrlAccess } from "@/server/services/url/check-url-access.service";
 import { WarnRedirectSearchParams } from "@/types/server/types";
@@ -12,6 +14,25 @@ export async function GET(req: NextRequest, props: { params: Params }) {
   try {
     const userAgentParsed = userAgent(req);
     const { shortCode } = await props.params;
+
+    const parsed = shortCodeSchema.safeParse(shortCode);
+
+    if (!parsed.success) {
+      const redirect = req.nextUrl.clone();
+      redirect.pathname = "/redirect/url/not-found";
+      return NextResponse.redirect(redirect, 302);
+    }
+
+    // Rate limit check
+    const limiterResult = await applyRateLimit({
+      limiterKey: "clickTrackRateLimit",
+    });
+
+    if (!limiterResult?.success) {
+      const redirect = req.nextUrl.clone();
+      redirect.pathname = "/redirect/too-many-requests";
+      return NextResponse.redirect(redirect, 302);
+    }
 
     const accessResult = await checkUrlAccess(shortCode);
 
@@ -31,9 +52,12 @@ export async function GET(req: NextRequest, props: { params: Params }) {
     }
 
     const url = accessResult.url;
-    const response = await recordClickEventService(url, userAgentParsed);
+    const clickRecordResponse = await recordClickEventService(
+      url,
+      userAgentParsed
+    );
 
-    if (response.success && response.data) {
+    if (clickRecordResponse.success) {
       if (url.flagged) {
         const warnRedirectUrl = req.nextUrl.clone();
         warnRedirectUrl.pathname = "/redirect/url/warn";

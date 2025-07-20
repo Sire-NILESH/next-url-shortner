@@ -2,6 +2,7 @@
 
 import { db, eq } from "@/server/db";
 import { urls, urlStatusEnum } from "@/server/db/schema";
+import { redirectUrlCache } from "@/server/redis/cache/urls/redirect-url-cache";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 import { revalidatePath } from "next/cache";
@@ -37,20 +38,23 @@ export async function updateUrlStatus(
       };
     }
 
-    const urlToManage = await db.query.urls.findFirst({
-      where: (urls, { eq }) => eq(urls.id, urlId),
-    });
-
-    if (!urlToManage) {
-      return { success: false, error: "URL not found" };
-    }
-
-    await db
+    const updateResult = await db
       .update(urls)
       .set({
         status,
       })
-      .where(eq(urls.id, urlId));
+      .where(eq(urls.id, urlId))
+      .returning({ urlShortCode: urls.shortCode });
+
+    if (updateResult.length == 0) {
+      return {
+        success: false,
+        error: "URL not found",
+      };
+    }
+
+    // Important: Also delete this url shortcode from the redirect cache
+    await redirectUrlCache.delete(updateResult[0].urlShortCode);
 
     revalidatePath("/admin/urls");
     revalidatePath("/admin/urls/flagged");

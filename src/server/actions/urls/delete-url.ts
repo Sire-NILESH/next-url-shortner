@@ -2,8 +2,10 @@
 
 import { db, eq } from "@/server/db";
 import { urls } from "@/server/db/schema";
+import { redirectUrlCache } from "@/server/redis/cache/urls/redirect-url-cache";
 import { userUrlsCache } from "@/server/redis/cache/urls/user-urls-cache";
 import { applyRateLimit } from "@/server/redis/ratelimiter";
+import { redis } from "@/server/redis/redis";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { ApiResponse } from "@/types/server/types";
 import { z } from "zod";
@@ -53,7 +55,10 @@ export async function deleteUrl(
       };
     }
 
-    if (url.userId && url.userId !== session.user.id) {
+    if (
+      (url.userId && url.userId !== session.user.id) ||
+      session.user.role !== "admin"
+    ) {
       return {
         success: false,
         error: "Unauthorized",
@@ -62,8 +67,13 @@ export async function deleteUrl(
 
     await db.delete(urls).where(eq(urls.id, urlId));
 
-    // Delete existing user urls cache data in redis
-    await userUrlsCache.delete(session.user.id);
+    await redis
+      .pipeline()
+      // Delete existing user urls cache data in redis
+      .del(userUrlsCache.getFullKey(session.user.id))
+      // Also delete this url shortcode from the redirect cache.
+      .del(redirectUrlCache.getFullKey(url.shortCode))
+      .exec();
 
     return {
       success: true,

@@ -1,12 +1,12 @@
 import { redis } from "./redis";
 import { deflate, inflate } from "pako";
 
-function compress(str: string): string {
+export function compress(str: string): string {
   const compressed = deflate(str);
   return Buffer.from(compressed).toString("base64");
 }
 
-function decompress(base64: string): string {
+export function decompress(base64: string): string {
   const buffer = Buffer.from(base64, "base64");
   return inflate(buffer, { to: "string" });
 }
@@ -60,6 +60,10 @@ export function createRedisCache<T>({
       } catch (err) {
         console.error(`Redis DELETE error for key "${fullKey}"`, err);
       }
+    },
+
+    getFullKey(key: string): string {
+      return `${prefix}:${key}`;
     },
   };
 }

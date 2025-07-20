@@ -5,6 +5,7 @@ export default function useMyUrls() {
   return useQuery({
     queryKey: ["my-urls"],
     queryFn: fetchMyUrls,
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: true,
   });
 }

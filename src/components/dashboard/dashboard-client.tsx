@@ -10,49 +10,38 @@ import {
 import { ChartConfig } from "@/components/ui/chart";
 import useMyUrls from "@/hooks/useMyUrls";
 import { EqualApproximately, Link, MousePointerClick } from "lucide-react";
-import { useMemo } from "react";
 import SkeletonWrapper from "../skeleton-wrapper";
+import DashboardClientErrorFallback from "./dashboard-client-error-fallback";
 import { NewShrinkifyURLCard } from "./new-shrinkify-url-card";
 import StatCard from "./stat-card";
 import { UrlClicksDistributionCard } from "./url-clicks-distribution-card";
 import { UrlsHistoryChart } from "./url-history-chart";
-import DashboardClientErrorFallback from "./dashboard-client-error-fallback";
 
 export default function DashboardClient() {
   const { data: userUrls, isLoading, error } = useMyUrls();
 
   // calculate total clicks
-  const totalClicks = useMemo(
-    () => (userUrls ? userUrls.reduce((sum, url) => sum + url.clicks, 0) : 0),
-    [userUrls]
-  );
+  const totalClicks = userUrls
+    ? userUrls.reduce((sum, url) => sum + url.clicks, 0)
+    : 0;
 
   // calculate average clicks per URL
-  const avgClicks = useMemo(
-    () =>
-      userUrls && totalClicks && userUrls.length > 0
-        ? Math.round((totalClicks / userUrls.length) * 10) / 10
-        : 0,
-    [totalClicks, userUrls]
-  );
+  const avgClicks =
+    userUrls && totalClicks && userUrls.length > 0
+      ? Math.round((totalClicks / userUrls.length) * 10) / 10
+      : 0;
 
   // get top performing URL
-  const topUrls = useMemo(
-    () =>
-      userUrls
-        ? [...userUrls].sort((a, b) => b.clicks - a.clicks).slice(0, 5)
-        : [],
-    [userUrls]
-  );
+  const topUrls = userUrls
+    ? [...userUrls].sort((a, b) => b.clicks - a.clicks).slice(0, 5)
+    : [];
 
   // prepare data for the pie chart with numerc values
-  const pieChartData = useMemo(() => {
-    return topUrls.map((url, index) => ({
-      url: url.shortCode,
-      clicks: url.clicks,
-      fill: `var(--chart-${index + 1})`,
-    }));
-  }, [topUrls]);
+  const pieChartData = topUrls.map((url, index) => ({
+    url: url.shortCode,
+    clicks: url.clicks,
+    fill: `var(--chart-${index + 1})`,
+  }));
 
   // pie chart config
   const pieChartConfig = {

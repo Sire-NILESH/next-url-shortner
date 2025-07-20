@@ -1,4 +1,5 @@
 import { userUrlsCache } from "@/server/redis/cache/urls/user-urls-cache";
+import { applyRateLimit } from "@/server/redis/ratelimiter";
 import { authorizeRequest } from "@/server/services/auth/authorize-request-service";
 import { getUserUrlsByUserId } from "@/server/services/url/get-user-urls-by-userid.service";
 import { UserUrl } from "@/types/client/types";
@@ -15,6 +16,18 @@ export async function GET(req: NextRequest) {
       return Response.json(authResponse satisfies ResponseType);
 
     const userId = authResponse.data.user.id;
+
+    // Rate limit check
+    const limiterResult = await applyRateLimit({
+      limiterKey: "userUrlsRateLimit",
+    });
+
+    if (!limiterResult?.success) {
+      return Response.json({
+        success: false,
+        error: "Too many requests, please try again later.",
+      } satisfies ResponseType);
+    }
 
     // Check redis cache
     const cacheData = await userUrlsCache.get(userId);
