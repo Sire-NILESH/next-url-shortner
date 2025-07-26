@@ -1,8 +1,8 @@
 import "server-only";
 
-import { auth } from "@/server/auth";
 import { ApiResponse, UserRoleTypeEnum } from "@/types/server/types";
 import { Session } from "next-auth";
+import getUserSession from "./getUserSession";
 
 type AuthorizeRequestOptions = {
   provideSession?: Session;
@@ -19,7 +19,7 @@ export async function authorizeRequest({
   allowOverrideRole,
 }: AuthorizeRequestOptions = {}): Promise<ApiResponse<Session>> {
   try {
-    const session = provideSession ?? (await auth());
+    const session = provideSession ?? (await getUserSession());
 
     if (!session?.user) {
       return {

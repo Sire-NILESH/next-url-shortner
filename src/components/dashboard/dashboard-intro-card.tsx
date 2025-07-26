@@ -1,12 +1,12 @@
-import React, { ComponentProps } from "react";
-import { Card, CardContent, CardHeader } from "../ui/card";
 import { cn } from "@/lib/utils";
-import { UserAvatar } from "../auth/user-avatar";
-import { auth } from "@/server/auth";
-import { Separator } from "../ui/separator";
-import Link from "next/link";
+import getUserSession from "@/server/services/auth/getUserSession";
 import { Cog } from "lucide-react";
+import Link from "next/link";
+import { ComponentProps } from "react";
+import { UserAvatar } from "../auth/user-avatar";
 import { buttonVariants } from "../ui/button";
+import { Card, CardContent, CardHeader } from "../ui/card";
+import { Separator } from "../ui/separator";
 
 type Props = ComponentProps<"div"> & {
   pageTitle: string;
@@ -19,7 +19,7 @@ const DashboardIntroCard = async ({
   pageSubtitle,
   ...props
 }: Props) => {
-  const session = await auth();
+  const session = await getUserSession();
 
   const userName = session?.user.name;
   const userEmail = session?.user.email;
