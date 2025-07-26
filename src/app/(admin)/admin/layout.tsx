@@ -7,14 +7,14 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { auth } from "@/server/auth";
+import getUserSession from "@/server/services/auth/getUserSession";
 import { redirect } from "next/navigation";
 import { PropsWithChildren } from "react";
 
 type Props = PropsWithChildren;
 
 export default async function AdminLayout({ children }: Props) {
-  const session = await auth();
+  const session = await getUserSession();
 
   if (!session?.user) {
     redirect("/login");

@@ -1,9 +1,9 @@
 import "server-only";
 
 import { redirect } from "next/navigation";
-import { auth } from "@/server/auth";
 import { UserRoleTypeEnum } from "@/types/server/types";
 import { Session } from "next-auth";
+import getUserSession from "./getUserSession";
 
 type AuthorizeOptions = {
   requireUserId?: string;
@@ -16,7 +16,7 @@ export async function authorizePageService({
   allowedRoles,
   allowOverrideRole,
 }: AuthorizeOptions = {}): Promise<Session> {
-  const session = await auth();
+  const session = await getUserSession();
 
   if (!session?.user) {
     redirect("/login");

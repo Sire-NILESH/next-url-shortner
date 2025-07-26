@@ -10,13 +10,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { mobileNavRoutes } from "@/site-config/nav-routes";
+import { mobileHomeNavRoutes } from "@/site-config/nav-routes";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import Brand from "./brand";
 import ThemeSwitch from "../theme/theme-switch";
+import Brand from "./brand";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -48,7 +48,7 @@ export function MobileNav() {
 
         <ScrollArea className="my-4 h-[calc(100vh-8rem)] px-4">
           <nav className="flex flex-col text-lg space-y-2">
-            {Object.values(mobileNavRoutes).map((pathObj) => (
+            {Object.values(mobileHomeNavRoutes).map((pathObj) => (
               <Link key={pathObj.id} href={pathObj.path}>
                 <li
                   className={cn(

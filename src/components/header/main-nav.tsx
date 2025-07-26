@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { navRoutes } from "@/site-config/nav-routes";
+import { homeNavRoutes } from "@/site-config/nav-routes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ComponentProps } from "react";
@@ -18,7 +18,7 @@ const MainNav = ({ className, ...props }: Props) => {
       )}
       {...props}
     >
-      {Object.values(navRoutes).map((pathObj) => (
+      {Object.values(homeNavRoutes).map((pathObj) => (
         <Link key={pathObj.id} href={pathObj.path}>
           <li
             className={cn(

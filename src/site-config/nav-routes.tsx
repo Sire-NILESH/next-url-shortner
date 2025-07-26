@@ -12,7 +12,20 @@ import {
   UsersIcon,
 } from "lucide-react";
 
-export const navRoutes = {
+export const userAuthProtectedRoutes = new Set(["/dashboard", "/my-urls"]);
+
+export const adminAuthProtectedRoutes = new Set([
+  "/admin",
+  "/admin/analytics",
+  "/admin/urls",
+  "/admin/users",
+  "/admin/database",
+]);
+
+export const isPublicPath = (path: string) =>
+  !userAuthProtectedRoutes.has(path) && !adminAuthProtectedRoutes.has(path);
+
+export const homeNavRoutes = {
   "/": {
     id: "home",
     path: "/",
@@ -27,8 +40,8 @@ export const navRoutes = {
   },
 };
 
-export const mobileNavRoutes = {
-  ...navRoutes,
+export const mobileHomeNavRoutes = {
+  ...homeNavRoutes,
   "/login": {
     id: "login",
     path: "/login",

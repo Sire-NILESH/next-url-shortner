@@ -11,6 +11,11 @@ import { z } from "zod";
 import { db } from "./db";
 import { accounts, sessions, users, verificationTokens } from "./db/schema";
 import { applyRateLimit } from "./redis/ratelimiter";
+import {
+  adminAuthProtectedRoutes,
+  isPublicPath,
+  userAuthProtectedRoutes,
+} from "@/site-config/nav-routes";
 
 // extend the types to include role and status
 declare module "next-auth" {
@@ -50,18 +55,26 @@ export const authConfig: NextAuthConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
-      const isOnAdmin = nextUrl.pathname.startsWith("/admin");
+      const isAdmin = isLoggedIn && auth?.user?.role === "admin";
 
-      if (isOnAdmin) {
-        return isLoggedIn && auth?.user?.role === "admin";
-      } else if (isOnDashboard) {
-        if (isLoggedIn) return true;
-        return false;
+      const isOnUserAuthProtecedRoute = userAuthProtectedRoutes.has(
+        nextUrl.pathname
+      );
+      const isOnAdminAuthProtecedRoute = adminAuthProtectedRoutes.has(
+        nextUrl.pathname
+      );
+      const isPublic = isPublicPath(nextUrl.pathname);
+
+      if (isOnAdminAuthProtecedRoute) {
+        return isAdmin;
+      } else if (isOnUserAuthProtecedRoute) {
+        return isLoggedIn;
       } else if (isLoggedIn) {
         return true;
+      } else if (isPublic) {
+        return true;
       }
-      return true;
+      return false;
     },
     jwt: async ({ token, user }) => {
       if (user) {
